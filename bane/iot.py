@@ -44,15 +44,19 @@ def getip():
   the following functions are used to scan safe IPs all over the internet with a wordlist, it can scan bruteforce their: ftp, ssh, telnet, smtp and mysql logins then save them on text files in the same directory.
   it's highly recommended to be used with a VPS or your slow internet speed will be an obstacle to your scan.
 '''
-__port=None
-__ehlo=True
-__helo=False
-__ttls=False
+global port_sc
+port_sc=None
+global ehlo_sc
+ehlo_sc=True
+global helo_sc
+helo_sc=False
+global ttls_sc
+ttls_sc=False
 class iots(threading.Thread):
  def run(self):
   self.ip_seg=ip_seg
   self.timeout=_timeout
-  self.port=__port
+  self.port=port_sc
   time.sleep(2)
   while (stop!=True):
    if self.ip_seg==None:
@@ -93,8 +97,8 @@ class iots(threading.Thread):
 def mass_ssh(threads=100,word_list=wordlist,filename='ssh_bots.txt',ip_range=None,timeout=5,p=22):
  global stop
  stop=False
- global __port
- __port=p
+ global port_sc
+ port_sc=p
  global _timeout
  _timeout=timeout
  global ip_seg
@@ -128,7 +132,7 @@ class iott(threading.Thread):
  def run(self):
   self.ip_seg=ip_seg
   self.timeout=_timeout
-  self.port=__port
+  self.port=port_sc
   time.sleep(2)
   while (stop!=True):
    if self.ip_seg==None:
@@ -167,8 +171,8 @@ class iott(threading.Thread):
 def mass_telnet(threads=500,word_list=wordlist,filename='telnet_bots.txt',ip_range=None,timeout=5,p=23):
  global stop
  stop=False
- global __port
- __port=p
+ global port_sc
+ port_sc=p
  global _timeout
  _timeout=timeout
  global ip_seg
@@ -202,7 +206,7 @@ class iotelt(threading.Thread):
  def run(self):
   self.ip_seg=ip_seg
   self.timeout=_timeout
-  self.port=__port
+  self.port=port_sc
   time.sleep(2)
   while (stop!=True):
    if self.ip_seg==None:
@@ -231,8 +235,8 @@ class iotelt(threading.Thread):
 def mass_exposed_telnet(threads=500,filename='exposed_telnet_bots.txt',ip_range=None,timeout=5,p=23):
  global stop
  stop=False
- global __port
- __port=p
+ global port_sc
+ port_sc=p
  global _timeout
  _timeout=timeout
  global ip_seg
@@ -389,10 +393,10 @@ class iotsm(threading.Thread):
  def run(self):
   self.ip_seg=ip_seg
   self.timeout=_timeout
-  self.port=__port
-  self.ehlo=__ehlo
-  self.helo=__helo
-  self.ttls=__ttls
+  self.port=port_sc
+  self.ehlo=ehlo_sc
+  self.helo=helo_sc
+  self.ttls=ttls_sc
   time.sleep(2)
   while (stop!=True):
    if self.ip_seg==None:
@@ -423,14 +427,14 @@ class iotsm(threading.Thread):
 def mass_smtp(o,threads=100,word_list=wordlist,filename='smtp_bots.txt',ip_range=None,timeout=5,p=25,ehlo=True,helo=False,ttls=False):
  global ip_seg
  ip_seg=ip_range
- global __ehlo
- __ehlo=ehlo
- global __helo
- __helo=helo
- global __ttls
- __ttls=ttls
- global __port
- __port=p
+ global ehlo_sc
+ ehlo_sc=ehlo
+ global helo_sc
+ helo_sc=helo
+ global ttls_sc
+ ttls_sc=ttls
+ global port_sc
+ port_sc=p
  global _timeout
  _timeout=timeout
  global stop

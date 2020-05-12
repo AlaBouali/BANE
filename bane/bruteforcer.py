@@ -397,10 +397,10 @@ def ssh_linux(u,username,password,p=22,timeout=3):
  else:
   return False
  
-def ssh_win(ip,username,password,p=22,timeout=3):
+def ssh_win(ip,username,password,p=22,version=1,timeout=3):
  #ssh login for windows (requires putty: plink )
  try:
-  l='echo yes | plink -ssh -l {} -pw {} {} -P {} exit'.format(username,password,ip,p)
+  l='echo yes | plink -ssh -{} -l {} -pw {} {} -P {} exit'.format(version,username,password,ip,p)
   ti=time.time()
   ssh = subprocess.Popen(l.split(),stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
   while ssh.poll() is None:
@@ -470,7 +470,7 @@ def mysql(u,username,password):
  except Exception as e:
   pass
  return False
-def hydra(u,p=22,protocol="ssh",word_list=[],logs=True,returning=False,mapping=False,timeout=5,ehlo=False,helo=True,ttls=False,proxy=None,proxies=None):
+def hydra(u,p=22,protocol="ssh",ssh_version=2,word_list=[],logs=True,returning=False,mapping=False,timeout=5,ehlo=False,helo=True,ttls=False,proxy=None,proxies=None):
  '''
    this function is similar to hydra tool to bruteforce attacks on different ports.
 
@@ -499,6 +499,9 @@ def hydra(u,p=22,protocol="ssh",word_list=[],logs=True,returning=False,mapping=F
   if logs==True:
    print("[*]Trying: {}:{}".format(user,pwd))
   if protocol=="ssh":
+    if (sys.platform == "win32") or( sys.platform == "win64"):
+      r=s(u,user,pwd,timeout=timeout,p=p,version=ssh_version)
+    else:
       r=s(u,user,pwd,timeout=timeout,p=p)
   if protocol=="telnet":
       r=s(u,user,pwd,timeout=timeout,p=p)

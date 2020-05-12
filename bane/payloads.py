@@ -1,3 +1,6 @@
+seqnumber=0
+ackseq=0
+urg_ptr=0
 ip_seg='{}.{}.{}.{}'
 postfmin=5
 postfmax=10

