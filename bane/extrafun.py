@@ -135,3 +135,32 @@ def youtube_search(q,proxy=None,timeout=10):
  except Exception as e:
   pass
  return l
+def web_cams(count=10,by={'country':'us'},timeout=10):
+ a=0
+ f={}
+ x=1
+ if by:
+  key=by.keys()[0].lower()
+  if key not in ['country','tag','city','timezone','type']:
+   raise Exception('Your search must be in one of these categories: country, city, timezone, type, tag')
+  value=by[key].lower()
+  url="https://www.insecam.org/en/by{}/{}/?page=".format(key,value)
+ else:
+  url="https://www.insecam.org/en/byrating/?page="
+ while True:
+  try:
+   soup = BeautifulSoup(requests.get(url+str(x), headers={'User-Agent': random.choice(ua)},timeout=timeout).text,"html.parser")
+   fi = soup.findAll('img',{'class':'thumbnail-item__img img-responsive'})
+   for i in fi:
+    j=HTMLParser.HTMLParser().unescape(i['src'])
+    o=HTMLParser.HTMLParser().unescape(i['title'])
+    f.update({j:o})
+   if (len(fi)==0 ) or (a==len(f)):
+    break
+   a=len(f)
+  except Exception as e:
+   break
+  if len(f)>=int(count):
+    break
+  x+=1
+ return {k: f[k] for k in f.keys()[:int(count)]}
