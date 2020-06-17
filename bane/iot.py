@@ -14,7 +14,7 @@ try:
     import pexpect
 except:
     pass
-import mysql.connector as mconn
+import mysqlcp
 from bane.bruteforcer import *
 from bane.extrafun import create_file,write_file
 def getip():

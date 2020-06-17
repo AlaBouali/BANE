@@ -23,10 +23,8 @@ from bane.bruteforcer import *
 from bane.iot import *
 from bane.vulns import *
 from bane.wp import *
-from bane.filt import *
 from bane.proxer import *
 from bane.amplifier import *
 from bane.updating import *
 from bane.wp_scanning import *
-#from bane.sshbf import *
 from bane.swtch import *

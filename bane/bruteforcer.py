@@ -7,7 +7,7 @@ if os.path.isdir('/data/data')==True:
     adr=True
 if os.path.isdir('/data/data/com.termux/')==True:
     termux=True
-import mysql.connector as mconn
+import mysqlcp
 from bane.pager import *
 from bane.wp import wpadmin
 from bane.hasher import *
@@ -416,10 +416,11 @@ def ssh_win(ip,username,password,p=22,version=1,timeout=3):
   except:
    pass
   p=ssh.communicate()
-  if ("access denied" in str(p).lower()) or ("fatal error" in str(p).lower()) or ("host does not exist" in str(p).lower()):
-     return False
-  else:
+  print(p)
+  if ("Access granted" in p[0])or ("Access granted" in p[1]):
      return True
+  else:
+     return False
  except:
   pass
  return False
@@ -463,9 +464,10 @@ def ftp(ip,username,password,timeout=5):
    except Exception as e:
     pass
    return False
-def mysql(u,username,password):
+def mysql(u,username,password,timeout=5,p=3306):
  try:
-  mconn.connect(host=u,user=username, password=password)
+  s=mysqlcp.session(u,username,password,timeout=timeout,port=p)
+  s.destroy()
   return True
  except Exception as e:
   pass
@@ -497,7 +499,7 @@ def hydra(u,p=22,protocol="ssh",ssh_version=2,word_list=[],logs=True,returning=F
   user=x.split(':')[0].strip()
   pwd=x.split(':')[1].strip()
   if logs==True:
-   print("[*]Trying: {}:{}".format(user,pwd))
+   print("[*]Trying ==> {}:{}".format(user,pwd))
   if protocol=="ssh":
     if (sys.platform == "win32") or( sys.platform == "win64"):
       r=s(u,user,pwd,timeout=timeout,p=p,version=ssh_version)
@@ -506,7 +508,7 @@ def hydra(u,p=22,protocol="ssh",ssh_version=2,word_list=[],logs=True,returning=F
   if protocol=="telnet":
       r=s(u,user,pwd,timeout=timeout,p=p)
   if (protocol=="mysql"):
-   r=s(u,user,pwd)
+   r=s(u,user,pwd,timeout=timeout,p=p)
   elif (protocol=="ftp"):
    r=s(u,user,pwd,timeout=timeout)
   elif (protocol=="wp"):

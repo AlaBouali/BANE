@@ -1,4 +1,4 @@
-import os
+import os,sys
 def update_py2(version=None):
  if os.path.isdir('/home/')==True:
   os.system('sudo pip uninstall bane -y')
@@ -25,3 +25,8 @@ def update_py3(version=None):
    os.system('pip3 install bane=='+str(version))
   else:
    os.system('pip3 install bane')
+def update(version=None):
+ if  sys.version_info < (3,0):
+   update_py2(version=version)
+ else:
+   update_py3(version=version)

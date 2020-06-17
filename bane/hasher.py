@@ -3,12 +3,23 @@ def xor(data, key):
  '''
    function to return XOR encrypted string
  '''
- return bytes(bytearray(a^b for a, b in zip(*map(bytearray, [data.encode('utf-8'), key.encode('utf-8')]))))
-def md_5(w):
+ i=0
+ c=""
+ while (i<len(data)):
+   for x in key:
+     if i==len(data):
+       break
+     c+=chr(ord(data[i])^ord(x))
+     i+=1
+ i=None
+ data=None
+ key=None
+ return c
+def md5(w):
  '''
    function to return md5 encrypted string
  '''
- return hashlib.md5(w).hexdigest()
+ return hashlib.md5(w.encode("utf-8")).hexdigest()
 def sha1(w): 
  '''
    function to return sha1 encrypted string
@@ -54,21 +65,30 @@ def sha512(w):
   >>>bane.md5fl('ala.txt')
   '66eab7dfd5c98ca5fbbbda6f7d7b36c3'
 '''
+def xorfl(f,key):
+  w=""
+  with open(f,"rb") as f: 
+   l=f.readlines()
+   for x in l:
+    w+=x.decode('utf-8')
+  f.close()
+  s= xor(w,key)
+  return s
 def md5fl(f):
   w=""
   with open(f,"rb") as f: 
    l=f.readlines()
    for x in l:
-    w+=x
+    w+=x.decode('utf-8')
   f.close()
-  s= md_5(w)
+  s= md5(w)
   return s
 def sha1fl(f):
   w=""
   with open(f,"rb") as f: 
    l=f.readlines()
    for x in l:
-    w+=x
+    w+=x.decode('utf-8')
   f.close()
   s= sha1(w)
   return s
@@ -77,7 +97,7 @@ def sha224fl(f):
   with open(f,"rb") as f: 
    l=f.readlines()
    for x in l:
-    w+=x
+    w+=x.decode('utf-8')
   f.close()
   s= sha224(w)
   return s
@@ -86,7 +106,7 @@ def sha256fl(f):
   with open(f,"rb") as f: 
    l=f.readlines()
    for x in l:
-    w+=x
+    w+=x.decode('utf-8')
   f.close()
   s= sha256(w)
   return s
@@ -95,7 +115,7 @@ def sha384fl(f):
   with open(f,"rb") as f: 
    l=f.readlines()
    for x in l:
-    w+=x
+    w+=x.decode('utf-8')
   f.close()
   s= sha384(w)
   return s
@@ -104,7 +124,7 @@ def sha512fl(f):
   with open(f,"rb") as f: 
    l=f.readlines()
    for x in l:
-    w+=x
+    w+=x.decode('utf-8')
   f.close()
   s= sha512(w)
   return s
@@ -113,7 +133,7 @@ def base64encodefl(f):
   with open(f,"rb") as f: 
    l=f.readlines()
    for x in l:
-    w+=x
+    w+=x.decode('utf-8')
   f.close()
   s= base64encode(w)
   return s
@@ -122,7 +142,7 @@ def base64decodefl(f):
   with open(f,"rb") as f: 
    l=f.readlines()
    for x in l:
-    w+=x
+    w+=x.decode('utf-8')
   f.close()
   s= base64decode(w)
   return s
