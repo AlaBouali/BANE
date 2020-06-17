@@ -6,6 +6,7 @@ termux=False
 if os.path.isdir('/home/')==True:
  os.system('sudo apt install sshpass -y')
  os.system('sudo apt install nodejs -y')
+ os.system('sudo apt install openssh-client-ssh1 -y')
 adr=False
 if os.path.isdir('/data/data')==True:
     adr=True
@@ -18,27 +19,30 @@ if termux==False:
    else:
     os.system('pip3 uninstall dnspython -y')
     os.system('pip3 install dnspython')
+
+#protobuf==3.6.1
+
 if  sys.version_info < (3,0):
- req=["xtelnet","protobuf==3.6.1","requests","PySocks","bs4","mysql-connector","scapy","stem","cfscrape","python-whois","google","colorama","dnspython"]
+ req=["future","xtelnet","requests","PySocks","bs4","mysqlcp","scapy","stem","cfscrape","python-whois","google","colorama","dnspython"]
  if adr==True:
-    req=["xtelnet","protobuf==3.6.1","requests","PySocks","bs4","mysql-connector","cfscrape","scapy","python-whois","google","colorama","dnspython"]
+    req=["future","xtelnet","requests","PySocks","bs4","mysqlcp","cfscrape","scapy","python-whois","google","colorama","dnspython"]
  if termux==True:
-    req=["xtelnet","protobuf==3.6.1","requests","PySocks","bs4","mysql-connector","scapy","cfscrape","python-whois","google","colorama","dnspython"]
+    req=["future","xtelnet","requests","PySocks","bs4","mysqlcp","scapy","cfscrape","python-whois","google","colorama","dnspython"]
 else:
- req=["xtelnet","requests","protobuf==3.6.1","PySocks","bs4","mysql-connector","kamene","stem","cfscrape","python-whois","google","colorama","dnspython"]
+ req=["future","xtelnet","requests","PySocks","bs4","mysqlcp","kamene","stem","cfscrape","python-whois","google","colorama","dnspython"]
  if adr==True:
-    req=["xtelnet","requests","protobuf==3.6.1","PySocks","bs4","mysql-connector","cfscrape","kamene","python-whois","google","colorama","dnspython"]
+    req=["future","xtelnet","requests","PySocks","bs4","mysqlcp","cfscrape","kamene","python-whois","google","colorama","dnspython"]
  if termux==True:
-    req=["xtelnet","requests","protobuf==3.6.1","PySocks","bs4","mysql-connector","kamene","cfscrape","python-whois","google","colorama","dnspython"]
+    req=["future","xtelnet","requests","PySocks","bs4","mysqlcp","kamene","cfscrape","python-whois","google","colorama","dnspython"]
 if (sys.platform == "win32") or( sys.platform == "win64"):
  req+=["win_inet_pton"]
 if termux==True:
- os.system('pkg install openssh -y')
+ os.system('apt install openssh -y')
  os.system('pkg install sshpass -y')
  os.system('pkg install nodejs -y')
 setuptools.setup(
     name="bane",
-    version="4.0.0",
+    version="4.0.8",
     author="AlaBouali",
     author_email="trap.leader.123@gmail.com",
     description="cyber security library",
