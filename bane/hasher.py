@@ -1,4 +1,5 @@
-import hashlib,base64
+import hashlib,base64,sys
+
 def xor(data, key):
  '''
    function to return XOR encrypted string
@@ -19,7 +20,8 @@ def md5(w):
  '''
    function to return md5 encrypted string
  '''
- return hashlib.md5(w.encode("utf-8")).hexdigest()
+ a=hashlib.md5(w.encode("utf-8")).hexdigest()
+ return a
 def sha1(w): 
  '''
    function to return sha1 encrypted string
