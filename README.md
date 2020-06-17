@@ -335,7 +335,7 @@ II-Usage (General usage):
 <h4>Caesar:</h4>
 <br>bane.caesar( data, key )
 <h4>MD5:</h4>
-<br>bane.md_5( data )
+<br>bane.md5( data )
 <h4>SHA1:</h4>
 <br>bane.sha1( data )
 <h4>SHA224:</h4>
@@ -350,6 +350,8 @@ II-Usage (General usage):
 <br>bane.base64encode( data )
 <h4>Base64 decoding:</h4>
 <br>bane.base64decode( data )
+<h4>File content encryption with XOR:</h4>
+<br>bane.xorfl( file , key )
 <h4>File content encryption with MD5:</h4>
 <br>bane.md5fl( file )
 <h4>File content encryption with SHA1:</h4>
@@ -435,10 +437,7 @@ II-Usage (General usage):
 
 # Updating bane:
 
-<h4>Updating for Python2:</h4>
-<br>bane.update_py2(version=None)
-<h4>Updating for Python3:</h4>
-<br>bane.update_py3(version=None)
+<br>bane.update(version=None)
 
 # Some extra useful functions:
 
@@ -464,3 +463,8 @@ II-Usage (General usage):
 <br>bane.youtube_search( query )
 <h4>Write to a file:</h4>
 <br>bane.write_file( data , file )
+<h4>Find webcams:</h4>
+<br>bane.webcams( count=10 , by={'country':'us'} )
+<br>bane.webcams( count=10 , by={'type':'axis'} )
+<br>bane.webcams( count=10 , by={'city':'paris'} )
+<br>bane.webcams( count=10 , by={'timezone':'+00:00'} )
