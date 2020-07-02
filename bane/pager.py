@@ -67,24 +67,44 @@ def forms(u,value=True,user_agent=None,timeout=10,bypass=False,proxy=None,cookie
    same as "inputs" function but it works on forms input fields only
  '''
  if user_agent:
-  us=user_agent
+   us=user_agent
  else:
-  us=random.choice(ua)
+   us=random.choice(ua)
  if proxy:
-  proxy={'http':'http://'+proxy}
+   proxy={'http':'http://'+proxy}
  if bypass==True:
-  u+='#'
+   u+='#'
  if cookie:
-  hea={'User-Agent': us,'Cookie':cookie}
+   hea={'User-Agent': us,'Cookie':cookie}
  else:
-  hea={'User-Agent': us}
+   hea={'User-Agent': us}
  l=[]
+ fom=[]
  try:
   c=requests.get(u, headers = hea,proxies=proxy,timeout=timeout, verify=False).text
   soup= BeautifulSoup(c,'html.parser')
   i=soup.find_all('form')
   for f in i:
+   #print(f)
+   ma=str(f).split('>')[0]
+   if "action" in ma:
+    ac=ma.split("action=")[1]
+    ac=ac.replace("'","")
+    ac=ac.replace('"',"")
+    ac=ac.replace(">","")
+    ac=ac.split()[0]
+   else:
+    ac=""
+   if "method" in ma:
+    me=ma.split("method=")[1]
+    me=me.replace("'","")
+    me=me.replace('"',"")
+    me=me.replace(">","")
+    me=me.split()[0]
+   else:
+    me=""
    p=f.find_all('input')
+   s=""
    for r in p: 
     v=""
     if r.has_attr('name'):
@@ -101,9 +121,11 @@ def forms(u,value=True,user_agent=None,timeout=10,bypass=False,proxy=None,cookie
      y=s
     if y not in l:
      l.append(y)
+   fom.append({'inputs':l,'action':ac,'method':me}) 
+   l=[]
  except Exception as e:
   pass
- return l
+ return fom
 def loginform(u,timeout=10,user_agent=None,bypass=False,value=True,proxy=None):
  '''
    same as "inputs" function but it works on login input fields only

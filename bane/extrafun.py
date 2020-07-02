@@ -9,7 +9,7 @@ else:
 import bs4
 from bs4 import BeautifulSoup
 from bane.payloads import *
-from bane.hasher import sha256fl
+
 def clear_file(w):
  with open(w,'w'):
     pass

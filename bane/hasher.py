@@ -6,57 +6,72 @@ def xor(data, key):
  '''
  i=0
  c=""
- while (i<len(data)):
+ l=len(data)
+ k=len(key)
+ if (not data) or (l==0):
+     raise Exception("You must provide data")
+ if (not key) or (k==0):
+     raise Exception("You must provide a key")
+ while (i<l):
    for x in key:
-     if i==len(data):
+     if i==l:
        break
      c+=chr(ord(data[i])^ord(x))
      i+=1
  i=None
+ l=None
+ k=None
  data=None
  key=None
  return c
-def md5(w):
- '''
+def md5(w,encode="utf-8"):
+ if w:
+  '''
    function to return md5 encrypted string
- '''
- a=hashlib.md5(w.encode("utf-8")).hexdigest()
- return a
-def sha1(w): 
- '''
+  '''
+  return hashlib.md5(w.encode(encode)).hexdigest()
+def sha1(w,encode="utf-8"):
+ if w: 
+  '''
    function to return sha1 encrypted string
- '''
- return hashlib.sha1(w.encode("utf-8")).hexdigest()
-def sha256(w):
- '''
+  '''
+  return hashlib.sha1(w.encode(encode)).hexdigest()
+def sha256(w,encode="utf-8"):
+ if w:
+  '''
    function to return sha256 encrypted string
- '''
- return hashlib.sha256(w.encode("utf-8")).hexdigest()
+  '''
+  return hashlib.sha256(w.encode(encode)).hexdigest()
 def base64encode(w):
- '''
+ if w:
+  '''
    function to return base64 encoded string
- '''
- return base64.b64encode(w)
+  '''
+  return base64.b64encode(w)
 def base64decode(w):
- '''
+ if w:
+  '''
    function to return base64 decoded string
- '''
- return base64.b64decode(w)
-def sha224(w):
- '''
+  '''
+  return base64.b64decode(w)
+def sha224(w,encode="utf-8"):
+ if w:
+  '''
    function to return sha224 encrypted string
- '''
- return hashlib.sha224(w.encode("utf-8")).hexdigest()
-def sha384(w):
- '''
+  '''
+  return hashlib.sha224(w.encode(encode)).hexdigest()
+def sha384(w,encode="utf-8"):
+ if w:
+  '''
    function to return sha384 encrypted string
- '''
- return hashlib.sha384(w.encode("utf-8")).hexdigest()
-def sha512(w):
- '''
+  '''
+  return hashlib.sha384(w.encode(encode)).hexdigest()
+def sha512(w,encode="utf-8"):
+ if w:
+  '''
    function to return sha512 encrypted string
- '''
- return hashlib.sha512(w.encode("utf-8")).hexdigest()
+  '''
+  return hashlib.sha512(w.encode(encode)).hexdigest()
 '''
   the following functions are taking a file path and return encrypted content of  the file with the defined encryption method in the function's
   name.
@@ -67,84 +82,93 @@ def sha512(w):
   >>>bane.md5fl('ala.txt')
   '66eab7dfd5c98ca5fbbbda6f7d7b36c3'
 '''
-def xorfl(f,key):
+def xorfl(f,key,decode='utf-8'):
+ if f and key:
   w=""
   with open(f,"rb") as f: 
    l=f.readlines()
    for x in l:
-    w+=x.decode('utf-8')
+    w+=x.decode(decode)
   f.close()
   s= xor(w,key)
   return s
-def md5fl(f):
+def md5fl(f,decode='utf-8'):
+ if f:
   w=""
   with open(f,"rb") as f: 
    l=f.readlines()
    for x in l:
-    w+=x.decode('utf-8')
+    w+=x.decode(decode)
   f.close()
-  s= md5(w)
+  s= md5(w,encode=decode)
   return s
-def sha1fl(f):
+def sha1fl(f,decode='utf-8'):
+ if f:
   w=""
   with open(f,"rb") as f: 
    l=f.readlines()
    for x in l:
-    w+=x.decode('utf-8')
+    w+=x.decode(decode)
   f.close()
-  s= sha1(w)
+  s= sha1(w,encode=decode)
   return s
-def sha224fl(f):
+def sha224fl(f,decode='utf-8'):
+ if f:
   w=""
   with open(f,"rb") as f: 
    l=f.readlines()
    for x in l:
-    w+=x.decode('utf-8')
+    w+=x.decode(decode)
   f.close()
-  s= sha224(w)
+  s= sha224(w,encode=decode)
   return s
-def sha256fl(f):
+def sha256fl(f,decode='utf-8'):
+ if f:
   w=""
   with open(f,"rb") as f: 
    l=f.readlines()
    for x in l:
-    w+=x.decode('utf-8')
+    w+=x.decode(decode)
   f.close()
-  s= sha256(w)
+  s= sha256(w,encode=decode)
   return s
-def sha384fl(f):
+def sha384fl(f,decode='utf-8'):
+ if f:
   w=""
   with open(f,"rb") as f: 
    l=f.readlines()
    for x in l:
-    w+=x.decode('utf-8')
+    w+=x.decode(decode)
   f.close()
-  s= sha384(w)
+  s= sha384(w,encode=decode)
   return s
-def sha512fl(f):
+def sha512fl(f,decode='utf-8'):
+ if f:
   w=""
   with open(f,"rb") as f: 
    l=f.readlines()
    for x in l:
-    w+=x.decode('utf-8')
+    w+=x.decode(decode)
   f.close()
-  s= sha512(w)
+  s= sha512(w,encode=decode)
   return s
-def base64encodefl(f):
+def base64encodefl(f,decode='utf-8'):
+ if f:
   w=""
   with open(f,"rb") as f: 
    l=f.readlines()
    for x in l:
-    w+=x.decode('utf-8')
+    w+=x.decode(decode)
   f.close()
   s= base64encode(w)
   return s
-def base64decodefl(f):
+def base64decodefl(f,decode='utf-8'):
+ if f:
   w=""
   with open(f,"rb") as f: 
    l=f.readlines()
    for x in l:
-    w+=x.decode('utf-8')
+    w+=x.decode(decode)
   f.close()
   s= base64decode(w)
   return s
@@ -171,36 +195,42 @@ def base64decodefl(f):
       else:
        print'[-]failed'
 '''
-def dsha224(w,z):
- w=hashlib.sha224(w.encode("utf-8")).hexdigest()
- if w==z:
+def dsha224(w,z,encode="utf-8"):
+ if w and z:
+  w=hashlib.sha224(w.encode(encode)).hexdigest()
+  if w==z:
    return True
- return False
-def dsha384(w,z):
- w=hashlib.sha384(w.encode("utf-8")).hexdigest()
- if w==z:
+  return False
+def dsha384(w,z,encode="utf-8"):
+ if w and z:
+  w=hashlib.sha384(w.encode(encode)).hexdigest()
+  if w==z:
    return True
- return False
-def dsha512(w,z):
- w=hashlib.sha512(w.encode("utf-8")).hexdigest()
- if w==z:
+  return False
+def dsha512(w,z,encode="utf-8"):
+ if w and z:
+  w=hashlib.sha512(w.encode(encode)).hexdigest()
+  if w==z:
    return True
- return False
-def dsha256(w,z):
- w=hashlib.sha256(w.encode("utf-8")).hexdigest()
- if w==z:
+  return False
+def dsha256(w,z,encode="utf-8"):
+ if w and z:
+  w=hashlib.sha256(w.encode(encode)).hexdigest()
+  if w==z:
    return True
- return False
-def dsha1(w,z):
- w=hashlib.sha1(w.encode("utf-8")).hexdigest()
- if w==z:
+  return False
+def dsha1(w,z,encode="utf-8"):
+ if w and z:
+  w=hashlib.sha1(w.encode(encode)).hexdigest()
+  if w==z:
    return True
- return False
-def dmd5(w,z):
- w=hashlib.md5(w.encode("utf-8")).hexdigest()
- if w==z:
+  return False
+def dmd5(w,z,encode="utf-8"):
+ if w and z:
+  w=hashlib.md5(w.encode(encode)).hexdigest()
+  if w==z:
    return True
- return False
+  return False
 '''
   function to do simple caesar encryption lol.
   
@@ -214,17 +244,21 @@ def dmd5(w,z):
   'fqf'
 '''
 def caesar(w,k):
+ if (type(k) is not int) or (k not in range(1,27)):
+     raise Exception('the key must be an integer between: 1 and 26')
+ if (not w) or (len(w)==0):
+     raise Exception("You must provide data")
  a='abcdefghijklmnopqrstuvwxyz'
  b='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
  c=''
  for i in w:
-  if (k>26) or (k<1) or (ord(i) not in range(32,127)):
-   break
+  """if (k>26) or (k<1) or (ord(i) not in range(32,127)):
+   break"""
   if (i in a):
    c+=a[(a.index(i)+k)%26]
   elif i in b:
    c+=b[(b.index(i)+k)%26]
-  elif ord(i) in range(32,127):
+  else:
     c+=i
  return c
 '''
@@ -240,16 +274,20 @@ def caesar(w,k):
   'ala'
 '''
 def dcaesar(w,k):
+ if (type(k) is not int) or (k not in range(1,27)):
+     raise Exception('the key must be an integer between: 1 and 26')
+ if (not w) or (len(w)==0):
+     raise Exception("You must provide data")
  a='abcdefghijklmnopqrstuvwxyz'
  b='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
  c=''
  for i in w:
-  if (k>26) or (k<1) or (ord(i) not in range(32,128)):
-   break
+  """if (k>26) or (k<1) or (ord(i) not in range(32,128)):
+   break"""
   if (i in a):
    c+=a[(a.index(i)-k)%26]
   elif i in b:
    c+=b[(b.index(i)-k)%26]
-  elif ord(i) in range(32,128):
+  else:
     c+=i
  return c
