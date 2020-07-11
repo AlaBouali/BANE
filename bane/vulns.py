@@ -879,7 +879,7 @@ def adb_exploit(u,timeout=5,port=5555):
         s.send(b"CNXN\x00\x00\x00\x01\x00\x10\x00\x00\x07\x00\x00\x00\x32\x02\x00\x00\xbc\xb1\xa7\xb1host::\x00") 
         c=s.recv(4096)
         s.close()
-        if "device" in str(c):
+        if "CNXN" in str(c):
             return True
     except Exception as e:
         pass
