@@ -877,9 +877,11 @@ def adb_exploit(u,timeout=5,port=5555):
         s.settimeout(timeout)
         s.connect((u,port))
         s.send(b"CNXN\x00\x00\x00\x01\x00\x10\x00\x00\x07\x00\x00\x00\x32\x02\x00\x00\xbc\xb1\xa7\xb1host::\x00") 
-        if "CNXN" in str(s.recv(4096)):
+        c=s.recv(4096)
+        s.close()
+        if "device" in str(c):
             return True
-    except:
+    except Exception as e:
         pass
     return False
 def exposed_telnet(u,p=23,timeout=3):
