@@ -416,7 +416,7 @@ def ssh_win(ip,username,password,p=22,version=2,timeout=5):
   except:
    pass
   p=ssh.communicate()
-  if ("ccess denied" in p[1]):
+  if (("ccess denied" in p[1].decode("utf-8")) or("FATAL ERROR" in p[1].decode("utf-8"))):
      return False
   else:
      return True
