@@ -884,7 +884,7 @@ def adb_exploit(u,timeout=5,port=5555):
     except Exception as e:
         pass
     return False
-def exposed_telnet(u,p=23,timeout=3):
+def exposed_telnet(u,p=23,timeout=5):
  try:
   t=xtelnet.session()
   t.connect(u,p=p,timeout=timeout)
