@@ -374,9 +374,9 @@ def telnet(u,username,password,p=23,timeout=3):
  except:
   pass
  return False
-def ssh_linux(u,username,password,p=22,timeout=3):
+def ssh_linux(u,username,password,p=22,timeout=5):
  # ssh login on linux
- l="sshpass -p {} ssh -o ConnectTimeout={} -p {} -o StrictHostKeyChecking=no -l {} {} ; exit".format(password,timeout,p,username,u) #we use the sshpass command to send the password
+ l="sshpass -p {} ssh -o ConnectTimeout={} -p {} -o StrictHostKeyChecking=no -l {} {} 'exithg'".format(password,timeout,p,username,u) #we use the sshpass command to send the password
  ti=time.time()
  ssh = subprocess.Popen(l.split(),stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
  while ssh.poll() is None:
@@ -392,15 +392,15 @@ def ssh_linux(u,username,password,p=22,timeout=3):
    ssh.kill()
  except:
    pass
- if (p[1].decode("utf-8") ==''):
-  return True
- else:
+ if ( "ermission denied" in p[1].decode("utf-8") ):
   return False
+ else:
+  return True
  
-def ssh_win(ip,username,password,p=22,version=1,timeout=3):
+def ssh_win(ip,username,password,p=22,version=2,timeout=5):
  #ssh login for windows (requires putty: plink )
  try:
-  l='echo yes | plink -ssh -{} -l {} -pw {} {} -P {} exit'.format(version,username,password,ip,p)
+  l='echo y | plink -ssh -l {} -pw {} {} -P {} "exithj"'.format(username,password,ip,p)
   ti=time.time()
   ssh = subprocess.Popen(l.split(),stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
   while ssh.poll() is None:
@@ -416,17 +416,16 @@ def ssh_win(ip,username,password,p=22,version=1,timeout=3):
   except:
    pass
   p=ssh.communicate()
-  print(p)
-  if ("Access granted" in p[0])or ("Access granted" in p[1]):
-     return True
-  else:
+  if ("ccess denied" in p[1]):
      return False
+  else:
+     return True
  except:
   pass
  return False
-def ssh_andro(u,username,password,p=22,timeout=3):
+def ssh_andro(u,username,password,p=22,timeout=5):
  # ssh login on termux
- l="sshpass -p {} ssh -o ConnectTimeout={} -p {} -o StrictHostKeyChecking=no -l {} {} ; exit".format(password,timeout,p,username,u) #we use the sshpass command to send the password
+ l="sshpass -p {} ssh -o ConnectTimeout={} -p {} -o StrictHostKeyChecking=no -l {} {} 'exithg'".format(password,timeout,p,username,u) #we use the sshpass command to send the password
  ti=time.time()
  ssh = subprocess.Popen(l.split(),stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
  while ssh.poll() is None:
@@ -442,10 +441,10 @@ def ssh_andro(u,username,password,p=22,timeout=3):
    ssh.kill()
  except:
    pass
- if (p[1].decode("utf-8") ==''):
-  return True
- else:
+ if ( "ermission denied" in p[1].decode("utf-8") ):
   return False
+ else:
+  return True
 def ftp_anon(ip,timeout=5):
   #anonymous ftp login
   try:
@@ -472,7 +471,7 @@ def mysql(u,username,password,timeout=5,p=3306):
  except Exception as e:
   pass
  return False
-def hydra(u,p=22,protocol="ssh",ssh_version=2,word_list=[],logs=True,returning=False,mapping=False,timeout=5,ehlo=False,helo=True,ttls=False,proxy=None,proxies=None):
+def hydra(u,p=22,protocol="ssh",word_list=[],logs=True,returning=False,mapping=False,timeout=5,ehlo=False,helo=True,ttls=False,proxy=None,proxies=None):
  '''
    this function is similar to hydra tool to bruteforce attacks on different ports.
 
@@ -502,7 +501,7 @@ def hydra(u,p=22,protocol="ssh",ssh_version=2,word_list=[],logs=True,returning=F
    print("[*]Trying ==> {}:{}".format(user,pwd))
   if protocol=="ssh":
     if (sys.platform == "win32") or( sys.platform == "win64"):
-      r=s(u,user,pwd,timeout=timeout,p=p,version=ssh_version)
+      r=s(u,user,pwd,timeout=timeout,p=p)
     else:
       r=s(u,user,pwd,timeout=timeout,p=p)
   if protocol=="telnet":
