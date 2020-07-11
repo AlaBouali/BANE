@@ -365,7 +365,7 @@ def smtp(u, username,password,p=25,ehlo=True,helo=False,ttls=False):
  except Exception as e:
   pass
  return False
-def telnet(u,username,password,p=23,timeout=3):
+def telnet(u,username,password,p=23,timeout=5):
  try:
   t=xtelnet.session()
   t.login(u,username=username,password=password,p=p,timeout=timeout)
