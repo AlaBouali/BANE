@@ -324,7 +324,7 @@ II-Usage (General usage):
 <h4>Resolve any domain using a specific DNS server:</h4>
 <br>bane.resolve( domain , server="8.8.8.8" )
 <h4>Very Fast port scan:</h4>
-<br>bane.port_scan( IP , ports=[21,22,23,25,43,53,80,443,2082,3306] , timeout=5 )
+<br>bane.port_scan( IP , ports=[21,22,23,25,43,53,80,443,2082,3306] , timeout=5 ).result
 <h4>Subdomains finder:</h4>
 <br>bane.subdomains_finder( domain )
 
