@@ -16,7 +16,10 @@ def xor(data, key):
    for x in key:
      if i==l:
        break
-     c+=chr(ord(data[i])^ord(x))
+     if type(data[i])==str:
+      c+=chr(ord(data[i])^ord(x))
+     else:
+      c+=chr(data[i]^ord(x))
      i+=1
  i=None
  l=None
@@ -24,54 +27,70 @@ def xor(data, key):
  data=None
  key=None
  return c
-def md5(w,encode="utf-8"):
+def md_5(w,encode=None):
  if w:
+  if encode:
+   w.encode(encode)
   '''
    function to return md5 encrypted string
   '''
-  return hashlib.md5(w.encode(encode)).hexdigest()
-def sha1(w,encode="utf-8"):
- if w: 
+  return hashlib.md5(w).hexdigest()
+def sha1(w,encode=None):
+ if w:
+  if encode:
+   w.encode(encode)
   '''
    function to return sha1 encrypted string
   '''
-  return hashlib.sha1(w.encode(encode)).hexdigest()
-def sha256(w,encode="utf-8"):
+  return hashlib.sha1(w).hexdigest()
+def sha256(w,encode=None):
  if w:
+  if encode:
+   w.encode(encode)
   '''
    function to return sha256 encrypted string
   '''
-  return hashlib.sha256(w.encode(encode)).hexdigest()
-def base64encode(w):
+  return hashlib.sha256(w).hexdigest()
+def base64encode(w,encode=None):
  if w:
+  if encode:
+   w.encode(encode)
   '''
    function to return base64 encoded string
   '''
   return base64.b64encode(w)
-def base64decode(w):
+def base64decode(w,encode=None):
  if w:
+  if encode:
+   w.encode(encode)
   '''
    function to return base64 decoded string
   '''
   return base64.b64decode(w)
-def sha224(w,encode="utf-8"):
+def sha224(w,encode=None):
  if w:
+  if encode:
+   w.encode(encode)
   '''
    function to return sha224 encrypted string
   '''
-  return hashlib.sha224(w.encode(encode)).hexdigest()
-def sha384(w,encode="utf-8"):
+  return hashlib.sha224(w).hexdigest()
+def sha384(w,encode=None):
  if w:
+  if encode:
+   w.encode(encode)
   '''
    function to return sha384 encrypted string
   '''
-  return hashlib.sha384(w.encode(encode)).hexdigest()
-def sha512(w,encode="utf-8"):
+  return hashlib.sha384(w).hexdigest()
+def sha512(w,encode=None):
  if w:
+  if encode:
+   w.encode(encode)
   '''
    function to return sha512 encrypted string
   '''
-  return hashlib.sha512(w.encode(encode)).hexdigest()
+  return hashlib.sha512(w).hexdigest()
 '''
   the following functions are taking a file path and return encrypted content of  the file with the defined encryption method in the function's
   name.
@@ -82,96 +101,60 @@ def sha512(w,encode="utf-8"):
   >>>bane.md5fl('ala.txt')
   '66eab7dfd5c98ca5fbbbda6f7d7b36c3'
 '''
-def xorfl(f,key,decode='utf-8'):
+def xorfl(f,key):
  if f and key:
-  w=""
   with open(f,"rb") as f: 
-   l=f.readlines()
-   for x in l:
-    w+=x.decode(decode)
+   w=f.read()
   f.close()
-  s= xor(w,key)
-  return s
-def md5fl(f,decode='utf-8'):
+  return xor(w,key)
+def md5fl(f):
  if f:
-  w=""
   with open(f,"rb") as f: 
-   l=f.readlines()
-   for x in l:
-    w+=x.decode(decode)
+   w=f.read()
   f.close()
-  s= md5(w,encode=decode)
-  return s
-def sha1fl(f,decode='utf-8'):
+  return md5(w)
+def sha1fl(f):
  if f:
-  w=""
   with open(f,"rb") as f: 
-   l=f.readlines()
-   for x in l:
-    w+=x.decode(decode)
+   w=f.read()
   f.close()
-  s= sha1(w,encode=decode)
-  return s
-def sha224fl(f,decode='utf-8'):
+  return sha1(w)
+def sha224fl(f):
  if f:
-  w=""
   with open(f,"rb") as f: 
-   l=f.readlines()
-   for x in l:
-    w+=x.decode(decode)
+   w=f.read()
   f.close()
-  s= sha224(w,encode=decode)
-  return s
-def sha256fl(f,decode='utf-8'):
+  return sha224(w)
+def sha256fl(f):
  if f:
-  w=""
   with open(f,"rb") as f: 
-   l=f.readlines()
-   for x in l:
-    w+=x.decode(decode)
+   w=f.read()
   f.close()
-  s= sha256(w,encode=decode)
-  return s
-def sha384fl(f,decode='utf-8'):
+  return sha256(w)
+def sha384fl(f):
  if f:
-  w=""
   with open(f,"rb") as f: 
-   l=f.readlines()
-   for x in l:
-    w+=x.decode(decode)
+   w=f.read()
   f.close()
-  s= sha384(w,encode=decode)
-  return s
-def sha512fl(f,decode='utf-8'):
+  return sha384(w)
+def sha512fl(f):
  if f:
-  w=""
   with open(f,"rb") as f: 
-   l=f.readlines()
-   for x in l:
-    w+=x.decode(decode)
+   w=f.read()
   f.close()
-  s= sha512(w,encode=decode)
-  return s
-def base64encodefl(f,decode='utf-8'):
+  return sha512(w)
+def base64encodefl(f):
  if f:
-  w=""
   with open(f,"rb") as f: 
-   l=f.readlines()
-   for x in l:
-    w+=x.decode(decode)
+   w=f.read()
   f.close()
-  s= base64encode(w)
-  return s
-def base64decodefl(f,decode='utf-8'):
+  return base64encode(w)
+def base64decodefl(f):
  if f:
-  w=""
   with open(f,"rb") as f: 
-   l=f.readlines()
-   for x in l:
-    w+=x.decode(decode)
+   w=f.read()
   f.close()
-  s= base64decode(w)
-  return s
+  return base64decode(w)
 '''
   the following functions are recommanded to be used in bruteforce attacks to crack the hashed passwords.
 
@@ -195,39 +178,39 @@ def base64decodefl(f,decode='utf-8'):
       else:
        print'[-]failed'
 '''
-def dsha224(w,z,encode="utf-8"):
+def dsha224(w,z):
  if w and z:
-  w=hashlib.sha224(w.encode(encode)).hexdigest()
+  w=hashlib.sha224(w).hexdigest()
   if w==z:
    return True
   return False
-def dsha384(w,z,encode="utf-8"):
+def dsha384(w,z):
  if w and z:
-  w=hashlib.sha384(w.encode(encode)).hexdigest()
+  w=hashlib.sha384(w).hexdigest()
   if w==z:
    return True
   return False
-def dsha512(w,z,encode="utf-8"):
+def dsha512(w,z):
  if w and z:
-  w=hashlib.sha512(w.encode(encode)).hexdigest()
+  w=hashlib.sha512(w).hexdigest()
   if w==z:
    return True
   return False
-def dsha256(w,z,encode="utf-8"):
+def dsha256(w,z):
  if w and z:
-  w=hashlib.sha256(w.encode(encode)).hexdigest()
+  w=hashlib.sha256(w).hexdigest()
   if w==z:
    return True
   return False
-def dsha1(w,z,encode="utf-8"):
+def dsha1(w,z):
  if w and z:
-  w=hashlib.sha1(w.encode(encode)).hexdigest()
+  w=hashlib.sha1(w).hexdigest()
   if w==z:
    return True
   return False
-def dmd5(w,z,encode="utf-8"):
+def dmd5(w,z):
  if w and z:
-  w=hashlib.md5(w.encode(encode)).hexdigest()
+  w=hashlib.md5(w).hexdigest()
   if w==z:
    return True
   return False

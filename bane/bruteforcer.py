@@ -532,7 +532,7 @@ def hydra(u,p=22,protocol="ssh",word_list=[],logs=True,returning=False,mapping=F
     print("[-]Failed")
  if returning==True:
   return o
-def decrypt(u,word_list=[],md5_hash=True,sha1_hash=False,sha256_hash=False,sha224_hash=False,sha384_hash=False,sha512_hash=False,base64_hash=False,caesar_hash=False,logs=True,returning=False):
+def decrypt(u,word_list=[],md5_hash=False,sha1_hash=False,sha256_hash=False,sha224_hash=False,sha384_hash=False,sha512_hash=False,base64_hash=False,caesar_hash=False,logs=True,returning=False):
  if logs==True:
   print('[!]hash: '+u+'\nbruteforcing has started!!!\n')
  s=False

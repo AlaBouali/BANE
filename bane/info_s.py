@@ -4,12 +4,16 @@ from bs4 import BeautifulSoup
 from bane.payloads import *
 if os.path.isdir('/data/data/com.termux/')==False:
     import dns.resolver
+def remove_html_tags(text):
+    """Remove html tags from a string"""
+    clean = re.compile('<.*?>')
+    return re.sub(clean, '', text)
 def get_banner(u,p=23,timeout=3,payload=None):
  try:
   return xtelnet.get_banner(u,p=p,timeout=timeout,payload=payload)
  except:
   return None
-def info(u,timeout=10,proxy=None):
+def info(u,timeout=10,proxy=None,logs=False,returning=True):
  '''
    this function fetchs all informations about the given ip or domain using check-host.net and returns them to the use as string
    with this format:
@@ -31,32 +35,47 @@ def info(u,timeout=10,proxy=None):
   u='https://check-host.net/ip-info?host='+u
   c=requests.get(u, headers = {'User-Agent': random.choice(ua)},proxies=proxy,timeout=timeout).text
   soup = BeautifulSoup(c,"html.parser")
-  d=soup.find_all("tr")
-  for a in d:
+  la=soup.find_all('a')
+  l=[]
+  for i in la:
+   if "#ip_info-dbip" in str(i):
+    l.append(remove_html_tags(str(i)).strip().replace('\n',' '))
+   if "#ip_info-ip2location" in str(i):
+    l.append(remove_html_tags(str(i)).strip().replace('\n',' '))
+   if "#ip_info-geolite2" in str(i):
+    l.append(remove_html_tags(str(i)).strip().replace('\n',' '))
+  p=soup.find_all('table')
+  o=0
+  di={}
+  for x in p:
    try:
-    b=str(a)
-    if "IP address" not in b:
-     a=b.split('<td>')[1].split('!')[0]
-     a=a.split('</td>')[0].split('!')[0]
-     c=b.split('<td>')[2].split('!')[0]
-     c=c.split('</td>')[0].split('!')[0]
-     if "strong" in c:
-      for n in ['</strong>','<strong>']:
-       c=c.replace(n,"")
-     if "<a" in c:
-      c=c.split('<a')[0].split('!')[0]
-      c=c.split('</a>')[0].split('!')[0]
-     if "<img" in c:
-      c=c.split('<img')[1].split('!')[0]
-      c=c.split('/>')[1].split('!')[0]
-     n=a.strip()+': '+c.strip()
-     h+=n+'\n'
-   except Exception as e:
+    do={}
+    y=x.find_all('tr')
+    for w in y:
+     a=w.find_all('td')
+     try:
+      c=str(a[0]).split('<td>')[1].split('</td>')[0].strip()
+      d=str(a[1]).split('<td>')[1].split('</td>')[0].strip()
+      d=remove_html_tags(d).strip().replace('\n',' ')
+      do.update({c:d})
+     except:
+      pass
+    di.update({l[o]:do})
+    o+=1
+   except:
     pass
- except Exception as e:
-  pass
- return h
-def norton_rate(u,logs=True,returning=False,timeout=15,proxy=None):
+  if logs==True:
+   for x in di:
+    print (x)
+    print('')
+    for y in di[x]:
+     print(y+": "+di[x][y])
+    print('')
+  if returning==True:
+   return di
+ except:
+  return None
+def norton_rate(u,logs=True,returning=False,timeout=30,proxy=None):
  '''
    this function takes any giving and gives a security report from: safeweb.norton.com, if it is a: spam domain, contains a malware...
    it takes 3 arguments:
@@ -72,16 +91,14 @@ def norton_rate(u,logs=True,returning=False,timeout=15,proxy=None):
   proxy={'http':'http://'+proxy}
  s=""
  try:
-  if logs==True:
-   print('[*]Testing link with safeweb.norton.com')
   ur=urllib.quote(u, safe='')
   ul='https://safeweb.norton.com/report/show?url='+ur
   c=requests.get(ul, headers = {'User-Agent': random.choice(ua)},proxies=proxy,timeout=timeout).text 
-  soup = BeautifulSoup(c, "html.parser").text
-  s=soup.split("Summary")[1].split('=')[0]
-  s=s.split("The Norton rating")[0].split('=')[0]
+  soup = BeautifulSoup(c, "html.parser")
+  s=soup.find_all('div', class_="communityRatings")
+  s=remove_html_tags(str(s[0])).replace('\n\n\n','\n')
   if logs==True:
-   print('[+]Report:\n',s.strip())
+   print('Report:\n'+s.strip())
  except:
   pass
  if returning==True:
@@ -188,6 +205,9 @@ this should give you a dict like this:
 
 """
 class port_scan:
+ def __new__(cls):
+         return self.result
+         return super(port_scan, cls).__new__(cls)
  def scan (self):
         p=self.por[self.flag2]
         s= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
