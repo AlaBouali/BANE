@@ -86,35 +86,17 @@ def forms(u,value=True,user_agent=None,timeout=10,bypass=False,proxy=None,cookie
   i=soup.find_all('form')
   for f in i:
    #print(f)
-   ma=str(f).split('>')[0]
-   if "action" in ma:
-    ac=ma.split("action=")[1]
-    ac=ac.replace("'","")
-    ac=ac.replace('"',"")
-    ac=ac.replace(">","")
-    ac=ac.split()[0]
-   else:
-    ac=""
-   if "method" in ma:
-    me=ma.split("method=")[1]
-    me=me.replace("'","")
-    me=me.replace('"',"")
-    me=me.replace(">","")
-    me=me.split()[0]
-   else:
-    me=""
+   ac=f.get('action')
+   if len(ac)==0:
+    ac=u
+   me=f.get('method').lower()
    p=f.find_all('input')
-   s=""
    for r in p: 
-    v=""
     if r.has_attr('name'):
-     s=str(r)
-     s=s.split('name="')[1].split(',')[0]
-     s=s.split('"')[0].split(',')[0]
-     if (r.has_attr('value') and (value==True)):
-      v=str(r)
-      v=v.split('value="')[1].split(',')[0]
-      v=v.split('"')[0].split(',')[0]
+     s=r.get("name")
+     v=r.get("value")
+     if v==None:
+      v=''
     if value==True:
      y=s+":"+v
     else:
