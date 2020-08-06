@@ -6,7 +6,6 @@ termux=False
 if os.path.isdir('/home/')==True:
  os.system('sudo apt install sshpass -y')
  os.system('sudo apt install nodejs -y')
- os.system('sudo apt install openssh-client-ssh1 -y')
 adr=False
 if os.path.isdir('/data/data')==True:
     adr=True
@@ -42,7 +41,7 @@ if termux==True:
  os.system('pkg install nodejs -y')
 setuptools.setup(
     name="bane",
-    version="4.1.8",
+    version="4.1.9",
     author="AlaBouali",
     author_email="trap.leader.123@gmail.com",
     description="cyber security library",
