@@ -313,8 +313,8 @@ def xss(u,payload=None,fresh=False,logs=True,returning=False,proxy=None,remove_v
        extr.remove(x)
      if logs==True:
       print("\n\nURL: "+u+"\nPayload: "+xp+"\n")
-     if '?' in u:
-      u=u.split('?')[0].split(',')[0]
+     #if '?' in u:
+      #u=u.split('?')[0]
      for i in l:
       if stop==True:
        break
