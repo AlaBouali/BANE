@@ -253,7 +253,7 @@ def xss_post(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None,d
   except Exception as e:
    pass
   return False
-def xss(u,payload=None,fresh=False,get=True,post=True,logs=True,returning=False,proxy=None,remove_value=["..."],proxies=None,timeout=10,user_agent=None,cookie=None,debug=False):
+def xss(u,payload=None,fresh=False,logs=True,returning=False,proxy=None,remove_value=["..."],proxies=None,timeout=10,user_agent=None,cookie=None,debug=False):
   '''
    this function is for xss test with both POST and GET requests. it extracts the input fields names using the "inputs" function then test each input using POST and GET methods.
 
@@ -261,8 +261,6 @@ def xss(u,payload=None,fresh=False,get=True,post=True,logs=True,returning=False,
    
    u: link to test
    payload: the xss payload to use it, if it's set to: None (set by default to: None) it uses the default payload
-   get: (set by default to: True) to test the parameter using GET
-   post: (set by default to: True) to test the parameter using POST
    logs: (set by default to: True) show the process
    returning: (set by dfault to: False) to return scan results of the parameters as list of strings
 
