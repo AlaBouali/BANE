@@ -331,43 +331,43 @@ II-Usage (General usage):
 # Encryption:
 
 <h4>XOR:</h4>
-<br>bane.hasher.xor( data, key )
+<br>bane.xor_hash( data, key )
 <h4>Caesar:</h4>
-<br>bane.hasher.caesar( data, key )
+<br>bane.caesar_hash( data, key )
 <h4>MD5:</h4>
-<br>bane.hasher.md_5( data )
+<br>bane.md5_hash( data )
 <h4>SHA1:</h4>
-<br>bane.hasher.sha1( data )
+<br>bane.sha1_hash( data )
 <h4>SHA224:</h4>
-<br>bane.hasher.sha224( data )
+<br>bane.sha224_hash( data )
 <h4>SHA256:</h4>
-<br>bane.hasher.sha256( data )
+<br>bane.sha256_hash( data )
 <h4>SHA384:</h4>
-<br>bane.hasher.sha384( data )
+<br>bane.sha384_hash( data )
 <h4>SHA512:</h4>
-<br>bane.hasher.sha512( data )
+<br>bane.sha512_hash( data )
 <h4>Base64 encoding:</h4>
-<br>bane.hasher.base64encode( data )
+<br>bane.base64_encode( data )
 <h4>Base64 decoding:</h4>
-<br>bane.hasher.base64decode( data )
+<br>bane.base64_decode( data )
 <h4>File content encryption with XOR:</h4>
-<br>bane.hasher.xorfl( file , key )
+<br>bane.xor_file( file , key )
 <h4>File content encryption with MD5:</h4>
-<br>bane.hasher.md5fl( file )
+<br>bane.md5_file( file )
 <h4>File content encryption with SHA1:</h4>
-<br>bane.hasher.sha1fl( file )
+<br>bane.sha1_file( file )
 <h4>File content encryption with SHA224:</h4>
-<br>bane.hasher.sha224fl( file )
+<br>bane.sha224_file( file )
 <h4>File content encryption with SHA256:</h4>
-<br>bane.hasher.sha256fl( file )
+<br>bane.sha256_file( file )
 <h4>File content encryption with SHA384:</h4>
-<br>bane.hasher.sha384fl( file )
+<br>bane.sha384_file( file )
 <h4>File content encryption with SHA512:</h4>
-<br>bane.hasher.sha512fl( file )
+<br>bane.sha512_file( file )
 <h4>File content encoding with base64:</h4>
-<br>bane.hasher.base64encodefl( file )
+<br>bane.base64_encode_file( file )
 <h4>File content decoding with base64:</h4>
-<br>bane.hasher.base64decodefl( file )
+<br>bane.base64_decode_file( file )
 
 # Decryption:
 
