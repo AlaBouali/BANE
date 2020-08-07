@@ -263,7 +263,7 @@ def xss_post(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None,d
      if xp in c:
       return True 
   except Exception as e:
-   print(e)
+   pass
   return False
 def xss(u,payload=None,ignore_values=False,fresh=True,logs=True,fill_empty=10,returning=False,proxy=None,ignore_in_value=["..."],proxies=None,timeout=10,user_agent=None,cookie=None,debug=False):
   '''
