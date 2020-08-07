@@ -173,7 +173,7 @@ def sqli_time_based(u,delay=15,db="mysql",logs=True,returning=False,timeout=25,p
    print("[+]Vulnerable!!!")
  if returning==True:
   return s
-def xss_get(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None,debug=False):
+def xss_get(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None,debug=False,fill_empty=0):
   '''
    this function is for xss test with GET requests.
 
@@ -201,6 +201,12 @@ def xss_get(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None,de
   if extra:
    d.update(extra)
   d.update(pl)
+  for i in d:
+   if (d[i]=="") and (fill_empty>0):
+    st=""
+    for j in range(fill_empty):
+     st+=random.choice(lis)
+    d[i]=st
   if debug==True:
    print("\n")
    for x in d:
@@ -213,7 +219,7 @@ def xss_get(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None,de
   except Exception as e:
    pass
   return False
-def xss_post(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None,debug=False):
+def xss_post(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None,debug=False,fill_empty=0):
   '''
    this function is for xss test with POST requests.
 
@@ -241,6 +247,12 @@ def xss_post(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None,d
   if extra:
    d.update(extra)
   d.update(pl)
+  for i in d:
+   if (d[i]=="") and (fill_empty>0):
+    st=""
+    for j in range(fill_empty):
+     st+=random.choice(lis)
+    d[i]=st
   if debug==True:
    print("\n")
    for x in d:
@@ -251,9 +263,9 @@ def xss_post(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None,d
      if xp in c:
       return True 
   except Exception as e:
-   pass
+   print(e)
   return False
-def xss(u,payload=None,fresh=False,logs=True,returning=False,proxy=None,remove_value=["..."],proxies=None,timeout=10,user_agent=None,cookie=None,debug=False):
+def xss(u,payload=None,fresh=True,logs=True,fill_empty=10,returning=False,proxy=None,ignore_in_value=["..."],proxies=None,timeout=10,user_agent=None,cookie=None,debug=False):
   '''
    this function is for xss test with both POST and GET requests. it extracts the input fields names using the "inputs" function then test each input using POST and GET methods.
 
@@ -270,6 +282,7 @@ def xss(u,payload=None,fresh=False,logs=True,returning=False,proxy=None,remove_v
    >>>bane.xss('http://www.example.com/")
 
    >>>bane.xss('http://www.example.com/',payload="<script>alert(123);</script>")
+   
   '''
   global stop
   stop=False
@@ -304,7 +317,7 @@ def xss(u,payload=None,fresh=False,logs=True,returning=False,proxy=None,remove_v
      extr=[]
      l=[]
      for x in l1['inputs']:
-      if ((x.split(':')[1]!='') and (not any(s in x.split(':')[1] for s in remove_value))):#some websites may introduce in the input certain value that can be replaced ( because the function works only on empty inputs ) , all you have to do is put something which specify it among the others to be ingnored and inject our xss payload there !!
+      if ((x.split(':')[1]!='') and (not any(s in x.split(':')[1] for s in ignore_in_value))):#some websites may introduce in the input certain value that can be replaced ( because the function works only on empty inputs ) , all you have to do is put something which specify it among the others to be ingnored and inject our xss payload there !!
        extr.append(x)
       else:
        l.append(x)
@@ -338,7 +351,7 @@ def xss(u,payload=None,fresh=False,logs=True,returning=False,proxy=None,remove_v
          user=random.choice(ua)
          k=inputs(u,user_agent=user,proxy=proxy,timeout=timeout,value=True,cookie=cookie)
          for x in k:
-          if ((x.split(':')[1]!='') and (not any(s in x.split(':')[1] for s in remove_value))):
+          if ((x.split(':')[1]!='') and (not any(s in x.split(':')[1] for s in ignore_in_value))):
            extr.append(x)
          for x in extr:
           if x.split(':')[0] in l:
@@ -351,7 +364,10 @@ def xss(u,payload=None,fresh=False,logs=True,returning=False,proxy=None,remove_v
            extra.update({a:b})
         if stop==True:
          break
-        if xss_get(u,pl,user_agent=user,extra=extra,proxy=proxy,timeout=timeout,cookie=cookie,debug=debug)==True:
+        for lop in l:
+         if lop!=i:
+          extra.update({lop.split(':')[0]:lop.split(':')[1]})
+        if xss_get(u,pl,user_agent=user,extra=extra,proxy=proxy,timeout=timeout,cookie=cookie,debug=debug,fill_empty=fill_empty)==True:
           x="parameter: '"+i+"' method: 'GET' => [+]Payload was found"
         else:
          x="parameter: '"+i+"' method: 'GET' => [-]Payload was not found"
@@ -366,7 +382,7 @@ def xss(u,payload=None,fresh=False,logs=True,returning=False,proxy=None,remove_v
          user=random.choice(ua)
          k=inputs(u,user_agent=user,proxy=proxy,timeout=timeout,value=True,cookie=cookie)
          for x in k:
-          if ((x.split(':')[1]!='') and (not any(s in x.split(':')[1] for s in remove_value))):
+          if ((x.split(':')[1]!='') and (not any(s in x.split(':')[1] for s in ignore_in_value))):
            extr.append(x)
          for x in extr:
           if x.split(':')[0] in l:
@@ -379,7 +395,10 @@ def xss(u,payload=None,fresh=False,logs=True,returning=False,proxy=None,remove_v
            extra.update({a:b})
         if stop==True:
          break
-        if xss_post(u,pl,user_agent=user,extra=extra,proxy=proxy,timeout=timeout,cookie=cookie,debug=debug)==True:
+        for lop in l:
+         if lop!=i:
+          extra.update({lop.split(':')[0]:lop.split(':')[1]})
+        if xss_post(u,pl,user_agent=user,extra=extra,proxy=proxy,timeout=timeout,cookie=cookie,debug=debug,fill_empty=fill_empty)==True:
         	x="parameter: '"+i+"' method: 'POST' => [+]Payload was found"
         else:
          x="parameter: '"+i+"' method: 'POST' =>  [-]Payload was not found"
