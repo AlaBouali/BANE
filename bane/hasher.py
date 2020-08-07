@@ -1,6 +1,6 @@
 import hashlib,base64,sys
 
-def xor(data, key):
+def xor_hash(data, key):
  '''
    function to return XOR encrypted string
  '''
@@ -27,7 +27,7 @@ def xor(data, key):
  data=None
  key=None
  return c
-def md_5(w,encode=None):
+def md5_hash(w,encode=None):
  if w:
   if encode:
    w.encode(encode)
@@ -35,7 +35,7 @@ def md_5(w,encode=None):
    function to return md5 encrypted string
   '''
   return hashlib.md5(w).hexdigest()
-def sha1(w,encode=None):
+def sha1_hash(w,encode=None):
  if w:
   if encode:
    w.encode(encode)
@@ -43,7 +43,7 @@ def sha1(w,encode=None):
    function to return sha1 encrypted string
   '''
   return hashlib.sha1(w).hexdigest()
-def sha256(w,encode=None):
+def sha256_hash(w,encode=None):
  if w:
   if encode:
    w.encode(encode)
@@ -51,7 +51,7 @@ def sha256(w,encode=None):
    function to return sha256 encrypted string
   '''
   return hashlib.sha256(w).hexdigest()
-def base64encode(w,encode=None):
+def base64_encode(w,encode=None):
  if w:
   if encode:
    w.encode(encode)
@@ -59,7 +59,7 @@ def base64encode(w,encode=None):
    function to return base64 encoded string
   '''
   return base64.b64encode(w)
-def base64decode(w,encode=None):
+def base64_decode(w,encode=None):
  if w:
   if encode:
    w.encode(encode)
@@ -67,7 +67,7 @@ def base64decode(w,encode=None):
    function to return base64 decoded string
   '''
   return base64.b64decode(w)
-def sha224(w,encode=None):
+def sha224_hash(w,encode=None):
  if w:
   if encode:
    w.encode(encode)
@@ -75,7 +75,7 @@ def sha224(w,encode=None):
    function to return sha224 encrypted string
   '''
   return hashlib.sha224(w).hexdigest()
-def sha384(w,encode=None):
+def sha384_hash(w,encode=None):
  if w:
   if encode:
    w.encode(encode)
@@ -83,7 +83,7 @@ def sha384(w,encode=None):
    function to return sha384 encrypted string
   '''
   return hashlib.sha384(w).hexdigest()
-def sha512(w,encode=None):
+def sha512_hash(w,encode=None):
  if w:
   if encode:
    w.encode(encode)
@@ -101,60 +101,60 @@ def sha512(w,encode=None):
   >>>bane.md5fl('ala.txt')
   '66eab7dfd5c98ca5fbbbda6f7d7b36c3'
 '''
-def xorfl(f,key):
+def xor_file(f,key):
  if f and key:
   with open(f,"rb") as f: 
    w=f.read()
   f.close()
   return xor(w,key)
-def md5fl(f):
+def md5_file(f):
  if f:
   with open(f,"rb") as f: 
    w=f.read()
   f.close()
-  return md5(w)
-def sha1fl(f):
+  return md5_hash(w)
+def sha1_file(f):
  if f:
   with open(f,"rb") as f: 
    w=f.read()
   f.close()
-  return sha1(w)
-def sha224fl(f):
+  return sha1_hash(w)
+def sha224_file(f):
  if f:
   with open(f,"rb") as f: 
    w=f.read()
   f.close()
-  return sha224(w)
-def sha256fl(f):
+  return sha224_hash(w)
+def sha256_file(f):
  if f:
   with open(f,"rb") as f: 
    w=f.read()
   f.close()
-  return sha256(w)
-def sha384fl(f):
+  return sha256_hash(w)
+def sha384_file(f):
  if f:
   with open(f,"rb") as f: 
    w=f.read()
   f.close()
-  return sha384(w)
-def sha512fl(f):
+  return sha384_hash(w)
+def sha512_file(f):
  if f:
   with open(f,"rb") as f: 
    w=f.read()
   f.close()
-  return sha512(w)
-def base64encodefl(f):
+  return sha512_hash(w)
+def base64_encode_file(f):
  if f:
   with open(f,"rb") as f: 
    w=f.read()
   f.close()
-  return base64encode(w)
-def base64decodefl(f):
+  return base64_encode(w)
+def base64_decode_file(f):
  if f:
   with open(f,"rb") as f: 
    w=f.read()
   f.close()
-  return base64decode(w)
+  return base64_decode(w)
 '''
   the following functions are recommanded to be used in bruteforce attacks to crack the hashed passwords.
 
@@ -226,7 +226,7 @@ def dmd5(w,z):
   >>> bane.caesar('ala',5)
   'fqf'
 '''
-def caesar(w,k):
+def caesar_hash(w,k):
  if (type(k) is not int) or (k not in range(1,27)):
      raise Exception('the key must be an integer between: 1 and 26')
  if (not w) or (len(w)==0):

@@ -87,9 +87,20 @@ def forms(u,value=True,user_agent=None,timeout=10,bypass=False,proxy=None,cookie
   for f in i:
    #print(f)
    ac=f.get('action')
+   if not ac:
+    ac=u
    if len(ac)==0:
     ac=u
-   me=f.get('method').lower()
+   if ac[0]=="/":
+    ac=u+ac
+   if ac[:4]!="http":
+    ac=u+"/"+ac
+   me=f.get('method')
+   if not me :
+    me="get"
+   if len(me)==0:
+    me="get"
+   me=me.lower()
    p=f.find_all('input')
    for r in p: 
     if r.has_attr('name'):
