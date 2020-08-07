@@ -265,7 +265,7 @@ def xss_post(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None,d
   except Exception as e:
    print(e)
   return False
-def xss(u,payload=None,fresh=True,logs=True,fill_empty=10,returning=False,proxy=None,ignore_in_value=["..."],proxies=None,timeout=10,user_agent=None,cookie=None,debug=False):
+def xss(u,payload=None,ignore_values=False,fresh=True,logs=True,fill_empty=10,returning=False,proxy=None,ignore_in_value=["..."],proxies=None,timeout=10,user_agent=None,cookie=None,debug=False):
   '''
    this function is for xss test with both POST and GET requests. it extracts the input fields names using the "inputs" function then test each input using POST and GET methods.
 
@@ -304,7 +304,9 @@ def xss(u,payload=None,fresh=True,logs=True,fill_empty=10,returning=False,proxy=
     print("No forms were found!!!")
    hu=False
   if hu==True:
+   form_index=-1
    for l1 in fom:
+    form_index+=1
     lst=[]
     u=l1['action']
     if l1['method']=='post':
@@ -313,7 +315,9 @@ def xss(u,payload=None,fresh=True,logs=True,fill_empty=10,returning=False,proxy=
     else:
      post=False
      get=True
-    if len(inputs(u,proxy=proxy,timeout=timeout,value=True,cookie=cookie,user_agent=user_agent))>0:
+    if len(inputs(u,proxy=proxy,timeout=timeout,value=True,cookie=cookie,user_agent=user_agent))==0:
+     print("[-]No parameters found !! Moving on..")
+    else:
      extr=[]
      l=[]
      for x in l1['inputs']:
@@ -349,8 +353,8 @@ def xss(u,payload=None,fresh=True,logs=True,fill_empty=10,returning=False,proxy=
           break
          extr=[]
          user=random.choice(ua)
-         k=inputs(u,user_agent=user,proxy=proxy,timeout=timeout,value=True,cookie=cookie)
-         for x in k:
+         k=forms(u,user_agent=user,proxy=proxy,timeout=timeout,value=True,cookie=cookie)
+         for x in k[form_index]['inputs']:
           if ((x.split(':')[1]!='') and (not any(s in x.split(':')[1] for s in ignore_in_value))):
            extr.append(x)
          for x in extr:
@@ -367,6 +371,9 @@ def xss(u,payload=None,fresh=True,logs=True,fill_empty=10,returning=False,proxy=
         for lop in l:
          if lop!=i:
           extra.update({lop.split(':')[0]:lop.split(':')[1]})
+        if ignore_values==True:
+         for x in extra:
+          extra[x]=""
         if xss_get(u,pl,user_agent=user,extra=extra,proxy=proxy,timeout=timeout,cookie=cookie,debug=debug,fill_empty=fill_empty)==True:
           x="parameter: '"+i+"' method: 'GET' => [+]Payload was found"
         else:
@@ -380,8 +387,8 @@ def xss(u,payload=None,fresh=True,logs=True,fill_empty=10,returning=False,proxy=
           break
          extr=[]
          user=random.choice(ua)
-         k=inputs(u,user_agent=user,proxy=proxy,timeout=timeout,value=True,cookie=cookie)
-         for x in k:
+         k=forms(u,user_agent=user,proxy=proxy,timeout=timeout,value=True,cookie=cookie)
+         for x in k[form_index]['inputs']:
           if ((x.split(':')[1]!='') and (not any(s in x.split(':')[1] for s in ignore_in_value))):
            extr.append(x)
          for x in extr:
@@ -398,6 +405,9 @@ def xss(u,payload=None,fresh=True,logs=True,fill_empty=10,returning=False,proxy=
         for lop in l:
          if lop!=i:
           extra.update({lop.split(':')[0]:lop.split(':')[1]})
+        if ignore_values==True:
+         for x in extra:
+          extra[x]=""
         if xss_post(u,pl,user_agent=user,extra=extra,proxy=proxy,timeout=timeout,cookie=cookie,debug=debug,fill_empty=fill_empty)==True:
         	x="parameter: '"+i+"' method: 'POST' => [+]Payload was found"
         else:

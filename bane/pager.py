@@ -92,9 +92,11 @@ def forms(u,value=True,user_agent=None,timeout=10,bypass=False,proxy=None,cookie
    if len(ac)==0:
     ac=u
    if ac[0]=="/":
-    ac=u+ac
+    url_o="/".join(u.split('/')[:-1])
+    ac=url_o+ac
    if ac[:4]!="http":
-    ac=u+"/"+ac
+    url_o="/".join(u.split('/')[:-1])
+    ac=url_o+"/"+ac
    me=f.get('method')
    if not me :
     me="get"
@@ -117,7 +119,7 @@ def forms(u,value=True,user_agent=None,timeout=10,bypass=False,proxy=None,cookie
    fom.append({'inputs':l,'action':ac,'method':me}) 
    l=[]
  except Exception as e:
-  pass
+  print(e)
  return fom
 def loginform(u,timeout=10,user_agent=None,bypass=False,value=True,proxy=None):
  '''
