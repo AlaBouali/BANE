@@ -56,6 +56,8 @@ class S0u1wp():
         try:
             ip = socket.gethostbyname(__kill_ip)
             self.CheckWordpress = requests.get('http://' + self.url, timeout=self.timeout,proxies=self.proxy, verify=False)
+            if 'server' not in self.CheckWordpress.headers:
+              self.CheckWordpress.headers['server']="Unknown"
             if check_wp==True:
              if '/wp-content/' in self.CheckWordpress.text:
                 self.check=True

