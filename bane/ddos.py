@@ -6,6 +6,8 @@ if  sys.version_info < (3,0):
     # Python 2.x
     import httplib
     import urllib2
+    from scapy.config import conf
+    conf.ipv6_enabled = False
     from scapy.all import *
 else:
     py3=True
@@ -14,6 +16,8 @@ else:
     httplib = http.client
     import urllib.request
     urllib2=urllib.request
+    from kamene.config import conf
+    conf.ipv6_enabled = False
     from kamene.all import *
 from struct import *
 from bane.iot import getip

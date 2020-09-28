@@ -466,7 +466,7 @@ def xss(u,payload=None,target_form_action=None,ignore_values=False,fresh=True,lo
        break
     dic.update({form_index:{"Form":u,"Method":l1['method'],"Passed":vul,"Failed":sec}}) 
    if returning==True:
-    return {"Payload":xp,"Page":target_page,"Results":dic}
+    return {"Payload":xp,"Page":target_page,"Output":dic}
 def command_exec_link(u,timeout=10,proxy=None,user_agent=None,cookie=None):
  '''
    this function is for command execution test using a given link
