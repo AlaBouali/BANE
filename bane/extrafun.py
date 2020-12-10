@@ -1,4 +1,4 @@
-import cgi,requests,os,random,re,hashlib,urllib,sys,cfscrape
+import cgi,requests,os,random,re,hashlib,urllib,sys,cfscrape,json
 from googlesearch import search
 from bane.payloads import ua
 from bane.hasher import *
@@ -13,22 +13,24 @@ from bane.payloads import *
 def clear_file(w):
  with open(w,'w'):
     pass
+
 def delete_file(w):
- s=0
  if os.path.exists(w):
   os.remove(w)
-  s+=1
- return s
+
 def write_file(w,fi):
     with open(fi ,"a+") as f:
         f.write(w+'\n')
         return   
+
 def read_file(w):
     with open(w ,"r") as f:
         return f.readlines()
+
 def create_file(w):
     with open(w ,"a+") as f:
      pass   
+
 def get_cf_cookie(domain,user_agent):
   try:
    s = cfscrape.create_scraper()
@@ -36,40 +38,32 @@ def get_cf_cookie(domain,user_agent):
    return {user_agent: str(c).split("'")[1].split("'")[0]}
   except:
    return {}
+
 def HTB_invitation():
  try:
   r=requests.post('https://www.hackthebox.eu/api/invite/generate',headers={'User-Agent':random.choice(ua)},data={'':''}).text
   a=r.split('"code":"')[1].split('"')[0]
-  return base64decode(a)
+  return base64_decode(a)
  except:
   return None
+
 def facebook_id(u):
  try:
   r=requests.post('https://lookup-id.com/#',data={"fburl":u,"check":"Lookup"}).text
   return r.split('<p id="code-wrap"><span id="code">')[1].split('<')[0]
  except:
   return None
+
 def check_file_virustotal(f,proxy=None,timeout=10):
  if proxy:
   proxy={'http':'http://'+proxy}
- s=sha256fl(f)
- u="https://www.virustotal.com/en/file/"+s+"/analysis/"
+ file_hash=sha256_file(f)
  try:
-  r=requests.get(u,headers = {'User-Agent': random.choice(ua)},allow_redirects=False,proxies=proxy,timeout=timeout)
-  if (r.status_code==302):
-   return {"status": r.status_code,"reason":"File's signature wasn't recognized by VirusTotal.\nTry to upload the file manually if you want to make sure."}
-  elif r.status_code==200:
-   w=""
-   for x in r.text:
-    if (len(w)<1001):
-     w+=x
-   w=w[931:len(w)-3].strip()
-   w=w.replace("\n ","")
-   return {"status":r.status_code,"reason":w}
-  else:
-   return {"status":r.status_code,"reason":"something went wrong"}
+  r=requests.get('https://www.virustotal.com/ui/files/'+file_hash,headers={'Accept':'application/json','Referer':'https://www.virustotal.com/','content-type': 'application/json','X-Tool': 'vt-ui-main','X-VT-Anti-Abuse-Header': 'MTg4NDc3OTI3NzctWkc5dWRDQmlaU0JsZG1scy0xNjA0NjI1MTA4Ljg0Mg==','x-app-version': '20201029t163205','User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:82.0) Gecko/20100101 Firefox/82.0','Accept-Language': 'en-US,en;q=0.5','Accept-Ianguage': 'en-US,en;q=0.9,es;q=0.8','Connection': 'close','Accept-Encoding': 'gzip, deflate','Host':'www.virustotal.com'})
+  return json.loads(r.text)
  except Exception as e:
-  return {"status":e,"reason":"error with the process"}
+  pass
+
 def google_dorking(q,max_results=100,language='en',start_from=1, stop_on=None,top_level_domain='com',pause=2):
  j=[]
  j+=search(q,num=max_results,lang=language,start=start_from, stop=stop_on,tld="com", pause=2)
@@ -78,16 +72,19 @@ def google_dorking(q,max_results=100,language='en',start_from=1, stop_on=None,to
   if x not in l:
    l.append(x)
  return l
+
 def escape_html(s):
  '''
    function to return escaped html string
  '''
  return cgi.escape(s,quote=True)
+
 def unescape_html(s):
  '''
    function to return unescaped html string
  '''
  return HTMLParser.HTMLParser().unescape(s).encode("utf-8")
+
 def webhint_report(ur,proxy=None,timeout=10):
  '''
    this function takes any webpage link and returns a report link from webhint.io.
@@ -113,6 +110,7 @@ def webhint_report(ur,proxy=None,timeout=10):
  except Exception as e:
   pass
  return r
+
 def youtube_search(q,proxy=None,timeout=10):
  '''
    this function is for searching on youtub and returning a links of related videos.

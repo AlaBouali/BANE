@@ -75,7 +75,7 @@ def info(u,timeout=10,proxy=None,logs=False,returning=True):
    return di
  except:
   return None
-def norton_rate(u,logs=True,returning=False,timeout=30,proxy=None):
+def norton_rate(u,timeout=30,proxy=None):
  '''
    this function takes any giving and gives a security report from: safeweb.norton.com, if it is a: spam domain, contains a malware...
    it takes 3 arguments:
@@ -89,20 +89,21 @@ def norton_rate(u,logs=True,returning=False,timeout=30,proxy=None):
 '''
  if proxy:
   proxy={'http':'http://'+proxy}
- s=""
  try:
   ur=urllib.quote(u, safe='')
   ul='https://safeweb.norton.com/report/show?url='+ur
   c=requests.get(ul, headers = {'User-Agent': random.choice(ua)},proxies=proxy,timeout=timeout).text 
   soup = BeautifulSoup(c, "html.parser")
   s=soup.find_all('div', class_="communityRatings")
-  s=remove_html_tags(str(s[0])).replace('\n\n\n','\n')
-  if logs==True:
-   print('Report:\n'+s.strip())
+  s=remove_html_tags(str(s[0])).strip().split("\n")
+  while("" in s) : 
+    s.remove("") 
+  try:
+   return {"Profile":s[0],"Rate":float(s[1]),"By":s[2]}
+  except:
+   return {"Profile":s[0],"Rate":float(s[1])}
  except:
   pass
- if returning==True:
-  return s.strip()
 def myip(proxy=None,proxy_type=None,timeout=15):
  '''
    this function is for getting your ip using: ipinfo.io
@@ -205,6 +206,7 @@ this should give you a dict like this:
 
 """
 class port_scan:
+ __slots__=["timeout","por","result","target"]
  def __new__(cls):
          return self.result
          return super(port_scan, cls).__new__(cls)
@@ -239,45 +241,59 @@ class port_scan:
     except:
       pass
     del x
-def subdomains_finder(u,process_check_interval=5,logs=True,returning=False,requests_timeout=15,https=False):
- https_flag=0
- if (https==True) or('https://' in u):
+  self.timeout=None
+  self.por=None
+  self.target=None
+
+class subdomains_finder:
+ __slots__=["stop","finish","result"]
+ def __init__(self,u,process_check_interval=5,logs=True,returning=False,requests_timeout=15,https=False):
+  self.stop=False
+  self.finish=False
+  self.result=self.result={u:[]}
+  t=threading.Thread(target=self.crack,args=(u,process_check_interval,logs,requests_timeout,https,))
+  t.daemon=True
+  t.start()
+ def crack(self,u,process_check_interval,logs,requests_timeout,https):
+  https_flag=0
+  if (https==True) or('https://' in u):
      https_flag=1
- if "://" in u:
-  host=u.split('://')[1].split('/')[0]
- else:
-  host=u
- sd=[]
- while True:
-  try:
-   s=requests.session()
-   r=s.post('https://scan.penteston.com/scan_system.php',data={"scan_method":"S201","test_protocol":https_flag,"test_host":host},timeout=requests_timeout).text
-   if '"isFinished":"no"' not in r:
-    if logs==True:
-     print("\n[+]Scan results:")
-    c=r.split('strong><br\/>')[1].replace('"}','')
-    for x in (c.split('<br\/>')):
-     if x.strip():
+  if "://" in u:
+   host=u.split('://')[1].split('/')[0]
+  else:
+   host=u
+  sd=[]
+  while True:
+   if self.stop==True:
+    break
+   try:
+    s=requests.session()
+    r=s.post('https://scan.penteston.com/scan_system.php',data={"scan_method":"S201","test_protocol":https_flag,"test_host":host},timeout=requests_timeout).text
+    if '"isFinished":"no"' not in r:
+     if logs==True:
+      print("\n[+]Scan results:")
+     c=r.split('strong><br\/>')[1].replace('"}','')
+     for x in (c.split('<br\/>')):
       if logs==True:
        print(x)
-      sd.append(x)
-    if returning==True:
-     return sd
-    break
-   else:
-    if logs==True:
-     sys.stdout.write("\r[*]Scan in progress...")
-     sys.stdout.flush()
+       sd.append(x)
+     break
+    else:
+     if logs==True:
+      sys.stdout.write("\r[*]Scan in progress...")
+      sys.stdout.flush()
      #print("[*]Scan in progress...")
-  except KeyboardInterrupt:
+   except KeyboardInterrupt:
       break
-  except:
+   except:
     pass
-  try:
-   time.sleep(process_check_interval)
-  except KeyboardInterrupt:
-      break
-  except:
+   try:
+    time.sleep(process_check_interval)
+   except KeyboardInterrupt:
+       break
+   except:
     pass
- if returning==True:
-  return []
+  self.finish=True
+  self.result={u:sd}
+ def done(self):
+  return self.finish

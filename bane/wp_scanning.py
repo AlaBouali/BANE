@@ -1,16 +1,21 @@
 #encoding :utf8
 """
-  This script was proposed by my friend "S0U1" to hack Joomla and WordPress sites:
+  This script was proposed by my friend "S0U1" to hack WordPress sites:
   
   https://github.com/HLoTW/wordpressscan
   
-  Thank you for your help bro <3
+  Thank you for your help bro <3 i fixed the bugs and added more features i hope you like it ;)
 """
-import json, re, os, time, random, socket
+import json, re, os, time, random, socket,threading
 import sys
 
+from bs4 import BeautifulSoup
+from .payloads import lis,ua
+from .extrafun import get_cf_cookie
 import requests,urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+
 from colorama import Fore, Back, Style
 r = Fore.RED
 g = Fore.GREEN
@@ -29,10 +34,24 @@ if (sys.platform == "win32") or( sys.platform == "win64"):
  res=""
 path='/'
 timeout=15
+
+def random_str(size):
+ s=""
+ for x in range(size):
+     s+=random.choice(lis)
+ return s
 class S0u1wp():
-    def __init__(self,wp_url,path='/',check_wp=False,timeout=15,proxy=None):
+    def __init__(self,wp_url,path='/',check_wp=False,timeout=15,proxy=None,user_agent=None,cookie=None):
         self.check=True
         self.timeout=timeout
+        if user_agent:
+         us=user_agent
+        else:
+         us=random.choice(ua)
+        if cookie:
+         self.headers={'User-Agent': us,'Cookie':cookie}
+        else:
+         self.headers={'User-Agent': us}
         if proxy:
          self.proxy={'http':'http://'+proxy}
         else:
@@ -55,7 +74,7 @@ class S0u1wp():
         self.url+=self.wp_path
         try:
             ip = socket.gethostbyname(__kill_ip)
-            self.CheckWordpress = requests.get('http://' + self.url, timeout=self.timeout,proxies=self.proxy, verify=False)
+            self.CheckWordpress = requests.get('http://' + self.url, timeout=self.timeout,proxies=self.proxy,headers=self.headers, verify=False)
             if 'server' not in self.CheckWordpress.headers:
               self.CheckWordpress.headers['server']="Unknown"
             if check_wp==True:
@@ -88,7 +107,7 @@ class S0u1wp():
                  pass
                 try:
                  self.GeT_PluGin_Name()
-                except:
+                except :
                     pass
             else:
                 self.cls()
@@ -181,10 +200,10 @@ $R@i.~~ !     :   ~$$$$$B$$en:``
     def UserName_Enumeration(self):
         _cun = 1
         Flag = True
-        __Check2 = requests.get('http://' + self.url + '/?author=1', timeout=self.timeout,proxies=self.proxy, verify=False)
+        __Check2 = requests.get('http://' + self.url + '/?author=1', timeout=self.timeout,proxies=self.proxy,headers=self.headers, verify=False)
         try:
             while Flag:
-                GG = requests.get('http://' + self.url + '/wp-json/wp/v2/users/' + str(_cun), timeout=self.timeout,proxies=self.proxy, verify=False)
+                GG = requests.get('http://' + self.url + '/wp-json/wp/v2/users/' + str(_cun), timeout=self.timeout,proxies=self.proxy,headers=self.headers, verify=False)
                 __InFo = json.loads(GG.text)
                 if 'id' not in __InFo:
                     Flag = False
@@ -215,9 +234,9 @@ $R@i.~~ !     :   ~$$$$$B$$en:``
 
     def CpaNel_UserName_Enumeration(self):
         try:
-            Get_page = requests.get('http://' + self.url, timeout=self.timeout,proxies=self.proxy, verify=False)
+            Get_page = requests.get('http://' + self.url, timeout=self.timeout,proxies=self.proxy,headers=self.headers, verify=False)
             if '/wp-content/' in Get_page.text:
-                Hunt_path = requests.get('http://' + self.url + '/wp-includes/ID3/module.audio.ac3.php', timeout=self.timeout,proxies=self.proxy, verify=False)
+                Hunt_path = requests.get('http://' + self.url + '/wp-includes/ID3/module.audio.ac3.php', timeout=self.timeout,proxies=self.proxy,headers=self.headers, verify=False)
 
                 def Hunt_Path_User():
                     try:
@@ -256,33 +275,50 @@ $R@i.~~ !     :   ~$$$$$B$$en:``
                   ' ConnectionError! Maybe server Down, Or your ip is blocked! ' + y + ']')
 
     def Plugin_NamE_Vuln_TeST(self, Plugin_NaME):
+        agn=random_str(random.randint(3,15))
+        while True:
+         try:
+          cook=get_cf_cookie('wpvulndb.com',agn).values()[0]
+          break
+         except:
+          pass
+        headers={"User-agent":agn,"Cookie":cook}
+        #print(str(headers))
         num = 1
         cal = 0
         Flag = True
         while Flag:
             if Plugin_NaME == 'revslider':
                 Plugin_NaME = 'Slider Revolution'
-            url = 'https://wpvulndb.com/searches?page=' + str(num) + '&text=' + Plugin_NaME
-            aa = requests.get(url, timeout=5)
-            if 'No results found.' in aa.text:
+            url = 'https://wpvulndb.com/search?page=' + str(num) + '&text=' + Plugin_NaME
+            aa = requests.get(url,headers=headers, timeout=15)
+            if 'No results' in aa.text or "Cloudflare Ray ID" in aa.text:
                 Flag = False
                 break
             else:
-                az = re.findall('<td><a href="/vulnerabilities/(.*)">', aa.text)
-                bb = (len(az) / 2)
+                az=[]
+                titles=[]
+                soup = BeautifulSoup(aa.text,"html.parser")
+                for a in soup.find_all('a'):
+                  if a.has_attr('href') and '<a href="/vulnerability/' in str(a):
+                   a=str(a)
+                   cod=int(a.split('vulnerability/')[1].split('">')[0])
+                   if cod not in az:
+                    az.append(cod)
+                   tite=a.split('">')[1].split('</a')[0]
+                   if tite not in titles:
+                    titles.append(tite)
+                bb = len(az)
                 for x in range(int(bb)):
-                    uz = 'www.wpvulndb.com/vulnerabilities/' + str(az[cal])
-                    Get_title = requests.get('http://' + uz, timeout=5)
-                    Title = re.findall('<title>(.*)</title>'.encode('utf-8'), Get_title.text.encode('utf-8'))
-                    print (r + '        [' + y + 'MiGhT bE VuLn' + r + '] ' + w + uz + ' --- ' + r + \
-                          ((str(Title[0]).split('-')[0]).replace("&lt;",'')).replace('&amp;',''))
-                    cal = cal + 2
+                    uz = 'https://www.wpvulndb.com/vulnerability/' + str(az[cal])
+                    print (r + '        [' + y + 'MiGhT bE VuLn' + r + '] ' + w + uz + " --- " +(titles[cal].replace("&lt;",'')).replace('&amp;','') + r )
+                    cal += 1
                 cal = 0
                 num = num + 1
 
     def Version_Wp(self):
         try:
-            Check_oNe = requests.get('http://' + self.url + '/readme.html', timeout=self.timeout,proxies=self.proxy, verify=False)
+            Check_oNe = requests.get('http://' + self.url + '/readme.html', timeout=self.timeout,proxies=self.proxy,headers=self.headers, verify=False)
             find = re.findall('Version (.+)', Check_oNe.text)
             try:
                 version = find[0].strip()
@@ -381,6 +417,6 @@ $R@i.~~ !     :   ~$$$$$B$$en:``
                 print (r + '    [' + y + '+' + r + ']' + w + ' Themes Name: ' + m + Name_Theme)
                 self.Plugin_NamE_Vuln_TeST(Name_Theme)
 
-def wp_scan(u,path='/',check_wp=False,timeout=15,proxy=None):
- S0u1wp(u,path=path,check_wp=check_wp,timeout=timeout,proxy=proxy)
+def wp_scan(u,path='/',check_wp=False,timeout=15,proxy=None,cookie=None,user_agent=None):
+ S0u1wp(u,path=path,check_wp=check_wp,timeout=timeout,proxy=proxy,user_agent=user_agent,cookie=cookie)
  print (Style.RESET_ALL)

