@@ -6,7 +6,7 @@
   
   Thank you for your help bro <3 i fixed the bugs and added more features i hope you like it ;)
 """
-import json, re, os, time, random, socket,threading
+import json, re, os, time, random, socket
 import sys
 
 from bs4 import BeautifulSoup
@@ -14,6 +14,7 @@ from .payloads import lis,ua
 from .extrafun import get_cf_cookie
 import requests,urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 
 
 from colorama import Fore, Back, Style
@@ -40,8 +41,11 @@ def random_str(size):
  for x in range(size):
      s+=random.choice(lis)
  return s
+ 
+ 
 class S0u1wp():
     def __init__(self,wp_url,path='/',check_wp=False,timeout=15,proxy=None,user_agent=None,cookie=None):
+        self.vulnerabilities={}
         self.check=True
         self.timeout=timeout
         if user_agent:
@@ -273,17 +277,28 @@ $R@i.~~ !     :   ~$$$$$B$$en:``
             print (y + '---------------------------------------------------')
             print( g + '    [' + y + '+' + g + ']' + r + ' Error: ' + y + '    [ ' + w + \
                   ' ConnectionError! Maybe server Down, Or your ip is blocked! ' + y + ']')
+                  
+    def get_plugin_name(self,p):
+     if "." in p:
+      p=p.partition(".")[0]
+      while True:
+       try:
+        int(p[-1])
+        p=p[:-1]
+       except:
+        return p.strip()
+     return p.strip()
 
     def Plugin_NamE_Vuln_TeST(self, Plugin_NaME):
+        Plugin_NaME=self.get_plugin_name(Plugin_NaME)
         agn=random_str(random.randint(3,15))
         while True:
          try:
-          cook=get_cf_cookie('wpvulndb.com',agn).values()[0]
+          cook=get_cf_cookie('wpvulndb.com',agn)
           break
          except:
           pass
         headers={"User-agent":agn,"Cookie":cook}
-        #print(str(headers))
         num = 1
         cal = 0
         Flag = True
@@ -311,6 +326,7 @@ $R@i.~~ !     :   ~$$$$$B$$en:``
                 bb = len(az)
                 for x in range(int(bb)):
                     uz = 'https://www.wpvulndb.com/vulnerability/' + str(az[cal])
+                    self.vulnerabilities.update({uz:(titles[cal].replace("&lt;",'')).replace('&amp;','')})
                     print (r + '        [' + y + 'MiGhT bE VuLn' + r + '] ' + w + uz + " --- " +(titles[cal].replace("&lt;",'')).replace('&amp;','') + r )
                     cal += 1
                 cal = 0
@@ -418,5 +434,6 @@ $R@i.~~ !     :   ~$$$$$B$$en:``
                 self.Plugin_NamE_Vuln_TeST(Name_Theme)
 
 def wp_scan(u,path='/',check_wp=False,timeout=15,proxy=None,cookie=None,user_agent=None):
- S0u1wp(u,path=path,check_wp=check_wp,timeout=timeout,proxy=proxy,user_agent=user_agent,cookie=cookie)
+ a=S0u1wp(u,path=path,check_wp=check_wp,timeout=timeout,proxy=proxy,user_agent=user_agent,cookie=cookie)
  print (Style.RESET_ALL)
+ return a.vulnerabilities

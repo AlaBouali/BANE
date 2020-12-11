@@ -177,6 +177,8 @@ def crawl(u,timeout=10,user_agent=None,bypass=False,proxy=None,cookie=None):
 '''
  if urlparse(u).path=='':
   u+="/"
+ if u.split("?")[0][-1]!="/" and '.' not in u.split("?")[0].rsplit('/', 1)[-1]:
+    u=u.replace('?','/?')
  if user_agent:
   us=user_agent
  else:
@@ -194,8 +196,8 @@ def crawl(u,timeout=10,user_agent=None,bypass=False,proxy=None,cookie=None):
   c=requests.get(u, headers = hea,proxies=proxy,timeout=timeout, verify=False).text
   soup = BeautifulSoup(c,"html.parser")
   ur=u.replace(u.split("/")[-1],'')
-  if ur[-1]=='/':
-   ur=ur[:-1]
+  """if ur[-1]=='/':
+   ur=ur[:-1]"""
   index_link=0
   for a in soup.find_all('a'):
    u=ur

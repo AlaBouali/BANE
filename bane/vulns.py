@@ -1201,20 +1201,22 @@ def valid_parameter(parm):
  except:
   return True
 
-def file_inclusion_link(u,null_byte=False,bypass=False,target_os="linux",file_wrapper=True,proxy=None,timeout=10,user_agent=None,cookie=None):
+def file_inclusion_link(u,null_byte=False,bypass=False,target_os="linux",file_wrapper=True,proxy=None,proxies=None,timeout=10,user_agent=None,cookie=None):
  '''
    this function is for FI vulnerability test using a link
 '''
  if proxy:
   proxy={'http':'http://'+proxy}
+ if proxies:
+  proxy={'http':'http://'+random.choice(proxies)}
  if user_agent:
    us=user_agent
  else:
    us=random.choice(ua)
  if cookie:
-    hea={'User-Agent': us,'Cookie':cookie}
+    heads={'User-Agent': us,'Cookie':cookie}
  else:
-   hea={'User-Agent': us}
+   heads={'User-Agent': us}
  if ("=" not in u):
   return (False,'')
  else:
@@ -1231,12 +1233,38 @@ def file_inclusion_link(u,null_byte=False,bypass=False,target_os="linux",file_wr
   if null_byte==True:
    l+="%00"
   try:
-    r=requests.get(u.format(l),headers=hea,proxies=proxy,timeout=timeout, verify=False)
+    r=requests.get(u.format(l),headers=heads,proxies=proxy,timeout=timeout, verify=False)
     if (len(re.findall(r'[a-zA-Z0-9_]*:[a-zA-Z0-9_]*:[\d]*:[\d]*:[a-zA-Z0-9_]*:/', r.text))>0) or (all( x in r.text for x in ["; for 16-bit app support","[fonts]","[extensions]","[mci extensions]","[files]","[Mail]"])==True):
      return (True,r.url)
   except Exception as e:
     pass
  return (False,'')
+ 
+def file_inclusion(u,null_byte=False,bypass=False,target_os="linux",file_wrapper=True,proxy=None,proxies=None,timeout=10,user_agent=None,cookie=None): 
+ res=[]
+ if u.split("?")[0][-1]!="/" and '.' not in u.split("?")[0].rsplit('/', 1)[-1]:
+    u=u.replace('?','/?')
+ a=crawl(u,proxy=proxy,timeout=timeout,cookie=cookie,user_agent=user_agent)
+ l=[]
+ d=a.values()
+ for x in d:
+  if len(x[3])>0:
+   l.append(x)
+ o=[]
+ for x in l:
+  ur=x[1]
+  if ur.split("?")[0] not in o:
+   o.append(ur.split("?")[0])
+   if ur.split("?")[0][-1]!="/" and '.' not in ur.split("?")[0].rsplit('/', 1)[-1]:
+    ur=ur.replace('?','/?')
+   for y in x[3]:
+    if valid_parameter(y[1])==True:
+     trgt=ur.replace(y[0]+"="+y[1],y[0]+"={}")
+     q=file_inclusion_link(trgt,null_byte=null_byte,bypass=bypass,target_os=target_os,file_wrapper=file_wrapper,proxy=proxy,proxies=proxies,timeout=timeout,cookie=cookie,user_agent=user_agent)
+     if q[0]==True:
+      res.append(q[1])
+ return res
+
 
 '''
   the following functions are used to check any kind of Slow HTTP attacks vulnerabilities that will lead to a possible DoS.

