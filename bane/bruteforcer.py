@@ -11,6 +11,7 @@ import mysqlcp
 from bane.pager import *
 from bane.wp import wpadmin
 from bane.hasher import *
+
 class http_auth_bf:
  __slots__=["stop","finish","result"]
  def __init__(self,u,word_list=[],logs=True,proxy=None,proxies=None,cookie=None,user_agent=None,timeout=10):
@@ -547,18 +548,19 @@ def ssh_win(ip,username,password,p=22,version=2,timeout=5):
  except:
   pass
  return False"""
+
 def ssh(u,username,password,p=22,timeout=5,exchange_key=None):
  if os.name == 'nt':
   if exchange_key!=None:#this doesn't work on windows for some reason :(
    return False
-  l='echo y | plink -ssh -l {} -pw {} {} -P {} "exithj"'.format(username,password,u,p)
+  l='echo y | plink -ssh -l {} -pw {} {} -P {} "hvbjkjk"'.format(username,password,u,p)
   sshp = subprocess.Popen(l.split(),stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
  else:
   if exchange_key:
-   key="-oKexAlgorithms=+"+key
+   key="-oHostKeyAlgorithms=+"+exchange_key
   else:
    key=""
-  l="sshpass -p {} ssh "+key+" -o ConnectTimeout={} -p {} -o StrictHostKeyChecking=no -l {} {} 'exithg'".format(password,timeout,p,username,u) #we use the sshpass command to send the password
+  l="sshpass -p {} ssh {} -p {} -o StrictHostKeyChecking=no -l {} {} 'exithg'".format(password,key,p,username,u) #we use the sshpass command to send the password
   sshp = subprocess.Popen(l.split(),stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
  ti=time.time()
  while sshp.poll() is None:
@@ -570,22 +572,26 @@ def ssh(u,username,password,p=22,timeout=5,exchange_key=None):
        except:
         pass
        return False
- p=sshp.communicate()
+ ou=sshp.communicate()
  try:
    sshp.kill()
  except:
    pass
  time.sleep(0.1)
  if exchange_key==None:
-  if "no matching key exchange method found" in p[1].decode("utf-8"):
+  if "Their offer:" in ou[1].decode("utf-8") :
    if os.name == 'nt':
     return False
-   k=p[1].decode("utf-8").split("offer:")[1].strip()
+   k=ou[1].decode("utf-8").split("offer:")[1].strip()
    return ssh(u,username,password,p=p,timeout=timeout,exchange_key=k)
- if (( "denied" in p[1].decode("utf-8").lower() )or("FATAL ERROR" in p[1].decode("utf-8")) or ("refused" in p[1].decode("utf-8").lower()) or ("Unsupported KEX algorithm" in p[1].decode("utf-8")) or ("Bad SSH2 KexAlgorithms" in p[1].decode("utf-8")) ):
+ if "Server refused to start a shell/command" in ou[1].decode("utf-8"):
+  return True
+ if (( "unsupported" in ou[1].decode("utf-8").lower() )or( "denied" in ou[1].decode("utf-8").lower() )or("FATAL ERROR" in ou[1].decode("utf-8")) or ("refused" in ou[1].decode("utf-8").lower()) or ("Unsupported KEX algorithm" in ou[1].decode("utf-8")) or ("Bad SSH2 KexAlgorithms" in ou[1].decode("utf-8")) ):
   return False
  else:
   return True
+
+  
 def ftp_anon(ip,timeout=5):
   #anonymous ftp login
   try:
@@ -649,9 +655,9 @@ class hydra:
     print("[*]Trying ==> {}:{}".format(user,pwd))
    if protocol=="ssh":
     r=s(u,user,pwd,timeout=timeout,p=p,exchange_key=exchange_key)
-   if protocol=="telnet":
+   elif protocol=="telnet":
     r=s(u,user,pwd,timeout=timeout,p=p)
-   if (protocol=="mysql"):
+   elif (protocol=="mysql"):
     r=s(u,user,pwd,timeout=timeout,p=p)
    elif (protocol=="ftp"):
     r=s(u,user,pwd,timeout=timeout)

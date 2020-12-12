@@ -25,7 +25,10 @@ def masshttp(count=None,timeout=15):
  l=[]
  h=[]
  try:
-  h3tags = crawl(u,timeout=timeout)
+  h3tags1 = crawl(u,timeout=timeout)
+  h3tags=[]
+  for x in h3tags1.keys():
+   h3tags.append(h3tags1[x][1])
   for a in h3tags:
     try:
      if (("proxy-server" in str(a)) and("#" not in (str(a)))) :
@@ -49,7 +52,10 @@ def masshttp(count=None,timeout=15):
  l=[]
  u="https://www.dailyfreeproxy.com/#"
  try:
-  h3tags = crawl(u,timeout=timeout)
+  h3tags1 = crawl(u,timeout=timeout)
+  h3tags=[]
+  for x in h3tags1.keys():
+   h3tags.append(h3tags1[x][1])
   for a in h3tags:
     try:
      if (("-http" in str(a)) and("#" not in (str(a)))) :
@@ -124,7 +130,10 @@ def massocks4(count=None,timeout=15):
  l=[]
  u="https://www.dailyfreeproxy.com/#"
  try:
-  h3tags = crawl(u,timeout=timeout)
+  h3tags1 = crawl(u,timeout=timeout)
+  h3tags=[]
+  for x in h3tags1.keys():
+   h3tags.append(h3tags1[x][1])
   for a in h3tags:
     try:
      if (("-socks4" in str(a)) and("#" not in (str(a)))) :
@@ -198,7 +207,10 @@ def massocks5(count=None,timeout=15):
  t=[]
  u="https://www.dailyfreeproxy.com/#"
  try:
-  h3tags = crawl(u,timeout=timeout)
+  h3tags1 = crawl(u,timeout=timeout)
+  h3tags=[]
+  for x in h3tags1.keys():
+   h3tags.append(h3tags1[x][1])
   for a in h3tags:
     try:
      if (("-socks5" in str(a)) and("#" not in (str(a)))) :
