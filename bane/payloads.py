@@ -2,6 +2,9 @@ sql_errors=['sqlite3.OperationalError','error in your SQL syntax','mysql_fetch',
 'Microsoft OLE DB Provider for SQL Server', 'Unclosed quotation mark', 'ODBC Microsoft Access Driver', 'Microsoft JET Database', 'Error Occurred While Processing Request',
 'Server Error', 'Microsoft OLE DB Provider for ODBC Drivers error', 'Invalid Querystring', 'OLE DB Provider for ODBC', 'VBScript Runtime', 'ADODB.Field',
 'BOF or EOF', 'ADODB.Command', 'JET Database', 'mysql_fetch_array()', 'Syntax error', 'mysql_numrows()', 'GetArray()', 'FetchRow()', 'Input string was not in a correct format']
+
+env_paths=['/','/demo/','/turnero/Acceso/','/china-tickets/','/club/','/laravel-5.6/','/laravel/','/vendor/','/subdomains/program/html/','/test/laravel/','/test/']
+
 seqnumber=0
 ackseq=0
 urg_ptr=0

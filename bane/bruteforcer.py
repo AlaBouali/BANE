@@ -489,6 +489,7 @@ def smtp(u, username,password,p=25,ehlo=True,helo=False,ttls=False):
  except Exception as e:
   pass
  return False
+
 def telnet(u,username,password,p=23,timeout=5):
  try:
   t=xtelnet.session()
@@ -498,56 +499,8 @@ def telnet(u,username,password,p=23,timeout=5):
  except:
   pass
  return False
-"""def ssh_linux(u,username,password,p=22,timeout=5):
- # ssh login on linux
- l="sshpass -p {} ssh -o ConnectTimeout={} -p {} -o StrictHostKeyChecking=no -l {} {} 'exithg'".format(password,timeout,p,username,u) #we use the sshpass command to send the password
- ti=time.time()
- ssh = subprocess.Popen(l.split(),stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
- while ssh.poll() is None:
-   time.sleep(.1)
-   if int(time.time()-ti)==timeout:
-       try:
-        ssh.kill()
-       except:
-        pass
-       return False
- p=ssh.communicate()
- try:
-   ssh.kill()
- except:
-   pass
- if (( "denied" in p[1].decode("utf-8") )or("FATAL ERROR" in p[1].decode("utf-8")) or ("refused" in p[1].decode("utf-8").lower()):
-  return False
- else:
-  return True
 
-  
-def ssh_win(ip,username,password,p=22,version=2,timeout=5):
- #ssh login for windows (requires putty: plink )
- try:
-  l='echo y | plink -ssh -l {} -pw {} {} -P {} "exithj"'.format(username,password,ip,p)
-  ti=time.time()
-  ssh = subprocess.Popen(l.split(),stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
-  while ssh.poll() is None:
-   time.sleep(.1)
-   if int(time.time()-ti)==timeout:
-       try:
-        ssh.kill()
-       except:
-        pass
-       return False
-  try:
-   ssh.kill()
-  except:
-   pass
-  p=ssh.communicate()
-  if (("ccess denied" in p[1].decode("utf-8")) or("FATAL ERROR" in p[1].decode("utf-8"))):
-     return False
-  else:
-     return True
- except:
-  pass
- return False"""
+#why i used this code for ssh brute force instead of: pexpext/paramiko ? Well pexpect doesn't work on non-linux machines and paramiko gives a huuuuge numer of false positive results ! you will see, with this code there is no false positive brute force ;)
 
 def ssh(u,username,password,p=22,timeout=5,exchange_key=None):
  if os.name == 'nt':
