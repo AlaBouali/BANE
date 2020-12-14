@@ -23,6 +23,7 @@ import bs4
 from bs4 import BeautifulSoup
 from bane.payloads import *
 from bane.pager import inputs,forms,crawl
+from bane.js_fuck import js_fuck
 from bane.extrafun import write_file,delete_file
 
 def random_string(size):

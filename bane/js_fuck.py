@@ -1,5 +1,6 @@
-#P.S: I didn't write the following class but i find it very useful to encode XSS payloads
-
+"""
+P.S: I didn't write the following class but i find it very useful to encode XSS payloads. I would like to thank the guy who did it, good job bro <3
+"""
 class js_fuck(object):
     '''
     Encodes/Decodes Javascript using JSFuck 0.4.0
