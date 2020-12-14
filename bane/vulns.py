@@ -187,7 +187,7 @@ def xss_post(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None,d
   return (False,'')
 
 
-def xss(u,payload=None,show_warnings=True,target_form_action=None,ignore_values=False,fresh=True,logs=True,fill_empty=10,proxy=None,ignored_values=["anonymous user","..."],proxies=None,timeout=10,user_agent=None,cookie=None,debug=False,leave_empty=[]):
+def xss(u,payload=None,save_to_file="xss_report",show_warnings=True,target_form_action=None,ignore_values=False,fresh=True,logs=True,fill_empty=10,proxy=None,ignored_values=["anonymous user","..."],proxies=None,timeout=10,user_agent=None,cookie=None,debug=False,leave_empty=[]):
   '''
    this function is for xss test with both POST and GET requests. it extracts the input fields names using the "inputs" function then test each input using POST and GET methods.
 
@@ -377,19 +377,16 @@ def xss(u,payload=None,show_warnings=True,target_form_action=None,ignore_values=
        pass
        break
     dic.update({form_index:{"Form":u,"Method":l1['method'],"Passed":vul,"Failed":sec}}) 
+   if save_to_file:
+    with open(save_to_file.split('.')[0]+".json", 'w') as outfile:
+     json.dump({"Payload":xp,"Page":target_page,"Output":dic}, outfile, indent=4)
+    outfile.close()
    return {"Payload":xp,"Page":target_page,"Output":dic}
 
 
 def exec_get(u,pl,delay=10,file_name="",based_on="time",user_agent=None,extra=None,timeout=10,proxy=None,cookie=None,debug=False,fill_empty=0,leave_empty=[]):
   '''
    this function is for rce test with GET requests.
-
-   it takes the 4 arguments:
-   
-   u: link to test
-   pl: dictionary contains the paramter and the rce payload
-   extra: if the request needs additionnal parameters you can add them there in dictionary format {param : value}
-   timeout: timeout flag for the request
 
   '''
   ran=random_string(random.randint(3,10))
@@ -489,7 +486,7 @@ def exec_post(u,pl,delay=10,file_name="",based_on=("time",10),user_agent=None,ex
   
 
 
-def rce(u,payload_index=0,injection={"command":"linux"},quote="",based_on="time",delay=10,target_os="linux",show_warnings=True,target_form_action=None,ignore_values=False,fresh=True,logs=True,fill_empty=10,proxy=None,ignored_values=["anonymous user","..."],proxies=None,timeout=40,user_agent=None,cookie=None,debug=False,leave_empty=[]):
+def rce(u,payload_index=0,save_to_file="rce_report",injection={"command":"linux"},quote="",based_on="time",delay=10,target_os="linux",show_warnings=True,target_form_action=None,ignore_values=False,fresh=True,logs=True,fill_empty=10,proxy=None,ignored_values=["anonymous user","..."],proxies=None,timeout=40,user_agent=None,cookie=None,debug=False,leave_empty=[]):
   '''
    this function is for RCE test with both POST and GET requests. it extracts the input fields names using the "inputs" function then test each input using POST and GET methods.
 
@@ -755,7 +752,11 @@ def rce(u,payload_index=0,injection={"command":"linux"},quote="",based_on="time"
          print (colr+x+Style.RESET_ALL)
       except Exception as ex:
        break
-    dic.update({form_index:{"Action":u,"Method":l1['method'],"Passed":vul,"Failed":sec}}) 
+    dic.update({form_index:{"Action":u,"Method":l1['method'],"Passed":vul,"Failed":sec}})
+   if save_to_file:
+    with open(save_to_file.split('.')[0]+".json", 'w') as outfile:
+     json.dump({"Payload":xp,"Page":target_page,"Output":dic}, outfile, indent=4)
+    outfile.close()    
    return {"Payload":xp,"Based on":based_on_o,"Injection":injection,"Page":target_page,"Output":dic}
 
 def valid_parameter(parm):
