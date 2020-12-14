@@ -57,14 +57,18 @@ def facebook_id(u):
  except:
   return None
 
-def check_file_virustotal(f,proxy=None,timeout=10):
+def check_file_virustotal(f,proxy=None,timeout=10,file_name=None):
+ if not file_name:
+  file=os.path.basename(os.path.normpath(f))
+  file_name=file.split('.')[0]+".json"
  if proxy:
   proxy={'http':'http://'+proxy}
  file_hash=sha256_file(f)
  try:
   r=requests.get('https://www.virustotal.com/ui/files/'+file_hash,headers={'Accept':'application/json','Referer':'https://www.virustotal.com/','content-type': 'application/json','X-Tool': 'vt-ui-main','X-VT-Anti-Abuse-Header': 'MTg4NDc3OTI3NzctWkc5dWRDQmlaU0JsZG1scy0xNjA0NjI1MTA4Ljg0Mg==','x-app-version': '20201029t163205','User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:82.0) Gecko/20100101 Firefox/82.0','Accept-Language': 'en-US,en;q=0.5','Accept-Ianguage': 'en-US,en;q=0.9,es;q=0.8','Connection': 'close','Accept-Encoding': 'gzip, deflate','Host':'www.virustotal.com'})
-  return json.loads(r.text)
- except Exception as e:
+  delete_file(file_name)
+  write_file(r.text,file_name)
+ except:
   pass
 
 def google_dorking(q,max_results=100,language='en',start_from=1, stop_on=None,top_level_domain='com',pause=2):

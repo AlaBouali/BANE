@@ -1,4 +1,4 @@
-import os,sys,socket,random,time,threading,smtplib,xtelnet
+import os,sys,socket,random,time,threading,xtelnet
 from bane.payloads import *
 from bane.vulns import adb_exploit,exposed_telnet
 from ftplib import FTP
@@ -65,8 +65,10 @@ class mass_scan:
     so.connect((ip,self.port))
     i=True
     so.close()
-   except Exception as ex: 
+   except:
     pass
+   if self.stop==True:
+         break
    if i==True:
     if self.protocol=="adb":
      q=adb_exploit(ip,timeout=self.timeout,p=self.port)
@@ -101,3 +103,8 @@ class mass_scan:
         break
       except:
        pass
+ def reset(self):
+   for x in self.__dict__:
+    self.__dict__[x]=None
+ def kill(self):
+  self.stop=True
