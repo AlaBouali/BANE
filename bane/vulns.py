@@ -1482,17 +1482,17 @@ def slow_read_test(u,port=80,logs=True,timeout=5,duration=180,randomly=False,wai
    print("==>connection closed at: {} seconds".format(int(time.time()-ti)))
   return int(time.time()-ti)
 
-def adb_exploit(u,timeout=5,port=5555):
+def adb_exploit(u,timeout=5,p=5555):
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.settimeout(timeout)
-        s.connect((u,port))
+        s.connect((u,p))
         s.send(b"CNXN\x00\x00\x00\x01\x00\x10\x00\x00\x07\x00\x00\x00\x32\x02\x00\x00\xbc\xb1\xa7\xb1host::\x00") 
         c=s.recv(4096)
         s.close()
         if "CNXN" in str(c):
             return True
-    except Exception as e:
+    except:
         pass
     return False
 

@@ -12,7 +12,8 @@ from bane.payloads import *
 
 def clear_file(w):
  with open(w,'w'):
-    pass
+     pass
+ f.close()
 
 def delete_file(w):
  if os.path.exists(w):
@@ -21,15 +22,17 @@ def delete_file(w):
 def write_file(w,fi):
     with open(fi ,"a+") as f:
         f.write(w+'\n')
-        return   
-
+    f.close()
 def read_file(w):
     with open(w ,"r") as f:
-        return f.readlines()
+        l= f.readlines()
+    f.close()
+    return l
 
 def create_file(w):
     with open(w ,"a+") as f:
-     pass   
+     pass
+    f.close()
 
 def get_cf_cookie(domain,user_agent):
   try:
