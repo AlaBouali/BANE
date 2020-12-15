@@ -376,7 +376,6 @@ def xss(u,payload=None,save_to_file="xss_report",show_warnings=True,target_form_
          print (colr+x+Style.RESET_ALL)
       except Exception as ex:
        pass
-       break
     dic.update({form_index:{"Form":u,"Method":l1['method'],"Passed":vul,"Failed":sec}}) 
    if save_to_file:
     with open(save_to_file.split('.')[0]+".json", 'w') as outfile:
@@ -435,7 +434,7 @@ def exec_get(u,pl,delay=10,file_name="",based_on="time",user_agent=None,extra=No
       if int(time.time()-t)>=based_on[1]-2:
        return (True,'')
   except Exception as e:
-   print(e)
+   pass
   return (False,'')
 
 
