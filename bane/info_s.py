@@ -2,17 +2,23 @@ import requests,urllib,socket,random,time,re,threading,sys,whois,json,os,xtelnet
 import bs4
 from bs4 import BeautifulSoup
 from bane.payloads import *
+from scapy.all import *
 if os.path.isdir('/data/data/com.termux/')==False:
     import dns.resolver
+
 def remove_html_tags(text):
     """Remove html tags from a string"""
     clean = re.compile('<.*?>')
     return re.sub(clean, '', text)
+
+
 def get_banner(u,p=23,timeout=3,payload=None):
  try:
   return xtelnet.get_banner(u,p=p,timeout=timeout,payload=payload)
  except:
   return None
+
+
 def info(u,timeout=10,proxy=None,logs=False,returning=True):
  '''
    this function fetchs all informations about the given ip or domain using check-host.net and returns them to the use as string
@@ -75,6 +81,7 @@ def info(u,timeout=10,proxy=None,logs=False,returning=True):
    return di
  except:
   return None
+
 def norton_rate(u,timeout=30,proxy=None):
  '''
    this function takes any giving and gives a security report from: safeweb.norton.com, if it is a: spam domain, contains a malware...
@@ -104,6 +111,7 @@ def norton_rate(u,timeout=30,proxy=None):
    return {"Profile":s[0],"Rate":float(s[1])}
  except:
   pass
+
 def myip(proxy=None,proxy_type=None,timeout=15):
  '''
    this function is for getting your ip using: ipinfo.io
@@ -131,6 +139,7 @@ def myip(proxy=None,proxy_type=None,timeout=15):
  except:
   pass
  return ''
+
 def who_is(u):
  u=u.replace('www.','')
  try:
@@ -138,6 +147,7 @@ def who_is(u):
  except:
   pass
  return {}
+
 def geoip(u,timeout=15,proxy=None):
  '''
    this function is for getting: geoip informations
@@ -150,6 +160,8 @@ def geoip(u,timeout=15,proxy=None):
  except:
   pass
  return {}
+
+
 def headers(u,timeout=10,logs=True,returning=False,proxy=None):
  try:
    if proxy:
@@ -163,6 +175,8 @@ def headers(u,timeout=10,logs=True,returning=False,proxy=None):
    print("{} : {}".format(x,a[x]))
  if returning==True:
   return a
+
+
 def reverse_ip_lookup(u,timeout=10,logs=True,returning=False,proxy=None):
  '''
    this function is for: reverse ip look up
@@ -182,6 +196,8 @@ def reverse_ip_lookup(u,timeout=10,logs=True,returning=False,proxy=None):
 '''
    end of the information gathering functions using: api.hackertarget.com
 '''
+
+
 def resolve(u,server='8.8.8.8',timeout=1,lifetime=1):
  o=[]
  r = dns.resolver.Resolver()
@@ -205,24 +221,54 @@ this should give you a dict like this:
 {'443': 'Open', '22': 'Closed', '21': 'Closed', '23': 'Closed', '80': 'Closed', '3306': 'Closed'}
 
 """
+
+def get_local_ip():
+ try:
+  return [l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) if l][0][0]
+ except:
+  return '127.0.0.1'
+
+def host_alive(target):
+ if os.name == 'nt':
+  r = os.popen("ping -n 1 "+target).readlines() 
+ else:
+  r = os.popen("ping -c 1 "+target).readlines() 
+ if "TTL" in str(r):
+  r=None
+  return True
+ r=None
+ return False
+
+
+def tcp_scan(ip,port=1,timeout=2,retry=1,check_open=False):
+    syn = IP(dst=ip) / TCP(dport=port, flags="S")
+    ans, unans = sr(syn, timeout=timeout,retry=retry,verbose=0)
+    for sent, received in ans:
+        if check_open==True:
+         if received[TCP].flags == "SA":
+          return True
+         else:
+          return False
+        if received[TCP].flags == "RA" or received[TCP].flags == "SA":
+            return True
+    return False
+
+
 class port_scan:
- __slots__=["timeout","por","result","target"]
- def __new__(cls):
-         return self.result
-         return super(port_scan, cls).__new__(cls)
+ __slots__=["timeout","por","result","target","retry"]
+ 
  def scan (self):
         p=self.por[self.flag2]
-        s= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.settimeout(self.timeout)
-        r = s.connect_ex((self.target, int(p)))
-        if r == 0:
-         self.result.update({str(p):"Open"})
+        a= tcp_scan(self.target,port=int(p),check_open=True,timeout=self.timeout,retry=self.retry)
+        if a==True:
+         self.result.update({p:1})
         else:
-         self.result.update({str(p):"Closed"})
-        s.close()
- def __init__(self,u,ports=[21,22,23,25,43,53,80,443,2082,3306],timeout=5):
+         self.result.update({p:0})
+         
+ def __init__(self,u,ports=[21,22,23,25,43,53,80,443,2082,3306],timeout=2,retry=0):
   try:
    thr=[]
+   self.retry=retry
    self.result={}
    self.timeout=timeout
    self.por=ports
@@ -235,15 +281,10 @@ class port_scan:
     time.sleep(.1)
   except:
       pass
-  for x in thr:
-    try:
-      x.join(1)
-    except:
-      pass
-    del x
-  self.timeout=None
-  self.por=None
-  self.target=None
+  for x in self.__dict__:
+   if x!="result":
+    self.__dict__[x]=None
+
 
 class subdomains_finder:
  __slots__=["stop","finish","result"]
@@ -298,6 +339,7 @@ class subdomains_finder:
  def done(self):
   return self.finish
   
+
 def securitytrails_subdomains(domain,timeout=15,cookie=None,user_agent=None,proxy=None):
  l=[]
  try:
