@@ -1115,9 +1115,9 @@ def exposed_env(u,user_agent=None,cookie=None,proxies=None,proxy=None,path="",br
 def vulners_search(software,file_name="",max_vulnerabilities=100,version="",software_type="software",user_agent=None,cookie=None,proxies=None,proxy=None,timeout=20):
   if not file_name:
    if version:
-    file_name=software+"-"+version+".json"
+    file_name=software+"-"+version.replace('.','-')
    else:
-    file_name=software+".json"
+    file_name=software
   if user_agent:
    us=user_agent
   else:
@@ -1144,8 +1144,7 @@ def vulners_search(software,file_name="",max_vulnerabilities=100,version="",soft
    r=requests.get("https://vulners.com/api/v3/burp/software/",params=d,headers = hea,proxies=proxy,timeout=timeout, verify=False)
    c=json.loads(r.text)
    if c["result"]=="OK":
-    delete_file(file_name)
-    write_file(r.text,file_name)
+    write_file(r.text,file_namefile_name.split('.')[0]+".json")
     l={}
     m= c["data"]["search"]
     i=0
@@ -1155,4 +1154,15 @@ def vulners_search(software,file_name="",max_vulnerabilities=100,version="",soft
     return l
   except:
    pass
+  return {}
+
+def shodan_report(ip,api_key,file_name="shodan_report"):
+ u="https://api.shodan.io/shodan/host/{}?key={}".format(ip,api_key)
+ try:
+  r=requests.get(u,headers={"User-Agent":random.choice(ua)}).text
+  with open(file_name.split('.')[0]+".json", 'w') as outfile:
+     json.dump(json.loads(r), outfile, indent=4)
+  outfile.close() 
+  return json.loads(r)
+ except:
   return {}
