@@ -430,7 +430,7 @@ def exec_get(u,pl,delay=10,file_name="",based_on="time",user_agent=None,extra=No
       if ((c.status_code==200)and (len(c.text)==0)):
         return (True, u.replace(u.split("/")[-1],based_on[1])+".txt")
      if based_on[0]=="time":
-      if int(time.time()-t)>=based_on[1]:
+      if int(time.time()-t)>=based_on[1]-2:
        return (True,'')
   except Exception as e:
    pass
@@ -479,7 +479,7 @@ def exec_post(u,pl,delay=10,file_name="",based_on=("time",10),user_agent=None,ex
       if ((c.status_code==200)and (len(c.text)==0)):
         return (True, u.replace(u.split("/")[-1],based_on[1])+".txt")
      if based_on[0]=="time":
-      if int(time.time()-t)>=based_on[1]:
+      if int(time.time()-t)>=based_on[1]-2:
        return (True,'')
   except Exception as e:
    pass
@@ -487,7 +487,7 @@ def exec_post(u,pl,delay=10,file_name="",based_on=("time",10),user_agent=None,ex
   
 
 
-def rce(u,payload_index=0,save_to_file="rce_report",injection={"command":"linux"},quote="",based_on="time",delay=10,target_os="linux",show_warnings=True,target_form_action=None,ignore_values=False,fresh=True,logs=True,fill_empty=10,proxy=None,ignored_values=["anonymous user","..."],proxies=None,timeout=40,user_agent=None,cookie=None,debug=False,leave_empty=[]):
+def rce(u,payload_index=0,save_to_file="rce_report",injection={"command":"linux"},quote="",based_on="time",delay=10,show_warnings=True,target_form_action=None,ignore_values=False,fresh=True,logs=True,fill_empty=10,proxy=None,ignored_values=["anonymous user","..."],proxies=None,timeout=40,user_agent=None,cookie=None,debug=False,leave_empty=[]):
   '''
    this function is for RCE test with both POST and GET requests. it extracts the input fields names using the "inputs" function then test each input using POST and GET methods.
 
@@ -614,7 +614,7 @@ def rce(u,payload_index=0,save_to_file="rce_report",injection={"command":"linux"
     if based_on_o.lower()=="file":
      based_on=("file",random_string(random.randint(3,10)))
     else:
-     based_on=("time",int(delay))
+     based_on=("time",int(delay)+2)
     xp=xp.format(based_on[1])
     lst={}
     vul=[]
@@ -627,7 +627,7 @@ def rce(u,payload_index=0,save_to_file="rce_report",injection={"command":"linux"
      post=False
      get=True
     if logs==True:
-      print(Fore.BLUE+"Form: "+Fore.WHITE+str(form_index)+Fore.BLUE+"\nAction: "+Fore.WHITE+u+Fore.BLUE+"\nMethod: "+Fore.WHITE+l1['method']+Fore.BLUE+"\nPayload: "+Fore.WHITE+xp+Style.RESET_ALL)
+      print(Fore.BLUE+"Form: "+Fore.WHITE+str(form_index)+Fore.BLUE+"\nAction: "+Fore.WHITE+u+Fore.BLUE+"\nMethod: "+Fore.WHITE+l1['method']+Fore.BLUE+"\nPayload: "+Fore.WHITE+xp.replace(" {} ".format(int(delay)+2)," {} ".format(int(delay)))+Style.RESET_ALL)
     """if len(inputs(u,proxy=proxy,timeout=timeout,value=True,cookie=cookie,user_agent=user_agent))==0:
      if logs==True:
       print(Fore.YELLOW+"[-]No parameters found on that page !! Moving on.."+Style.RESET_ALL)"""
@@ -754,11 +754,16 @@ def rce(u,payload_index=0,save_to_file="rce_report",injection={"command":"linux"
       except Exception as ex:
        break
     dic.update({form_index:{"Action":u,"Method":l1['method'],"Passed":vul,"Failed":sec}})
+   if based_on_o=="time":
+    final={"Payload":xp.replace(" {} ".format(int(delay)+2)," {} ".format(int(delay))),"Based on":based_on_o,"Injection":injection,"Page":target_page,"Output":dic}
+   else:
+    final={"Payload":xp,"Based on":based_on_o,"Injection":injection,"Page":target_page,"Output":dic}
    if save_to_file:
     with open(save_to_file.split('.')[0]+".json", 'w') as outfile:
-     json.dump({"Payload":xp,"Page":target_page,"Output":dic}, outfile, indent=4)
-    outfile.close()    
-   return {"Payload":xp,"Based on":based_on_o,"Injection":injection,"Page":target_page,"Output":dic}
+     json.dump(final, outfile, indent=4)
+    outfile.close() 
+   return final
+   
 
 def valid_parameter(parm):
  try:
@@ -1144,7 +1149,9 @@ def vulners_search(software,file_name="",max_vulnerabilities=100,version="",soft
    r=requests.get("https://vulners.com/api/v3/burp/software/",params=d,headers = hea,proxies=proxy,timeout=timeout, verify=False)
    c=json.loads(r.text)
    if c["result"]=="OK":
-    write_file(r.text,file_namefile_name.split('.')[0]+".json")
+    with open(file_name.split('.')[0]+".json", 'w') as outfile:
+     json.dump(c, outfile, indent=4)
+    outfile.close()
     l={}
     m= c["data"]["search"]
     i=0
