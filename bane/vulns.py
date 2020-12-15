@@ -421,11 +421,9 @@ def exec_get(u,pl,delay=10,file_name="",based_on="time",user_agent=None,extra=No
    for x in d:
     print("{}{} : {}{}".format(Fore.MAGENTA,x,Fore.WHITE,d[x]))
   try:
-     print(based_on,u)
      if based_on[0]=="time":
       t=time.time()
-     c=requests.get(u.replace("#",""), params= pl,headers = hea,proxies=proxy,timeout=timeout, verify=False)
-     print(c.url)
+     c=requests.get(u.replace("#",""), params= d,headers = hea,proxies=proxy,timeout=timeout, verify=False)
      if based_on[0]=="file":
       c=requests.get(u.replace(u.split("/")[-1],based_on[1]+".txt").replace("#",""), params= pl,headers = hea,proxies=proxy,timeout=timeout, verify=False)
       if ((c.status_code==200)and (len(c.text)==0)):
