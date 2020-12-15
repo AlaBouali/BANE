@@ -139,7 +139,7 @@ def xss_get(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None,de
    for x in d:
     print("{}{} : {}{}".format(Fore.MAGENTA,x,Fore.WHITE,d[x]))
   try:
-     c=requests.get(u, params= pl,headers = hea,proxies=proxy,timeout=timeout, verify=False).text
+     c=requests.get(u, params= d,headers = hea,proxies=proxy,timeout=timeout, verify=False).text
      if  xp in c:
       return (True,find_xss_context(c,xp))
   except Exception as e:
