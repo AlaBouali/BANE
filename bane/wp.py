@@ -32,7 +32,7 @@ def wpadmin(u,username,password,user_agent=None,cookie=None,path='/xmlrpc.php',t
  except:
   pass
  return False
-def wp_users_list(u,path='/wp-json/wp/v2/users',timeout=10,user_agent=None,cookie=None,proxy=None):
+def wp_users(u,path='/wp-json/wp/v2/users',timeout=10,user_agent=None,cookie=None,proxy=None):
  '''
    this function is to get WP users
 '''
@@ -54,11 +54,11 @@ def wp_users_list(u,path='/wp-json/wp/v2/users',timeout=10,user_agent=None,cooki
    a= json.loads(r.text)
    users=[]
    for x in range(len(a)):
-    users.append({'slug':a[x]['slug'],'name':a[x]['name']})
-   return (users,a)
+    users.append({'id':a[x]['id'],'slug':a[x]['slug'],'name':a[x]['name']})
+   return users
  except Exception as e:
   pass
- 
+
 def wp_user(u,path='/wp-json/wp/v2/users/',user=1,user_agent=None,cookie=None,timeout=10,proxy=None):
  '''
    this function is to return all informations about a WP user with a given index integer
@@ -82,52 +82,7 @@ def wp_user(u,path='/wp-json/wp/v2/users/',user=1,user_agent=None,cookie=None,ti
  except Exception as e:
   pass
  
-def wp_posts_list(u,path='/wp-json/wp/v2/posts',timeout=10,user_agent=None,cookie=None,proxy=None):
- '''
-   this function is to get WP posts
-'''
- if user_agent:
-  us=user_agent
- else:
-  us=random.choice(ua)
- hed={"User-Agent":us}
- if cookie:
-  hed.update({"Cookie":cookie})
- if proxy:
-  proxy={'http':'http://'+proxy}
- if u[len(u)-1]=='/':
-  u=u[0:len(u)-1]
- u+=path
- try:
-  r=requests.get(u, headers = hed,proxies=proxy,timeout=timeout, verify=False)
-  if ('{"id":'in r.text) and('"date":"' in r.text):
-   return json.loads(r.text)
- except Exception as e:
-  pass
- 
-def wp_post(u,path='/wp-json/wp/v2/posts/',post=1,timeout=10,user_agent=None,cookie=None,proxy=None):
- '''
-   this function is to return all informations about a WP post with a given index integer
-'''
- if user_agent:
-  us=user_agent
- else:
-  us=random.choice(ua)
- hed={"User-Agent":us}
- if cookie:
-  hed.update({"Cookie":cookie})
- if proxy:
-  proxy={'http':'http://'+proxy}
- if u[len(u)-1]=='/':
-  u=u[0:len(u)-1]
- u+=path+str(post)
- try:
-  r=requests.get(u, headers = hed,proxies=proxy,timeout=timeout, verify=False)
-  if ('{"id":'in r.text) and('"date":"' in r.text):
-   return json.loads(r.text)
- except Exception as e:
-  pass
- 
+
 def wp_users_enumeration(u,path='/',timeout=15,user_agent=None,cookie=None,proxy=None,start=1,end=20,logs=True):
  if user_agent:
   us=user_agent
@@ -155,6 +110,7 @@ def wp_users_enumeration(u,path='/',timeout=15,user_agent=None,cookie=None,proxy
   except:
       pass
  return l
+
 def wp_version(u,timeout=15,user_agent=None,cookie=None,proxy=None):
  if user_agent:
   us=user_agent
@@ -167,6 +123,6 @@ def wp_version(u,timeout=15,user_agent=None,cookie=None,proxy=None):
   proxy={'http':'http://'+proxy}
  try:
   r=requests.get(u,headers = hed,proxies=proxy,timeout=timeout, verify=False).text
-  return r.split('<meta name="generator" content="')[1].split('"')[0].strip()
+  return r.split('<meta name="generator" content="')[1].split('"')[0].strip().split(' ')[1]
  except:
   pass
