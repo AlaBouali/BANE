@@ -425,7 +425,7 @@ def exec_get(u,pl,delay=10,file_name="",based_on="time",user_agent=None,extra=No
       t=time.time()
      c=requests.get(u.replace("#",""), params= d,headers = hea,proxies=proxy,timeout=timeout, verify=False)
      if based_on[0]=="file":
-      c=requests.get(u.replace(u.split("/")[-1],based_on[1]+".txt").replace("#",""), params= pl,headers = hea,proxies=proxy,timeout=timeout, verify=False)
+      c=requests.get(u.replace(u.split("/")[-1],based_on[1]+".txt").replace("#",""), params= d,headers = hea,proxies=proxy,timeout=timeout, verify=False)
       if ((c.status_code==200)and (len(c.text)==0)):
         return (True, u.replace(u.split("/")[-1],based_on[1])+".txt")
      if based_on[0]=="time":
@@ -474,7 +474,7 @@ def exec_post(u,pl,delay=10,file_name="",based_on=("time",10),user_agent=None,ex
       t=time.time()
      c=requests.post(u, data= d,headers = hea,proxies=proxy,timeout=timeout, verify=False).text
      if based_on[0]=="file":
-      c=requests.get(u.replace(u.split("/")[-1],based_on[1]+".txt"), params= pl,headers = hea,proxies=proxy,timeout=timeout, verify=False)
+      c=requests.get(u.replace(u.split("/")[-1],based_on[1]+".txt"), params= d,headers = hea,proxies=proxy,timeout=timeout, verify=False)
       if ((c.status_code==200)and (len(c.text)==0)):
         return (True, u.replace(u.split("/")[-1],based_on[1])+".txt")
      if based_on[0]=="time":
@@ -830,9 +830,15 @@ def file_inclusion(u,null_byte=False,bypass=False,target_os="linux",file_wrapper
    for y in x[3]:
     if valid_parameter(y[1])==True:
      trgt=ur.replace(y[0]+"="+y[1],y[0]+"={}")
-     q=file_inclusion_link(trgt,null_byte=null_byte,bypass=bypass,target_os=target_os,file_wrapper=file_wrapper,proxy=proxy,proxies=proxies,timeout=timeout,cookie=cookie,user_agent=user_agent)
+     q=file_inclusion_link(trgt,null_byte=null_byte,bypass=bypass,target_os="linux",file_wrapper=file_wrapper,proxy=proxy,proxies=proxies,timeout=timeout,cookie=cookie,user_agent=user_agent)
      if q[0]==True:
-      res.append(q[1])
+      if q[1] not in res:
+        res.append(q[1])
+     else:
+      q=file_inclusion_link(trgt,null_byte=null_byte,bypass=bypass,file_wrapper=file_wrapper,proxy=proxy,proxies=proxies,timeout=timeout,cookie=cookie,user_agent=user_agent,target_os="windows")
+      if q[0]==True:
+       if q[1] not in res:
+        res.append(q[1])
  return res
 
 
