@@ -116,9 +116,11 @@ def forms(u,value=True,user_agent=None,timeout=10,bypass=False,proxy=None,cookie
     url_o="/".join(u.split('/')[:-1])
     ac=url_o+"/"+ac"""
    if ("://" not in ac):
+      ur=u[:u.rfind('/')]
       if ac[0]=="/":
        ac=ac[1:len(ac)]
-      ac=u+ac
+       print(ac)
+      ac=ur+"/"+ac
    me=f.get('method')
    if not me :
     me="get"

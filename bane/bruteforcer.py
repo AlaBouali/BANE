@@ -8,9 +8,9 @@ if os.path.isdir('/data/data')==True:
 if os.path.isdir('/data/data/com.termux/')==True:
     termux=True
 import mysqlcp
-from bane.pager import *
-from bane.wp import wpadmin
-from bane.hasher import *
+from .pager import *
+from .wp import wpadmin
+from .hasher import *
 
 class http_auth_bf:
  __slots__=["stop","finish","result"]
@@ -151,7 +151,7 @@ class web_login_bruteforce:
          b=x.split(':')[1]
          extra.update({a:b})
    pl.update(extra)
-   r=requests.post(u,data=pl,headers = hed,allow_redirects=False,proxies=proxy,timeout=timeout, verify=False)
+   r=requests.post(u,data=pl,headers = hed,proxies=proxy,timeout=timeout, verify=False)
    if (all( x in r.text for x in black)==False):
     return True
   except:
@@ -279,22 +279,23 @@ class filemanager_finder:
     if u[len(u)-1]=='/':
      u=u[0:len(u)-1]
     g=u+i
-    if logs==True:
-     print("[*]Trying:",g)
     r=requests.get(g,  headers = hed , allow_redirects=False,proxies=proxy,timeout=timeout, verify=False) 
     if r.status_code == requests.codes.ok:
      if ("Uncaught exception" not in r.text) and ("404 Not Found" not in r.text) and ('could not be found' not in r.text):
        self.finish=True
        if logs==True:
-        print("[+]FOUND!!!")
+        sys.stdout.write("\rStats: {}/{} | Found: {}  ".format(manager.index(g),len(manager),self.finish))
+        sys.stdout.flush()
        self.result.update({u:g})
        break
      else:
         if logs==True:
-         print("[-]Failed")
+         sys.stdout.write("\rStats: {}/{} | Found: {}  ".format(manager.index(g),len(manager),self.finish))
+         sys.stdout.flush()
     else:
      if logs==True:
-      print("[-]Failed")
+        sys.stdout.write("\rStats: {}/{} | Found: {}  ".format(manager.index(g),len(manager),self.finish))
+        sys.stdout.flush()
    except KeyboardInterrupt:
     break
    except Exception as e:
