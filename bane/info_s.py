@@ -339,14 +339,3 @@ class subdomains_finder:
  def done(self):
   return self.finish
   
-
-def securitytrails_subdomains(domain,timeout=15,cookie=None,user_agent=None,proxy=None):
- l=[]
- try:
-  r=crawl('https://securitytrails.com/list/apex_domain/'+domain,proxy=proxy,cookie=cookie,user_agent=user_agent,timeout=timeout)
-  for x in r:
-   if domain in r[x][0]:
-    l.append(r[x][0])
- except:
-  pass
- return l

