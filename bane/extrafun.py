@@ -39,7 +39,7 @@ def get_cf_cookie(domain,user_agent):
   try:
    s = cfscrape.create_scraper()
    c = s.get_cookie_string("http://"+domain,user_agent=user_agent)
-   return str(c).split("'")[1].split("'")[0]
+   return c[0]
   except:
    return {}
 

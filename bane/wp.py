@@ -268,7 +268,7 @@ def wp_users_enumeration(u,path='/',timeout=15,user_agent=None,cookie=None,proxy
        a=a.split(',')[0]
        l.append((x,a))
        if logs==True:
-          print("[+]Username found: {} | ID: {}".format(a,x))
+          print("[+]Username found: {} | ID: {}".format(a.encode("utf-8","replace"),x))
   except KeyboardInterrupt:
       break
   except:

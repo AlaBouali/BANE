@@ -33,8 +33,6 @@ if (sys.platform == "win32") or( sys.platform == "win64"):
  y=""
  m=""
  res=""
-path='/'
-timeout=15
 
 def random_str(size):
  s=""
@@ -291,11 +289,12 @@ $R@i.~~ !     :   ~$$$$$B$$en:``
 
     def Plugin_NamE_Vuln_TeST(self, Plugin_NaME):
         Plugin_NaME=self.get_plugin_name(Plugin_NaME)
-        agn=random_str(random.randint(3,15))
+        agn=random_str(random.randint(10,30))
         while True:
          try:
           cook=get_cf_cookie('wpvulndb.com',agn)
-          break
+          if len(cook)>0:
+           break
          except:
           pass
         headers={"User-agent":agn,"Cookie":cook}
@@ -317,7 +316,7 @@ $R@i.~~ !     :   ~$$$$$B$$en:``
                 for a in soup.find_all('a'):
                   if a.has_attr('href') and '<a href="/vulnerability/' in str(a):
                    a=str(a)
-                   cod=int(a.split('vulnerability/')[1].split('">')[0])
+                   cod=a.split('vulnerability/')[1].split('">')[0]
                    if cod not in az:
                     az.append(cod)
                    tite=a.split('">')[1].split('</a')[0]
@@ -401,6 +400,7 @@ $R@i.~~ !     :   ~$$$$$B$$en:``
         for name_plugins in plugin_NamEz:
             print (r + '    [' + y + '+' + r + ']' + w + ' Plugin Name: ' + m + name_plugins)
             self.Plugin_NamE_Vuln_TeST(name_plugins)
+            time.sleep(5)
 
     def GeT_Theme_Name(self):
         a = re.findall('/wp-content/themes/(.*)', self.CheckWordpress.text)
