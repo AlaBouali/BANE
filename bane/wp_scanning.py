@@ -89,9 +89,9 @@ class S0u1wp():
             if self.check==True:
                 #self.cls()
                 #self.print_logo()
-                print (r + '    [' + y + '+' + r + ']' + w + ' URL      : ' + m + str(self.url.split(self.wp_path)[0]))
-                print (r + '    [' + y + '+' + r + ']' + w + ' IP Server: ' + m + ip)
-                print (r + '    [' + y + '+' + r + ']' + w + ' Server   : ' + m + self.CheckWordpress.headers[
+                print (r + '[' + y + '+' + r + ']' + w + ' URL      : ' + m + str(self.url.split(self.wp_path)[0]))
+                print (r + '[' + y + '+' + r + ']' + w + ' IP Server: ' + m + ip)
+                print (r + '[' + y + '+' + r + ']' + w + ' Server   : ' + m + self.CheckWordpress.headers[
                     'server'])
                 try:
                  self.UserName_Enumeration()
@@ -143,7 +143,7 @@ class S0u1wp():
     def Worng(self):
         try:
             print (y + '---------------------------------------------------')
-            print (g + '    [' + y + '+' + g + ']' + r + ' Error: ' + y + '    [ ' + w + \
+            print (g + '[' + y + '+' + g + ']' + r + ' Error: ' + y + '    [ ' + w + \
                   ' Enter Valid Domain, We Cant Connect to Server ' + y + ']')
         except:
             pass
@@ -151,7 +151,7 @@ class S0u1wp():
     def Worng2(self):
         try:
             print( y + '---------------------------------------------------')
-            print (g + '    [' + y + '+' + g + ']' + r + ' Error: ' + y + '    [ ' + w + \
+            print (g + '[' + y + '+' + g + ']' + r + ' Error: ' + y + '    [ ' + w + \
                   ' This WebSite Not WordPress! ' + y + ']')
         except:
             pass
@@ -225,9 +225,9 @@ $R@i.~~ !     :   ~$$$$$B$$en:``
                     if '/feed' in username:
                         find = re.findall('/author/(.*)/feed/"', __Check2.text)
                         username2 = find[0].strip()
-                        print (r + '    [' + y + '+' + r + ']' + w + ' Wordpress Username: ' + m + username2)
+                        print (r + '[' + y + '+' + r + ']' + w + ' Wordpress Username: ' + m + username2)
                     else:
-                        print (r + '    [' + y + '+' + r + ']' + w + ' Wordpress Username: ' + m + username)
+                        print (r + '[' + y + '+' + r + ']' + w + ' Wordpress Username: ' + m + username)
 
             except requests.exceptions.ReadTimeout:
                 #self.cls()
@@ -261,15 +261,15 @@ $R@i.~~ !     :   ~$$$$$B$$en:``
                 Cpanel_username = Hunt_Path_User()
                 Path_Host = Hunt_Path_Host()
                 if Cpanel_username == None:
-                    print (r + '    [' + y + '+' + r + ']' + w + ' Cpanel Username: ' + r + 'Not Found')
+                    print (r + '[' + y + '+' + r + ']' + w + ' Cpanel Username: ' + r + 'Not Found')
 
                 else:
-                    print (r + '    [' + y + '+' + r + ']' + w + ' Cpanel Username: ' + m + Cpanel_username)
+                    print (r + '[' + y + '+' + r + ']' + w + ' Cpanel Username: ' + m + Cpanel_username)
 
                 if Path_Host == None:
-                    print (r + '    [' + y + '+' + r + ']' + w + ' User Path Host : ' + r + 'Not Found')
+                    print (r + '[' + y + '+' + r + ']' + w + ' User Path Host : ' + r + 'Not Found')
                 else:
-                    print( r + '    [' + y + '+' + r + ']' + w + ' User Path Host : ' + m + Path_Host)
+                    print( r + '[' + y + '+' + r + ']' + w + ' User Path Host : ' + m + Path_Host)
 
         except requests.exceptions.ReadTimeout:
             #self.cls()
@@ -327,7 +327,7 @@ $R@i.~~ !     :   ~$$$$$B$$en:``
                 for x in range(int(bb)):
                     uz = 'https://www.wpvulndb.com/vulnerability/' + str(az[cal])
                     self.vulnerabilities.update({uz:(titles[cal].replace("&lt;",'')).replace('&amp;','')})
-                    print (r + '        [' + y + 'MiGhT bE VuLn' + r + '] ' + w + uz + " --- " +(titles[cal].replace("&lt;",'')).replace('&amp;','') + r )
+                    print (r + '[' + y + 'MiGhT bE VuLn' + r + '] ' + w + uz + " --- " +(titles[cal].replace("&lt;",'')).replace('&amp;','') + r )
                     cal += 1
                 cal = 0
                 num = num + 1
@@ -342,13 +342,13 @@ $R@i.~~ !     :   ~$$$$$B$$en:``
                     print( r + '    [' + y + '+' + r + ']' + w + ' Wp Version: ' + m + version)
                     self.Plugin_NamE_Vuln_TeST('Wordpress ' + version)
             except:
-                print (r + '    [' + y + '+' + r + ']' + w + ' Wp Version: ' + r + 'Not Found')
+                print (r + '[' + y + '+' + r + ']' + w + ' Wp Version: ' + r + 'Not Found')
 
         except requests.exceptions.ReadTimeout:
             #self.cls()
             #self.print_logo()
             print (y + '---------------------------------------------------')
-            print (g + '    [' + y + '+' + g + ']' + r + ' Error: ' + y + '    [ ' + w + \
+            print (g + '[' + y + '+' + g + ']' + r + ' Error: ' + y + '    [ ' + w + \
                   ' ConnectionError! Maybe server Down, Or your ip is blocked! ' + y + ']')
 
     def GeT_PluGin_Name(self):
@@ -411,26 +411,26 @@ $R@i.~~ !     :   ~$$$$$B$$en:``
             OK_Ver = Name_Theme + ' ' + version[0]
             if '-' in OK_Ver:
                 x2 = OK_Ver.replace('-', ' ')
-                print (r + '    [' + y + '+' + r + ']' + w + ' Themes Name: ' + m + x2)
+                print (r + '[' + y + '+' + r + ']' + w + ' Themes Name: ' + m + x2)
                 self.Plugin_NamE_Vuln_TeST(x2)
             elif '_' in OK_Ver:
                 x = OK_Ver.replace('_', ' ')
-                print (r + '    [' + y + '+' + r + ']' + w + ' Themes Name: ' + m + x)
+                print (r + '[' + y + '+' + r + ']' + w + ' Themes Name: ' + m + x)
                 self.Plugin_NamE_Vuln_TeST(x)
             else:
-                print (r + '    [' + y + '+' + r + ']' + w + ' Themes Name: ' + m + OK_Ver)
+                print (r + '[' + y + '+' + r + ']' + w + ' Themes Name: ' + m + OK_Ver)
                 self.Plugin_NamE_Vuln_TeST(OK_Ver)
         else:
             if '-' in Name_Theme:
                 x2 = Name_Theme.replace('-', ' ')
-                print (r + '    [' + y + '+' + r + ']' + w + ' Themes Name: ' + m + x2)
+                print (r + '[' + y + '+' + r + ']' + w + ' Themes Name: ' + m + x2)
                 self.Plugin_NamE_Vuln_TeST(x2)
             elif '_' in Name_Theme:
                 x = Name_Theme.replace('_', ' ')
-                print (r + '    [' + y + '+' + r + ']' + w + ' Themes Name: ' + m + x)
+                print (r + '[' + y + '+' + r + ']' + w + ' Themes Name: ' + m + x)
                 self.Plugin_NamE_Vuln_TeST(x)
             else:
-                print (r + '    [' + y + '+' + r + ']' + w + ' Themes Name: ' + m + Name_Theme)
+                print (r + '[' + y + '+' + r + ']' + w + ' Themes Name: ' + m + Name_Theme)
                 self.Plugin_NamE_Vuln_TeST(Name_Theme)
 
 def wp_scan(u,path='/',check_wp=False,timeout=15,proxy=None,cookie=None,user_agent=None):
