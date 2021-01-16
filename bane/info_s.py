@@ -2,7 +2,14 @@ import requests,urllib,socket,random,time,re,threading,sys,whois,json,os,xtelnet
 import bs4
 from bs4 import BeautifulSoup
 from bane.payloads import *
-from scapy.all import *
+if  sys.version_info < (3,0):
+    from scapy.config import conf
+    conf.ipv6_enabled = False
+    from scapy.all import *
+else:
+    from kamene.config import conf
+    conf.ipv6_enabled = False
+    from kamene.all import *
 if os.path.isdir('/data/data/com.termux/')==False:
     import dns.resolver
 

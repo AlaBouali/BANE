@@ -90,7 +90,7 @@ def wp_xmlrpc_mass_bruteforce(u,user_agent=None,cookie=None,path='/xmlrpc.php',t
  return False
 
 
-def wp_xmlrpc_pingback(u,user_agent=None,cookie=None,path='/xmlrpc.php',timeout=10,proxy=None):
+def wp_xmlrpc_pingback(u,user_agent=None,test_url="https://www.google.com/",cookie=None,path='/xmlrpc.php',timeout=10,proxy=None):
  if proxy:
   proxy={'http':'http://'+proxy}
  if u[len(u)-1]=='/':
@@ -108,7 +108,7 @@ def wp_xmlrpc_pingback(u,user_agent=None,cookie=None,path='/xmlrpc.php',timeout=
 <methodName>pingback.ping</methodName>
 <params>
 <param>
-<value><string>https://www.google.com/</string></value>
+<value><string>"""+test_url+"""</string></value>
 </param>
 <param>
 <value><string>"""+u+"""</string></value>
