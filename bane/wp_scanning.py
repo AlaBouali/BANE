@@ -64,8 +64,8 @@ class S0u1wp():
             self.url = wp_url
             self.wp_path=path
         except IndexError:
-            self.cls()
-            self.print_logo()
+            #self.cls()
+            #self.print_logo()
             self.__option()
             #sys.exit()
         if self.url.startswith('http://'):
@@ -87,8 +87,8 @@ class S0u1wp():
              else:
                 self.check=False
             if self.check==True:
-                self.cls()
-                self.print_logo()
+                #self.cls()
+                #self.print_logo()
                 print (r + '    [' + y + '+' + r + ']' + w + ' URL      : ' + m + str(self.url.split(self.wp_path)[0]))
                 print (r + '    [' + y + '+' + r + ']' + w + ' IP Server: ' + m + ip)
                 print (r + '    [' + y + '+' + r + ']' + w + ' Server   : ' + m + self.CheckWordpress.headers[
@@ -114,20 +114,20 @@ class S0u1wp():
                 except :
                     pass
             else:
-                self.cls()
-                self.print_logo()
+                #self.cls()
+                #self.print_logo()
                 self.Worng2()
                 #sys.exit()
         except socket.gaierror:
-            self.cls()
-            self.print_logo()
+            #self.cls()
+            #self.print_logo()
             print (y + '---------------------------------------------------')
             print (g + '    [' + y + '+' + g + ']' + r + ' Error: ' + y + '    [ ' + w + \
                   ' Something worng! target.com without / in end ' + y + ']')
             #sys.exit()
         except requests.exceptions.ReadTimeout:
-            self.cls()
-            self.print_logo()
+            #self.cls()
+            #self.print_logo()
             print (y + '---------------------------------------------------')
             print (g + '    [' + y + '+' + g + ']' + r + ' Error: ' + y + '    [ ' + w + \
                   ' ConnectionError! Maybe server Down, Or your ip is blocked! ' + y + ']')
@@ -230,8 +230,8 @@ $R@i.~~ !     :   ~$$$$$B$$en:``
                         print (r + '    [' + y + '+' + r + ']' + w + ' Wordpress Username: ' + m + username)
 
             except requests.exceptions.ReadTimeout:
-                self.cls()
-                self.print_logo()
+                #self.cls()
+                #self.print_logo()
                 print (y + '---------------------------------------------------')
                 print (g + '    [' + y + '+' + g + ']' + r + ' Error: ' + y + '    [ ' + w + \
                       ' ConnectionError! Maybe server Down, Or your ip blocked! ' + y + ']')
@@ -272,8 +272,8 @@ $R@i.~~ !     :   ~$$$$$B$$en:``
                     print( r + '    [' + y + '+' + r + ']' + w + ' User Path Host : ' + m + Path_Host)
 
         except requests.exceptions.ReadTimeout:
-            self.cls()
-            self.print_logo()
+            #self.cls()
+            #self.print_logo()
             print (y + '---------------------------------------------------')
             print( g + '    [' + y + '+' + g + ']' + r + ' Error: ' + y + '    [ ' + w + \
                   ' ConnectionError! Maybe server Down, Or your ip is blocked! ' + y + ']')
@@ -345,8 +345,8 @@ $R@i.~~ !     :   ~$$$$$B$$en:``
                 print (r + '    [' + y + '+' + r + ']' + w + ' Wp Version: ' + r + 'Not Found')
 
         except requests.exceptions.ReadTimeout:
-            self.cls()
-            self.print_logo()
+            #self.cls()
+            #self.print_logo()
             print (y + '---------------------------------------------------')
             print (g + '    [' + y + '+' + g + ']' + r + ' Error: ' + y + '    [ ' + w + \
                   ' ConnectionError! Maybe server Down, Or your ip is blocked! ' + y + ']')
