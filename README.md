@@ -343,25 +343,15 @@ II-Usage (General usage):
 # IoTs mass scanning:
 
 <h4>Mass ssh scanning: (if you are on Windows OS, please install Putty)</h4>
-<br>bane.mass_ssh(threads=100 , word_list= ["root:root","admin:admin"] )
+<br>bane.mass_scan(threads=100 , protocol="ssh" , word_list= ["root:root","admin:admin"] )
 <h4>Mass telnet scanning:</h4>
-<br>bane.mass_telnet(threads=100 , word_list= ["root:root","admin:admin"] )
-<h4>Mass telnet scanning:</h4>
-<br>bane.mass_telnet(threads=100 , word_list= ["root:root","admin:admin"] )
-<h4>Mass unauthenticated telnet scanning:</h4>
-<br>bane.mass_exposed_telnet(threads=100 )
-<h4>Mass FTP scanning:</h4>
-<br>bane.mass_ftp(threads=100 , word_list= ["root:root","admin:admin"] )
-<h4>Mass Anonymous FTP scanning:</h4>
-<br>bane.mass_ftp_anon(threads=100 )
-<h4>Mass SMTP scanning:</h4>
-<br>bane.mass_smtp(threads=100 , word_list= ["root:root","admin:admin"] )
+<br>bane.mass_scan(threads=100 , protocol="telnet" , word_list= ["root:root","admin:admin"] )
+<h4>Mass ftp scanning:</h4>
+<br>bane.mass_scan(threads=100 , protocol="ftp" , word_list= ["root:root","admin:admin"] )
 <h4>Mass MySQL scanning:</h4>
-<br>bane.mass_mysql(threads=100 , word_list= ["root:root","admin:admin"] )
-<h4>Mass MySQL scanning for servers with username "root" and empty password:</h4>
-<br>bane.mass_mysql_default(threads=100 )
+br>bane.mass_scan(threads=100 , protocol="mysql" , word_list= ["root:root","admin:admin"] )
 <h4>Mass Android Debug Bridge (ADB) exploit:</h4>
-<br>bane.mass_adb(threads=100 )
+<br>bane.mass_scan(threads=100 , protocol="adb" )
 
 # Extract information from page:
 
@@ -405,9 +395,11 @@ II-Usage (General usage):
 <h4>Very Fast port scan:</h4>
 <br>bane.port_scan( IP , ports=[21,22,23,25,43,53,80,443,2082,3306] , timeout=5 ).result
 <h4>Subdomains finder:</h4>
+<br>import bane, time
 <br>bane.subdomains_finder( domain )
 
-# Encryption:
+
+# Encryption & Hashing:
 
 <h4>XOR:</h4>
 <br>bane.xor_hash( data, key )
