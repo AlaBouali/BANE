@@ -154,7 +154,7 @@ def who_is(u):
   b=a.split('\n')
   d={} 
   for x in b:
-    d.update({x.split(':')[0].strip():x.replace(x.split(':')[0].strip(),'').strip()})
+    d.update({x.split(':')[0].strip():x.replace(x.split(':')[0].strip(),'').strip()[1:].strip()})
   return d
  except:
   pass
@@ -298,16 +298,7 @@ class port_scan:
     self.__dict__[x]=None
 
 
-class subdomains_finder:
- __slots__=["stop","finish","result"]
- def __init__(self,u,process_check_interval=5,logs=True,returning=False,requests_timeout=15,https=False):
-  self.stop=False
-  self.finish=False
-  self.result=self.result={u:[]}
-  t=threading.Thread(target=self.crack,args=(u,process_check_interval,logs,requests_timeout,https,))
-  t.daemon=True
-  t.start()
- def crack(self,u,process_check_interval,logs,requests_timeout,https):
+def subdomains_finder(u,process_check_interval=5,logs=True,requests_timeout=15,https=False):
   https_flag=0
   if (https==True) or('https://' in u):
      https_flag=1
@@ -317,12 +308,9 @@ class subdomains_finder:
    host=u
   sd=[]
   while True:
-   if self.stop==True:
-    break
    try:
     s=requests.session()
     r=s.post('https://scan.penteston.com/scan_system.php',data={"scan_method":"S201","test_protocol":https_flag,"test_host":host},timeout=requests_timeout).text
-    print(r)
     if '"isFinished":"no"' not in r:
      if logs==True:
       print("\n[+]Scan results:")
@@ -330,7 +318,7 @@ class subdomains_finder:
      for x in (c.split('<br\/>')):
       if logs==True:
        print(x)
-       sd.append(x)
+      sd.append(x)
      break
     else:
      if logs==True:
@@ -347,7 +335,4 @@ class subdomains_finder:
        break
    except:
     pass
-  self.finish=True
-  self.result={u:sd}
- def done(self):
-  return self.finish
+  return {u:sd}
