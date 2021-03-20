@@ -204,7 +204,7 @@ II-Usage (General usage):
 <br>bane.wpadmin(link , username , password , timeout=15 )
 
 <h4>Check Multiple Login Combo at once:</h4>
-<br>bane.wpadmin(link , word_list=["admin:123","admin:HGJJK","admin:HJKL","admin:%MLK"] , timeout=15 )
+<br>bane.wpadmin_mass(link , word_list=["admin:123","admin:HGJJK","admin:HJKL","admin:%MLK"] , timeout=15 )
 
 <h4>Check if it's possible to performe PingBack attack through xmlrpc:</h4>
 <br>bane.wp_xmlrpc_pingback(link , timeout=15 )
