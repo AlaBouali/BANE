@@ -243,6 +243,18 @@ II-Usage (General usage):
 
 <h4>File inclusion:</h4>
 <br>bane.file_inclusion(link, timeout=15 )
+
+<h4>Clickjacking:</h4>
+<br>bane.clickjacking(link, timeout=15 )
+
+<h4>CORS Misconfigurations:</h4>
+<br>bane.cors_misconfigurations(link, timeout=15 )
+
+<h4>CSRF:</h4>
+<br>cookie="session=fgyujikop"#just an example of cookie sinceit requires a session
+<br>bane.csrf(link, timeout=15 , cookie=cookie )
+
+
 <h4>Headers timeout:</h4>
 <br>bane.headers_timeout_test(IP , port=80, max_timeout=30 )
 <h4>Slow GET test:</h4>
@@ -253,10 +265,22 @@ II-Usage (General usage):
 <br>bane.slow_post_test(IP , port=80, duration=180 )
 <h4>Slow Read test:</h4>
 <br>bane.slow_read_test(IP , port=80, duration=180 )
+
 <h4>Android Debug Bridge (ADB) exploit:</h4>
 <br>bane.adb_exploit(IP , timeout=5 )
+
 <h4>Exposed unauthenticated Telnet server:</h4>
 <br>bane.exposed_telnet(IP , timeout=5 )
+
+<h4>Exposed "/.env" File:</h4>
+<br>bane.exposed_env(link , timeout=15 )
+
+<h4>Vulners API Search for known vulnerabilities on a particular software:</h4>
+<br>bane.vulners_search("wordpress",version="4.7.4")#just an example
+
+
+<h4>PHPUNIT exploit:</h4>
+<br>bane.phpunit_exploit(link , timeout=15 )
 
 
 # Proxies collecting:
