@@ -1,4 +1,4 @@
-import requests,urllib,socket,random,time,re,threading,sys,whois,json,os,xtelnet
+import requests,urllib,socket,random,time,re,threading,sys,json,os,xtelnet
 import bs4
 from bs4 import BeautifulSoup
 from bane.payloads import *
@@ -148,9 +148,14 @@ def myip(proxy=None,proxy_type=None,timeout=15):
  return ''
 
 def who_is(u):
- u=u.replace('www.','')
  try:
-  return whois.whois(u)
+  r=requests.post('https://check-host.net/ip-info/whois',data={'host':u})
+  a=r.text.split('\n\n')[0] 
+  b=a.split('\n')
+  d={} 
+  for x in b:
+    d.update({x.split(':')[0].strip():x.replace(x.split(':')[0].strip(),'').strip()})
+  return d
  except:
   pass
  return {}
