@@ -189,7 +189,7 @@ II-Usage (General usage):
 <br>bane.wp_users(link , timeout=15 )
 
 <h4>User's details:</h4>
-<br>bane.wp_users(link , user=1 , timeout=15 )
+<br>bane.wp_user(link , user=1 , timeout=15 )
 
 <h4>All xmlrpc's available functions:</h4>
 <br>bane.wp_xmlrpc_methods(link , timeout=15 )
