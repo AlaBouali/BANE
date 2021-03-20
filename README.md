@@ -186,17 +186,41 @@ II-Usage (General usage):
 # WordPress testing:
 
 <h4>Users list:</h4>
-<br>bane.wp_users_list(link , timeout=15 )
-<h4>User information:</h4>
-<br>bane.wp_user(link , user=user_id , timeout=15 )
-<h4>Posts list:</h4>
-<br>bane.wp_posts_list(link , timeout=15 )
-<h4>Post information:</h4>
-<br>bane.wp_post(link , post=post_id , timeout=15 )
+<br>bane.wp_users(link , timeout=15 )
+
+<h4>User's details:</h4>
+<br>bane.wp_users(link , user=1 , timeout=15 )
+
+<h4>All xmlrpc's available functions:</h4>
+<br>bane.wp_xmlrpc_methods(link , timeout=15 )
+
+<h4>Check if it's possible to performe BruteForce attack through xmlrpc:</h4>
+<br>bane.wp_xmlrpc_bruteforce(link , timeout=15 )
+
+<h4>Check if it's possible to performe Mass BruteForce attack through xmlrpc:</h4>
+<br>bane.wp_xmlrpc_mass_bruteforce(link , timeout=15 )
+
+<h4>Check a Login Combo:</h4>
+<br>bane.wpadmin(link , username , password , timeout=15 )
+
+<h4>Check Multiple Login Combo at once:</h4>
+<br>bane.wpadmin(link , word_list=["admin:123","admin:HGJJK","admin:HJKL","admin:%MLK"] , timeout=15 )
+
+<h4>Check if it's possible to performe PingBack attack through xmlrpc:</h4>
+<br>bane.wp_xmlrpc_pingback(link , timeout=15 )
+
+<h4>Performe PingBack attack through xmlrpc:</h4>
+<br>bane.wp_xmlrpc_pingback(link , target_url="https://www.example.com" , timeout=15 )
+
+<h4>Check if it's possible to performe BruteForce attack through xmlrpc:</h4>
+<br>bane.wp_xmlrpc_bruteforce(link , timeout=15 )
+
 <h4>Users Enumeration:</h4>
 <br>bane.wp_users_enumeration(link , timeout=15 )
+
 <h4>WordPress version:</h4>
 <br>bane.wp_version(link , timeout=15 )
+
 <h4>Vulnerable plugins and themes:</h4>
 <br>bane.wp_scan(link , timeout=15 )
 
@@ -341,6 +365,8 @@ II-Usage (General usage):
 
 # Extract information from page:
 
+<h4>Parse all forms in the page:</h4>
+<br>bane.forms_parser(link , timeout=10 )
 <h4>Get all page inputs and their values:</h4>
 <br>bane.inputs(link , value=True , timeout=10 )
 <h4>Get all page forms and their values:</h4>
