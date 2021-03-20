@@ -133,6 +133,7 @@ II-Usage (General usage):
 <br>bane.prox_xerxes(IP, p= port , duration= 300 , threads=500 , timeout=5 )
 <h4>Slow read attack:</h4>
 <br>bane.slow_read(IP, p= port , duration= 300 , set_tor=False , threads=500 , timeout=5 )
+<br><br>The below DDoS functions have been disabled and will be added again soon:<br><br>
 <h4>Slow proxies flood:</h4>
 <br>bane.prox_slow(IP, p= port , duration= 300 , set_tor=False , threads=500 , timeout=5 )
 <h4>Apache killer attack:</h4>
@@ -201,30 +202,45 @@ II-Usage (General usage):
 
 # Vulnerabilities TESTING:
 
-<h4>SQL Injection error based:</h4>
-<br>bane.sqli_error_based(link , timeout=15 )
-<h4>SQL Injection boolean based:</h4>
-<br>bane.sqli_boolean_based(link , timeout=15 )
-<h4>SQL Injection time based:</h4>
-<br>bane.sqli_time_based(link , timeout=15 )
-<h4>XSS GET method:</h4>
-<br>bane.xss_get(link , {"q" : "<script>alert(123)</script>"}, extra={"Submit" : "Submit"} , timeout=15 )
-<h4>XSS POST method:</h4>
-<br>bane.xss_post(link , {"q" : "<script>alert(123)</script>"}, extra={"Submit" : "Submit"} , timeout=15 )
 <h4>Automatic XSS scan for page:</h4>
 <br>bane.xss(link , payload="<script>alert(123)</script>" , timeout=15 )
-<h4>Command execution with a link:</h4>
-<br>bane.command_exec_link(link , timeout=15 )
-<h4>Command execution GET method:</h4>
-<br>bane.command_exec_get(link,param="q" , timeout=15 )
-<h4>Command execution POST method:</h4>
-<br>bane.command_exec_post(link,param="q" , timeout=15 )
-<h4>PHP code injection with a link:</h4>
-<br>bane.php_code_inject_link(link , timeout=15 )
-<h4>PHP code injection GET method:</h4>
-<br>bane.php_code_inject_get(link,param="q" , timeout=15 )
-<h4>PHP code injection POST method:</h4>
-<br>bane.php_code_injectc_post(link,param="q" , timeout=15 )
+
+<h4>Remote Command Execution Linux Time-Based:</h4>
+<br>bane.rce(link ,injection={"command":"linux"},based_on='time', timeout=15 )
+<h4>Remote Command Execution Linux File-Based:</h4>
+<br>bane.rce(link ,injection={"command":"linux"},based_on='file', timeout=15 )
+
+<h4>Remote Command Execution Windows Time-Based:</h4>
+<br>bane.rce(link ,injection={"command":"windows"},based_on='time', timeout=15 )
+<h4>Remote Command Execution Windows File-Based:</h4>
+<br>bane.rce(link ,injection={"command":"windows"},based_on='file', timeout=15 )
+
+<h4>Remote Code Execution PHP Time-Based:</h4>
+<br>bane.rce(link ,injection={"code":"php"},based_on='time', timeout=15 )
+<h4>Remote Code Execution PHP File-Based:</h4>
+<br>bane.rce(link ,injection={"code":"php"},based_on='file', timeout=15 )
+
+<h4>Remote Code Execution PYTHON Time-Based:</h4>
+<br>bane.rce(link ,injection={"code":"python"},based_on='time', timeout=15 )
+<h4>Remote Code Execution PYTHON File-Based:</h4>
+<br>bane.rce(link ,injection={"code":"python"},based_on='file', timeout=15 )
+
+<h4>Remote Code Execution PERL Time-Based:</h4>
+<br>bane.rce(link ,injection={"code":"perl"},based_on='time', timeout=15 )
+<h4>Remote Code Execution PERL File-Based:</h4>
+<br>bane.rce(link ,injection={"code":"perl"},based_on='file', timeout=15 )
+
+<h4>Remote Code Execution RUBY Time-Based:</h4>
+<br>bane.rce(link ,injection={"code":"ruby"},based_on='time', timeout=15 )
+<h4>Remote Code Execution RUBY File-Based:</h4>
+<br>bane.rce(link ,injection={"code":"ruby"},based_on='file', timeout=15 )
+
+<h4>Remote Code Execution NODEJS Time-Based:</h4>
+<br>bane.rce(link ,injection={"code":"nodejs"},based_on='time', timeout=15 )
+<h4>Remote Code Execution NODEJS File-Based:</h4>
+<br>bane.rce(link ,injection={"code":"nodejs"},based_on='file', timeout=15 )
+
+
 <h4>File inclusion:</h4>
 <br>bane.file_inclusion(link, timeout=15 )
 <h4>Headers timeout:</h4>
