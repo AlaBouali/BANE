@@ -79,6 +79,7 @@ def inputs(u,value=False,timeout=10,user_agent=None,bypass=False,proxy=None,cook
  except Exception as e:
   pass
  return l
+
 def forms(u,value=True,user_agent=None,timeout=10,bypass=False,proxy=None,cookie=None):
  '''
    same as "inputs" function but it works on forms input fields only
@@ -158,6 +159,78 @@ def forms(u,value=True,user_agent=None,timeout=10,bypass=False,proxy=None,cookie
  except Exception as e:
   pass
  return fom
+
+def forms_parser(u,user_agent=None,timeout=10,bypass=False,proxy=None,cookie=None):
+ '''
+   same as "forms" function but it return detailed information about all forms in a given page
+ '''
+ if urlparse(u).path=='':
+  u+="/"
+ if user_agent:
+   us=user_agent
+ else:
+   us=random.choice(ua)
+ if proxy:
+   proxy={'http':'http://'+proxy}
+ if bypass==True:
+   u+='#'
+ if cookie:
+   hea={'User-Agent': us,'Cookie':cookie}
+ else:
+   hea={'User-Agent': us}
+ l=[]
+ fom=[]
+ try:
+  c=requests.get(u, headers = hea,proxies=proxy,timeout=timeout, verify=False).text
+  soup= BeautifulSoup(c,'html.parser')
+  i=soup.find_all('form')
+  for f in i:
+   ac=f.get('action')
+   if not ac:
+    ac=u
+   """if len(ac)==0:
+    ac=u
+   if ac[0]=="/":
+    url_o="/".join(u.split('/')[:-1])
+    ac=url_o+ac
+   if ac[:4]!="http":
+    url_o="/".join(u.split('/')[:-1])
+    ac=url_o+"/"+ac"""
+   if ("://" not in ac):
+      ur=u[:u.rfind('/')]
+      if ac[0]=="/":
+       ac=ac[1:len(ac)]
+      ac=ur+"/"+ac
+   me=f.get('method')
+   if not me :
+    me="get"
+   if len(me)==0:
+    me="get"
+   me=me.lower()
+   p=f.find_all('textarea')
+   for r in p: 
+    if r.has_attr('name'):
+     s=r.get("name")
+     v=r.get("value",'')
+     typ=r.get("type","text")
+     y={"name":s,"value":v,"type":typ}
+     if y not in l:
+      l.append(y)
+   p=f.find_all('input')
+   for r in p: 
+    if r.has_attr('name'):
+     s=r.get("name")
+     v=r.get("value",'')
+     typ=r.get("type","text")
+     y={"name":s,"value":v,"type":typ}
+     if y not in l:
+      l.append(y)
+   fom.append({'inputs':l,'action':ac,'method':me}) 
+   l=[]
+ except Exception as e:
+  pass
+ return fom
+
 
 def crawl(u,timeout=10,user_agent=None,bypass=False,proxy=None,cookie=None):
  '''

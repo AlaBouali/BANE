@@ -317,6 +317,7 @@ class subdomains_finder:
    try:
     s=requests.session()
     r=s.post('https://scan.penteston.com/scan_system.php',data={"scan_method":"S201","test_protocol":https_flag,"test_host":host},timeout=requests_timeout).text
+    print(r)
     if '"isFinished":"no"' not in r:
      if logs==True:
       print("\n[+]Scan results:")
@@ -345,4 +346,3 @@ class subdomains_finder:
   self.result={u:sd}
  def done(self):
   return self.finish
-  

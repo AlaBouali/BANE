@@ -1,4 +1,4 @@
-import requests,random,json
+import requests,random,json,sys
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from bane.payloads import ua

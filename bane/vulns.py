@@ -22,7 +22,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import bs4
 from bs4 import BeautifulSoup
 from bane.payloads import *
-from bane.pager import inputs,forms,crawl
+from bane.pager import inputs,forms,crawl,forms_parser
 from bane.js_fuck import js_fuck
 from bane.extrafun import write_file,delete_file
 
@@ -188,7 +188,7 @@ def xss_post(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None,d
   return (False,'')
 
 
-def xss(u,payload=None,save_to_file="xss_report",show_warnings=True,target_form_action=None,ignore_values=False,fresh=True,logs=True,fill_empty=10,proxy=None,ignored_values=["anonymous user","..."],proxies=None,timeout=10,user_agent=None,cookie=None,debug=False,leave_empty=[]):
+def xss(u,payload=None,random_level=2,js_function="alert",save_to_file="xss_report",show_warnings=True,target_form_action=None,ignore_values=False,fresh=True,logs=True,fill_empty=10,proxy=None,ignored_values=["anonymous user","..."],proxies=None,timeout=10,user_agent=None,cookie=None,debug=False,leave_empty=[]):
   '''
    this function is for xss test with both POST and GET requests. it extracts the input fields names using the "inputs" function then test each input using POST and GET methods.
 
@@ -211,7 +211,7 @@ def xss(u,payload=None,save_to_file="xss_report",show_warnings=True,target_form_
    xp_f=payload
    pre_apyload=False
   else:
-   xp_f='<sCrIpT {}>{}(`vulnerable`)</ScRiPt {}>'
+   xp_f='<DeTAIlS/OpeN/OntOGglE = "{}`v`"'
   if logs==True:
    print(Fore.WHITE+"[~]Getting forms..."+Style.RESET_ALL)
   hu=True
@@ -230,7 +230,7 @@ def xss(u,payload=None,save_to_file="xss_report",show_warnings=True,target_form_
    form_index=-1
    for l1 in fom:
     if pre_apyload==True:
-     xp=xp_f.format(random_string(random.randint(1,7)),hexadecimal_encoder('alert'),random_string(random.randint(1,7)))
+     xp=xp_f.format(hexadecimal_encoder(js_function,random_level=random_level))
     else:
      xp=xp_f
     if target_form_action:
@@ -431,6 +431,8 @@ def exec_get(u,pl,delay=10,file_name="",based_on="time",user_agent=None,extra=No
      if based_on[0]=="time":
       if int(time.time()-t)>=based_on[1]-2:
        return (True,'')
+  except requests.exceptions.Timeout:
+   return (True,'')
   except Exception as e:
    pass
   return (False,'')
@@ -480,6 +482,8 @@ def exec_post(u,pl,delay=10,file_name="",based_on=("time",10),user_agent=None,ex
      if based_on[0]=="time":
       if int(time.time()-t)>=based_on[1]-2:
        return (True,'')
+  except requests.exceptions.Timeout:
+   return (True,'')
   except Exception as e:
    pass
   return (False,'')
@@ -839,6 +843,180 @@ def file_inclusion(u,null_byte=False,bypass=False,target_os="linux",file_wrapper
       if q[0]==True:
        if q[1] not in res:
         res.append(q[1])
+ return res
+
+def clickjacking(u,proxy=None,timeout=10,user_agent=None,cookie=None,debug=False):
+ if proxy:
+  proxy={'http':'http://'+proxy}
+ if user_agent:
+   us=user_agent
+ else:
+   us=random.choice(ua)
+ if cookie:
+    heads={'User-Agent': us,'Cookie':cookie}
+ else:
+   heads={'User-Agent': us}
+ try:
+  r=requests.get(u,headers=heads,proxies=proxy,timeout=timeout,verify=False).headers
+  click=True
+  for x in r:
+   if x.lower().strip()=='x-frame-options' or x.lower().strip()=='content-security-policy':
+     click=False
+   if debug==True:
+    print(x+" : "+r[x])
+ except:
+  return False
+ return click
+
+
+
+def csrf(u,proxy=None,timeout=10,user_agent=None,cookie=None):
+ if not cookie or len(cookie.strip())==0:
+  raise Exception("This attack requires authentication !! You need to set a Cookie")
+ res={"Vulnerable":[],"Safe":[]}
+ f=forms_parser(u,timeout=timeout,user_agent=user_agent,cookie=cookie,proxy=proxy)
+ for x in f:
+  vuln=True
+  for y in x["inputs"]:
+   if y["type"].lower()=="hidden":
+    vuln=False
+    break
+  if vuln==True:
+   res["Vulnerable"].append(x)
+  else:
+   res["Safe"].append(x)
+ return res
+
+
+def cors_reflection(u,proxy=None,timeout=10,user_agent=None,cookie=None,origin="www.evil-domain.com",debug=False):
+ a=None
+ b=None
+ if proxy:
+  proxy={'http':'http://'+proxy}
+ if user_agent:
+   us=user_agent
+ else:
+   us=random.choice(ua)
+ if cookie:
+    heads={'User-Agent': us,'Cookie':cookie}
+ else:
+   heads={'User-Agent': us}
+ heads.update({"Origin":origin})
+ try:
+  r=requests.get(u,headers=heads,proxies=proxy,timeout=timeout,verify=False).headers
+  a=r.get("Access-Control-Allow-Origin",None)
+  b=r.get("Access-Control-Allow-Credentials",None)
+  if debug==True:
+   for x in r:
+    print(x+" : "+r[x])
+  if a and b:
+   if a==origin and b=="true":
+    return (True,{"Access-Control-Allow-Origin":a,"Access-Control-Allow-Credentials":b})
+ except:
+  pass
+ return (False,{"Access-Control-Allow-Origin":a,"Access-Control-Allow-Credentials":b})
+ 
+def cors_wildcard(u,proxy=None,timeout=10,user_agent=None,cookie=None,debug=False):
+ a=None
+ b=None
+ if proxy:
+  proxy={'http':'http://'+proxy}
+ if user_agent:
+   us=user_agent
+ else:
+   us=random.choice(ua)
+ if cookie:
+    heads={'User-Agent': us,'Cookie':cookie}
+ else:
+   heads={'User-Agent': us}
+ heads.update({"Origin":"*"})
+ try:
+  r=requests.get(u,headers=heads,proxies=proxy,timeout=timeout,verify=False).headers
+  a=r.get("Access-Control-Allow-Origin",None)
+  b=r.get("Access-Control-Allow-Credentials",None)
+  if debug==True:
+   for x in r:
+    print(x+" : "+r[x])
+  if a and b:
+   if a=="*" and b=="true":
+    return (True,{"Access-Control-Allow-Origin":a,"Access-Control-Allow-Credentials":b})
+ except:
+  pass
+ return (False,{"Access-Control-Allow-Origin":a,"Access-Control-Allow-Credentials":b})
+
+def cors_null(u,proxy=None,timeout=10,user_agent=None,cookie=None,debug=False):
+ a=None
+ b=None
+ if proxy:
+  proxy={'http':'http://'+proxy}
+ if user_agent:
+   us=user_agent
+ else:
+   us=random.choice(ua)
+ if cookie:
+    heads={'User-Agent': us,'Cookie':cookie}
+ else:
+   heads={'User-Agent': us}
+ heads.update({"Origin":"null"})
+ try:
+  r=requests.get(u,headers=heads,proxies=proxy,timeout=timeout,verify=False).headers
+  a=r.get("Access-Control-Allow-Origin",None)
+  b=r.get("Access-Control-Allow-Credentials",None)
+  if debug==True:
+   for x in r:
+    print(x+" : "+r[x])
+  if a and b:
+   if a=="null" and b=="true":
+    return (True,{"Access-Control-Allow-Origin":a,"Access-Control-Allow-Credentials":b})
+ except:
+  pass
+ return (False,{"Access-Control-Allow-Origin":a,"Access-Control-Allow-Credentials":b})
+
+def proxies_select(proxy,proxies):
+ if proxy:
+   return proxy
+ if proxies:
+   return random.choice(proxies)
+ return None
+
+def cors_misconfigurations(u,origin="www.evil-domain.com",origin_reflection=True,wildcard_origin=True,null_origin=True,proxy=None,proxies=None,timeout=10,user_agent=None,cookie=None,logs=True,debug=False):
+ res={}
+ if origin_reflection==True:
+  if logs==True:
+   print("[*] Testing for: Origin Reflection...")
+  tes1=cors_reflection(u,origin=origin,cookie=cookie,user_agent=user_agent,timeout=timeout,proxy=proxies_select(proxy,proxies),debug=debug)
+  if tes1[0]==True:
+   res.update({"cors_reflection":tes1[1]})
+   if logs==True:
+    print("[+] Vulnerable !!")
+  else:
+   res.update({"cors_reflection":tes1[1]})
+   if logs==True:
+    print("[-] Not vulnerable")
+ if wildcard_origin==True:
+  if logs==True:
+   print("[*] Testing for: Wildcard Origin...")
+  tes2=cors_wildcard(u,cookie=cookie,user_agent=user_agent,timeout=timeout,proxy=proxies_select(proxy,proxies),debug=debug)
+  if tes2[0]==True:
+   res.update({"wildcard_origin":tes2[1]})
+   if logs==True:
+    print("[+] Vulnerable !!")
+  else:
+   res.update({"wildcard_origin":tes2[1]})
+   if logs==True:
+    print("[-] Not vulnerable")
+ if origin_reflection==True:
+  if logs==True:
+   print("[*] Testing for: Null Origin...")
+  tes3=cors_null(u,cookie=cookie,user_agent=user_agent,timeout=timeout,proxy=proxies_select(proxy,proxies),debug=debug)
+  if tes3[0]==True:
+   res.update({"null_origin":tes3[1]})
+   if logs==True:
+    print("[+] Vulnerable !!")
+  else:
+   res.update({"null_origin":tes3[1]})
+   if logs==True:
+    print("[-] Not vulnerable")
  return res
 
 

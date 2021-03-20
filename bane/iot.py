@@ -36,8 +36,9 @@ def getip():
 '''
 
 class mass_scan:
- def __init__(self,file_name="results.txt",protocol="telnet",threads=100,word_list=[],ip_range=None,timeout=7,p=23):
+ def __init__(self,file_name="results.txt",protocol="telnet",logs=True,threads=100,word_list=[],ip_range=None,timeout=7,p=23):
   self.word_list=word_list
+  self.logs=logs
   self.protocol=protocol.lower()
   self.stop=False
   self.ip_range=ip_range
