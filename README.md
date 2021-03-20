@@ -240,6 +240,15 @@ II-Usage (General usage):
 <h4>Remote Code Execution NODEJS File-Based:</h4>
 <br>bane.rce(link ,injection={"code":"nodejs"},based_on='file', timeout=15 )
 
+<h4>SQL-Injection Time-Based:</h4>
+<br>bane.rce(link ,injection={"sql":"mysql"}, timeout=15 )#test for MySQL
+<h4>SQL-Injection Time-Based:</h4>
+<br>bane.rce(link ,injection={"sql":"oracle"}, timeout=15 )#test for Oracle
+<h4>SQL-Injection Time-Based:</h4>
+<br>bane.rce(link ,injection={"sql":"postgre"}, timeout=15 )#test for Postgre
+<h4>SQL-Injection Time-Based:</h4>
+<br>bane.rce(link ,injection={"sql":"sql_server"}, timeout=15 )#test for SQL Server
+
 
 <h4>File inclusion:</h4>
 <br>bane.file_inclusion(link, timeout=15 )
@@ -281,6 +290,10 @@ II-Usage (General usage):
 
 <h4>PHPUNIT exploit:</h4>
 <br>bane.phpunit_exploit(link , timeout=15 )
+
+<h4>Shodan report:</h4>
+<br>api_key="ghbjklmjklmjlkml...."
+<br>bane.shodan_report(IP , api_key)
 
 
 # Proxies collecting:
