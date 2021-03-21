@@ -7,13 +7,12 @@ if os.path.isdir('/home/')==True:
  if os.getenv("SUDO_USER"):
   pm="apt"
   for x in ["apt","yum","pacman","dnf","zypper"]:
-   if subprocess.call(["which", "apt"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)==0:
+   if subprocess.call(["which", x], stdout=subprocess.PIPE, stderr=subprocess.PIPE)==0:
     pm=x
     break
   os.system('sudo '+pm+' install sshpass -y')
   os.system('sudo '+pm+' install nodejs -y')
- else:
-  print('The install wasn\'t run with root privilege !\nYou will have to install the following packages manually: sshpass , nodejs')
+
 adr=False
 if os.path.isdir('/data/data')==True:
     adr=True
@@ -50,7 +49,7 @@ if (sys.platform == "win32") or( sys.platform == "win64"):
 
 setuptools.setup(
     name="bane",
-    version="4.5.6",
+    version="4.5.7",
     author="AlaBouali",
     author_email="trap.leader.123@gmail.com",
     description="cyber security library",
@@ -66,3 +65,7 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License ",
     ],
 )
+
+if os.path.isdir('/home/')==True:
+ if not os.getenv("SUDO_USER"):
+  print('\n\nYou didn\'t the installation run with root privilege !\nYou will have to install the following packages manually: sshpass , nodejs\n')
