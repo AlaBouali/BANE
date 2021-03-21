@@ -452,7 +452,7 @@ II-Usage (General usage):
 <br>api_key="ghbjklmjklmjlkml...."
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.shodan_report(IP , api_key)
-
+</pre></div>
 
 # Proxies collecting:
 
