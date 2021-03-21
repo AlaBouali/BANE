@@ -651,6 +651,7 @@ br>bane.mass_scan(threads=100 , protocol="mysql" , word_list= ["root:root","admi
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.decrypt(hash , word_list=["admin","admin123","love"] , caesar_hash=True )
 </pre></div>
+
 # Bruteforcing:
 
 </pre></div><h4>Admin panel on web page:</h4>
@@ -709,6 +710,7 @@ br>bane.mass_scan(threads=100 , protocol="mysql" , word_list= ["root:root","admi
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.echo_factor( IP , timeout=3 )
 </pre></div>
+
 # Tor IP switching:
 
 </pre></div><h4>Without password: (doesn't work with Windows OS)</h4>
@@ -718,11 +720,13 @@ br>bane.mass_scan(threads=100 , protocol="mysql" , word_list= ["root:root","admi
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.tor_switch_with_password( interval=30 , password=password , p=9051 , logs=True)
 </pre></div>
+
 # Updating bane:
 
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.update(version=None)
 </pre></div>
+
 # Some extra useful functions:
 
 </pre></div><h4>Clear a file:</h4>
