@@ -406,9 +406,9 @@ II-Usage (General usage):
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.cors_misconfigurations(link, timeout=15 )
 
 </pre></div><h4>CSRF:</h4>
-<br>cookie="session=fgyujikop"#just an example of cookie sinceit requires a session
 
-<div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.csrf(link, timeout=15 , cookie=cookie )
+<div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">cookie="session=fgyujikop"#just an example of cookie sinceit requires a session
+<br>bane.csrf(link, timeout=15 , cookie=cookie )
 
 
 </pre></div><h4>Headers timeout:</h4>
