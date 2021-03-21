@@ -622,7 +622,7 @@ br>bane.mass_scan(threads=100 , protocol="mysql" , word_list= ["root:root","admi
 </pre></div><h4>File content decoding with base64:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.base64_decode_file( file )
-
+</pre></div>
 # Decryption:
 
 </pre></div><h4>MD5:</h4>
@@ -649,7 +649,7 @@ br>bane.mass_scan(threads=100 , protocol="mysql" , word_list= ["root:root","admi
 </pre></div><h4>Caesar:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.decrypt(hash , word_list=["admin","admin123","love"] , caesar_hash=True )
-
+</pre></div>
 # Bruteforcing:
 
 </pre></div><h4>Admin panel on web page:</h4>
@@ -682,7 +682,7 @@ br>bane.mass_scan(threads=100 , protocol="mysql" , word_list= ["root:root","admi
 </pre></div><h4>Filemanager finder:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.filemanager_finder(link , ext="php" , timeout=15 )
-
+</pre></div>
 # Amplification factors calculation for some protocols:
 
 </pre></div><h4>DNS:</h4>
