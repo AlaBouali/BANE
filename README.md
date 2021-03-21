@@ -93,7 +93,10 @@ I-INSTALLING THE LIBRARY AND IMPORTING:
 you can use pip to do that ( if you are on linux you must run it with "sudo" ) :
 
 
-pip install bane
+<div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">pip install bane</pre></div>
+or
+<div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">pip3 install bane</pre></div>
+
 
 <br>or you can clone the project's link then run setup.py<br>
 
@@ -102,9 +105,12 @@ pip install bane
 <br>python setup.py install
 </pre></div>
 
-<br>to import it you just do:
+<br>To use it, you have to open the python interpreter from your terminal/cmd (bane can be used only inside the interpreter only after importing it):
 
-
+<div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">python</pre></div>
+or
+<div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">python3</pre></div>
+then import it and start using it as in the tutorials below:
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">import bane
 </pre></div>
