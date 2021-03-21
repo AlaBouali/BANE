@@ -330,122 +330,125 @@ II-Usage (General usage):
 <h4>Remote Command Execution Linux Time-Based:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.rce(link ,injection={"command":"linux"},based_on='time', timeout=15 )
+</pre></div>
 <h4>Remote Command Execution Linux File-Based:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.rce(link ,injection={"command":"linux"},based_on='file', timeout=15 )
+</pre></div>
 
 <h4>Remote Command Execution Windows Time-Based:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.rce(link ,injection={"command":"windows"},based_on='time', timeout=15 )
+</pre></div>
 <h4>Remote Command Execution Windows File-Based:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.rce(link ,injection={"command":"windows"},based_on='file', timeout=15 )
 
-<h4>Remote Code Execution PHP Time-Based:</h4>
+</pre></div><h4>Remote Code Execution PHP Time-Based:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.rce(link ,injection={"code":"php"},based_on='time', timeout=15 )
-<h4>Remote Code Execution PHP File-Based:</h4>
+</pre></div><h4>Remote Code Execution PHP File-Based:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.rce(link ,injection={"code":"php"},based_on='file', timeout=15 )
 
-<h4>Remote Code Execution PYTHON Time-Based:</h4>
+</pre></div><h4>Remote Code Execution PYTHON Time-Based:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.rce(link ,injection={"code":"python"},based_on='time', timeout=15 )
-<h4>Remote Code Execution PYTHON File-Based:</h4>
+</pre></div><h4>Remote Code Execution PYTHON File-Based:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.rce(link ,injection={"code":"python"},based_on='file', timeout=15 )
 
-<h4>Remote Code Execution PERL Time-Based:</h4>
+</pre></div><h4>Remote Code Execution PERL Time-Based:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.rce(link ,injection={"code":"perl"},based_on='time', timeout=15 )
-<h4>Remote Code Execution PERL File-Based:</h4>
+</pre></div><h4>Remote Code Execution PERL File-Based:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.rce(link ,injection={"code":"perl"},based_on='file', timeout=15 )
 
-<h4>Remote Code Execution RUBY Time-Based:</h4>
+</pre></div><h4>Remote Code Execution RUBY Time-Based:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.rce(link ,injection={"code":"ruby"},based_on='time', timeout=15 )
-<h4>Remote Code Execution RUBY File-Based:</h4>
+</pre></div><h4>Remote Code Execution RUBY File-Based:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.rce(link ,injection={"code":"ruby"},based_on='file', timeout=15 )
 
-<h4>Remote Code Execution NODEJS Time-Based:</h4>
+</pre></div><h4>Remote Code Execution NODEJS Time-Based:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.rce(link ,injection={"code":"nodejs"},based_on='time', timeout=15 )
-<h4>Remote Code Execution NODEJS File-Based:</h4>
+</pre></div><h4>Remote Code Execution NODEJS File-Based:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.rce(link ,injection={"code":"nodejs"},based_on='file', timeout=15 )
 
-<h4>SQL-Injection Time-Based:</h4>
+</pre></div><h4>SQL-Injection Time-Based:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.rce(link ,injection={"sql":"mysql"}, timeout=15 )#test for MySQL
-<h4>SQL-Injection Time-Based:</h4>
+</pre></div><h4>SQL-Injection Time-Based:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.rce(link ,injection={"sql":"oracle"}, timeout=15 )#test for Oracle
-<h4>SQL-Injection Time-Based:</h4>
+</pre></div><h4>SQL-Injection Time-Based:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.rce(link ,injection={"sql":"postgre"}, timeout=15 )#test for Postgre
-<h4>SQL-Injection Time-Based:</h4>
+</pre></div><h4>SQL-Injection Time-Based:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.rce(link ,injection={"sql":"sql_server"}, timeout=15 )#test for SQL Server
 
 
-<h4>File inclusion:</h4>
+</pre></div><h4>File inclusion:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.file_inclusion(link, timeout=15 )
 
-<h4>Clickjacking:</h4>
+</pre></div><h4>Clickjacking:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.clickjacking(link, timeout=15 )
 
-<h4>CORS Misconfigurations:</h4>
+</pre></div><h4>CORS Misconfigurations:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.cors_misconfigurations(link, timeout=15 )
 
-<h4>CSRF:</h4>
+</pre></div><h4>CSRF:</h4>
 <br>cookie="session=fgyujikop"#just an example of cookie sinceit requires a session
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.csrf(link, timeout=15 , cookie=cookie )
 
 
-<h4>Headers timeout:</h4>
+</pre></div><h4>Headers timeout:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.headers_timeout_test(IP , port=80, max_timeout=30 )
-<h4>Slow GET test:</h4>
+</pre></div><h4>Slow GET test:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.slow_get_test(IP , port=80, duration=180 )
-<h4>Maximum number of allowed connections from a single host:</h4>
+</pre></div><h4>Maximum number of allowed connections from a single host:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.max_connections_limit(IP , port=80, connections=150 , duration=180 )
-<h4>Slow POST test:</h4>
+</pre></div><h4>Slow POST test:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.slow_post_test(IP , port=80, duration=180 )
-<h4>Slow Read test:</h4>
+</pre></div><h4>Slow Read test:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.slow_read_test(IP , port=80, duration=180 )
 
-<h4>Android Debug Bridge (ADB) exploit:</h4>
+</pre></div><h4>Android Debug Bridge (ADB) exploit:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.adb_exploit(IP , timeout=5 )
 
-<h4>Exposed unauthenticated Telnet server:</h4>
+</pre></div><h4>Exposed unauthenticated Telnet server:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.exposed_telnet(IP , timeout=5 )
 
-<h4>Exposed "/.env" File:</h4>
+</pre></div><h4>Exposed "/.env" File:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.exposed_env(link , timeout=15 )
 
-<h4>Vulners API Search for known vulnerabilities on a particular software:</h4>
+</pre></div><h4>Vulners API Search for known vulnerabilities on a particular software:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.vulners_search("wordpress",version="4.7.4")#just an example
 
 
-<h4>PHPUNIT exploit:</h4>
+</pre></div><h4>PHPUNIT exploit:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.phpunit_exploit(link , timeout=15 )
 
-<h4>Shodan report:</h4>
+</pre></div><h4>Shodan report:</h4>
 <br>api_key="ghbjklmjklmjlkml...."
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.shodan_report(IP , api_key)
@@ -453,263 +456,263 @@ II-Usage (General usage):
 
 # Proxies collecting:
 
-<h4>Mass HTTP proxies gathering:</h4>
+</pre></div><h4>Mass HTTP proxies gathering:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.masshttp()
-<h4>Mass SOCKS4 proxies gathering:</h4>
+</pre></div><h4>Mass SOCKS4 proxies gathering:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.massocks4()
-<h4>Mass SOCKS5 proxies gathering:</h4>
+</pre></div><h4>Mass SOCKS5 proxies gathering:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.massocks5()
-<h4>Some HTTP proxies gathering:</h4>
+</pre></div><h4>Some HTTP proxies gathering:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.http()
-<h4>Some HTTPS proxies gathering:</h4>
+</pre></div><h4>Some HTTPS proxies gathering:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.https()
-<h4>Some SOCKS4 proxies gathering:</h4>
+</pre></div><h4>Some SOCKS4 proxies gathering:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.socks4()
-<h4>Some SOCKS5 proxies gathering:</h4>
+</pre></div><h4>Some SOCKS5 proxies gathering:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.socks5()
-<h4>Checking proxy:</h4>
+</pre></div><h4>Checking proxy:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.proxy_check(IP , port , proto="http" , timeout=5)
 
 
 # IoTs mass scanning:
 
-<h4>Mass ssh scanning: (if you are on Windows OS, please install Putty)</h4>
+</pre></div><h4>Mass ssh scanning: (if you are on Windows OS, please install Putty)</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.mass_scan(threads=100 , protocol="ssh" , word_list= ["root:root","admin:admin"] )
-<h4>Mass telnet scanning:</h4>
+</pre></div><h4>Mass telnet scanning:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.mass_scan(threads=100 , protocol="telnet" , word_list= ["root:root","admin:admin"] )
-<h4>Mass ftp scanning:</h4>
+</pre></div><h4>Mass ftp scanning:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.mass_scan(threads=100 , protocol="ftp" , word_list= ["root:root","admin:admin"] )
-<h4>Mass MySQL scanning:</h4>
+</pre></div><h4>Mass MySQL scanning:</h4>
 br>bane.mass_scan(threads=100 , protocol="mysql" , word_list= ["root:root","admin:admin"] )
-<h4>Mass Android Debug Bridge (ADB) exploit:</h4>
+</pre></div><h4>Mass Android Debug Bridge (ADB) exploit:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.mass_scan(threads=100 , protocol="adb" )
 
 # Extract information from page:
 
-<h4>Parse all forms in the page:</h4>
+</pre></div><h4>Parse all forms in the page:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.forms_parser(link , timeout=10 )
-<h4>Get all page inputs and their values:</h4>
+</pre></div><h4>Get all page inputs and their values:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.inputs(link , value=True , timeout=10 )
-<h4>Get all page forms and their values:</h4>
+</pre></div><h4>Get all page forms and their values:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.forms(link , value=True , timeout=10 )
-<h4>Get login form:</h4>
+</pre></div><h4>Get login form:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.loginform(link , value=True , timeout=10 )
-<h4>Get all links on the page:</h4>
+</pre></div><h4>Get all links on the page:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.crawl(link , timeout=10 )
-<h4>Get all paths on the page:</h4>
+</pre></div><h4>Get all paths on the page:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.pather(link , timeout=10 )
-<h4>Get all social media and external links on the page:</h4>
+</pre></div><h4>Get all social media and external links on the page:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.media(link , timeout=10 )
-<h4>Get all subdomains links on the page:</h4>
+</pre></div><h4>Get all subdomains links on the page:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.subdomains_extract(link , timeout=10 )
 
 # Information gathering:
 
-<h4>Get banner:</h4>
+</pre></div><h4>Get banner:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.get_banner(IP , p=port , payload=None , timeout=5 )
-<h4>Get infomation about Domain or IP:</h4>
+</pre></div><h4>Get infomation about Domain or IP:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.info(IP , timeout=15 )
-<h4>safeweb.norton.com report for a link:</h4>
+</pre></div><h4>safeweb.norton.com report for a link:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.norton_rate(link , timeout=15 )
-<h4>Your IP address:</h4>
+</pre></div><h4>Your IP address:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.myip()
-<h4>WHOIS:</h4>
+</pre></div><h4>WHOIS:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.who_is( domain )
-<h4>GEO-Information for any IP:</h4>
+</pre></div><h4>GEO-Information for any IP:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.geoip( IP )
-<h4>HTTP headers:</h4>
+</pre></div><h4>HTTP headers:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.headers( link )
-<h4>Reverse IP Lookup:</h4>
+</pre></div><h4>Reverse IP Lookup:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.reverse_ip_lookup( IP )
-<h4>Resolve any domain using a specific DNS server:</h4>
+</pre></div><h4>Resolve any domain using a specific DNS server:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.resolve( domain , server="8.8.8.8" )
-<h4>Very Fast port scan:</h4>
+</pre></div><h4>Very Fast port scan:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.port_scan( IP , ports=[21,22,23,25,43,53,80,443,2082,3306] , timeout=5 ).result
-<h4>Subdomains finder:</h4>
+</pre></div><h4>Subdomains finder:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.subdomains_finder( domain )
 
 
 # Encryption & Hashing:
 
-<h4>XOR:</h4>
+</pre></div><h4>XOR:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.xor_hash( data, key )
-<h4>Caesar:</h4>
+</pre></div><h4>Caesar:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.caesar_hash( data, key )
-<h4>MD5:</h4>
+</pre></div><h4>MD5:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.md5_hash( data )
-<h4>SHA1:</h4>
+</pre></div><h4>SHA1:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.sha1_hash( data )
-<h4>SHA224:</h4>
+</pre></div><h4>SHA224:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.sha224_hash( data )
-<h4>SHA256:</h4>
+</pre></div><h4>SHA256:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.sha256_hash( data )
-<h4>SHA384:</h4>
+</pre></div><h4>SHA384:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.sha384_hash( data )
-<h4>SHA512:</h4>
+</pre></div><h4>SHA512:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.sha512_hash( data )
-<h4>Base64 encoding:</h4>
+</pre></div><h4>Base64 encoding:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.base64_encode( data )
-<h4>Base64 decoding:</h4>
+</pre></div><h4>Base64 decoding:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.base64_decode( data )
-<h4>File content encryption with XOR:</h4>
+</pre></div><h4>File content encryption with XOR:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.xor_file( file , key )
-<h4>File content encryption with MD5:</h4>
+</pre></div><h4>File content encryption with MD5:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.md5_file( file )
-<h4>File content encryption with SHA1:</h4>
+</pre></div><h4>File content encryption with SHA1:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.sha1_file( file )
-<h4>File content encryption with SHA224:</h4>
+</pre></div><h4>File content encryption with SHA224:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.sha224_file( file )
-<h4>File content encryption with SHA256:</h4>
+</pre></div><h4>File content encryption with SHA256:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.sha256_file( file )
-<h4>File content encryption with SHA384:</h4>
+</pre></div><h4>File content encryption with SHA384:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.sha384_file( file )
-<h4>File content encryption with SHA512:</h4>
+</pre></div><h4>File content encryption with SHA512:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.sha512_file( file )
-<h4>File content encoding with base64:</h4>
+</pre></div><h4>File content encoding with base64:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.base64_encode_file( file )
-<h4>File content decoding with base64:</h4>
+</pre></div><h4>File content decoding with base64:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.base64_decode_file( file )
 
 # Decryption:
 
-<h4>MD5:</h4>
+</pre></div><h4>MD5:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.decrypt(hash , word_list=["admin","admin123","love"] , md5_hash=True )
-<h4>SHA1:</h4>
+</pre></div><h4>SHA1:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.decrypt(hash , word_list=["admin","admin123","love"] , sha1_hash=True )
-<h4>SHA224:</h4>
+</pre></div><h4>SHA224:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.decrypt(hash , word_list=["admin","admin123","love"] , sha224_hash=True )
-<h4>SHA256:</h4>
+</pre></div><h4>SHA256:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.decrypt(hash , word_list=["admin","admin123","love"] , sha256_hash=True )
-<h4>SHA384:</h4>
+</pre></div><h4>SHA384:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.decrypt(hash , word_list=["admin","admin123","love"] , sha384_hash=True )
-<h4>SHA512:</h4>
+</pre></div><h4>SHA512:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.decrypt(hash , word_list=["admin","admin123","love"] , sha512_hash=True )
-<h4>Base64:</h4>
+</pre></div><h4>Base64:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.decrypt(hash , word_list=["admin","admin123","love"] , base64_hash=True )
-<h4>Caesar:</h4>
+</pre></div><h4>Caesar:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.decrypt(hash , word_list=["admin","admin123","love"] , caesar_hash=True )
 
 # Bruteforcing:
 
-<h4>Admin panel on web page:</h4>
+</pre></div><h4>Admin panel on web page:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.admin_brute_force(link , word_list=["admin:admin","admin:1234"] , timeout=15 )
-<h4>FTP server:</h4>
+</pre></div><h4>FTP server:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.hydra(IP , protocol="ftp" , word_list=["admin:admin","admin:1234"] , timeout=5 )
-<h4>SSH server: (if you are on windows, please install Putty)</h4>
+</pre></div><h4>SSH server: (if you are on windows, please install Putty)</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.hydra(IP , p=22 , protocol="ssh" , word_list=["admin:admin","admin:1234"] , timeout=5 )
-<h4>TELNET server:</h4>
+</pre></div><h4>TELNET server:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.hydra(IP , p=23 , protocol="telnet" , word_list=["admin:admin","admin:1234"] , timeout=5 )
-<h4>SMTP server:</h4>
+</pre></div><h4>SMTP server:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.hydra(IP , p=25 , protocol="smtp" , ehlo=False , helo=True , ttls=False , word_list=["admin:admin","admin:1234"] , timeout=5)
-<h4>MySQL server:</h4>
+</pre></div><h4>MySQL server:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.hydra(IP , p=3306 , protocol="mysqlt" , word_list=["admin:admin","admin:1234"] , timeout=5 )
-<h4>WordPress login page:</h4>
+</pre></div><h4>WordPress login page:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.hydra(link , protocol="wp" , word_list=["admin:admin","admin:1234"] , timeout=15 )
-<h4>Admin panel finder:</h4>
+</pre></div><h4>Admin panel finder:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.admin_panel_finder(link , ext="php" , timeout=15 )
-<h4>Force browsing pages on admin panel:</h4>
+</pre></div><h4>Force browsing pages on admin panel:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.force_browsing(link , ext="php" , timeout=15 )
-<h4>Filemanager finder:</h4>
+</pre></div><h4>Filemanager finder:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.filemanager_finder(link , ext="php" , timeout=15 )
 
 # Amplification factors calculation for some protocols:
 
-<h4>DNS:</h4>
+</pre></div><h4>DNS:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.dns_factor( IP , timeout=3 )
-<h4>NTP:</h4>
+</pre></div><h4>NTP:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.ntp_factor( IP , timeout=3 )
-<h4>Memcache:</h4>
+</pre></div><h4>Memcache:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.memcache_factor( IP , timeout=3 )
-<h4>Chargen:</h4>
+</pre></div><h4>Chargen:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.chargen_factor( IP , timeout=3 )
-<h4>SSDP:</h4>
+</pre></div><h4>SSDP:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.ssdp_factor( IP , timeout=3 )
-<h4>SNMP:</h4>
+</pre></div><h4>SNMP:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.snmp_factor( IP , timeout=3 )
-<h4>ECHO:</h4>
+</pre></div><h4>ECHO:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.echo_factor( IP , timeout=3 )
 
 # Tor IP switching:
 
-<h4>Without password: (doesn't work with Windows OS)</h4>
+</pre></div><h4>Without password: (doesn't work with Windows OS)</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.tor_switch_no_password( interval=30 , logs=True )
-<h4>Without password: (doesn't work with Windows OS)</h4>
+</pre></div><h4>Without password: (doesn't work with Windows OS)</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.tor_switch_with_password( interval=30 , password=password , p=9051 , logs=True)
 
@@ -720,45 +723,46 @@ br>bane.mass_scan(threads=100 , protocol="mysql" , word_list= ["root:root","admi
 
 # Some extra useful functions:
 
-<h4>Clear a file:</h4>
+</pre></div><h4>Clear a file:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.clear_file( file )
-<h4>Create a file:</h4>
+</pre></div><h4>Create a file:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.create_file( file )
-<h4>Delete a file:</h4>
+</pre></div><h4>Delete a file:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.delete_file( file )
-<h4>Get content of a file:</h4>
+</pre></div><h4>Get content of a file:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.read_file( file )
-<h4>Get CloudFlare cookie: (you must install NodeJS first)</h4>
+</pre></div><h4>Get CloudFlare cookie: (you must install NodeJS first)</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.get_cf_cookie( domain , user_agent )
-<h4>Get HTB invitation:</h4>
+</pre></div><h4>Get HTB invitation:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.HTB_invitation()
-<h4>Get Facebook account's ID:</h4>
+</pre></div><h4>Get Facebook account's ID:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.facebook_id( fb_link )
-<h4>Google dorking:</h4>
+</pre></div><h4>Google dorking:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.google_dorking( dork )
-<h4>Webhint report's link:</h4>
+</pre></div><h4>Webhint report's link:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.webhint_report( link )
-<h4>Youtube search:</h4>
+</pre></div><h4>Youtube search:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.youtube_search( query )
-<h4>Write to a file:</h4>
+</pre></div><h4>Write to a file:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.write_file( data , file )
-<h4>Find webcams:</h4>
+</pre></div><h4>Find webcams:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.webcams( count=10 , by={'country':'us'} )
-
+</pre></div>
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.webcams( count=10 , by={'type':'axis'} )
-
+</pre></div>
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.webcams( count=10 , by={'city':'paris'} )
-
+</pre></div>
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.webcams( count=10 , by={'timezone':'+00:00'} )
+</pre></div>
