@@ -480,7 +480,7 @@ II-Usage (General usage):
 </pre></div><h4>Checking proxy:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.proxy_check(IP , port , proto="http" , timeout=5)
-
+</pre></div>
 
 # IoTs mass scanning:
 
@@ -498,7 +498,7 @@ br>bane.mass_scan(threads=100 , protocol="mysql" , word_list= ["root:root","admi
 </pre></div><h4>Mass Android Debug Bridge (ADB) exploit:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.mass_scan(threads=100 , protocol="adb" )
-
+</pre></div>
 # Extract information from page:
 
 </pre></div><h4>Parse all forms in the page:</h4>
@@ -525,7 +525,7 @@ br>bane.mass_scan(threads=100 , protocol="mysql" , word_list= ["root:root","admi
 </pre></div><h4>Get all subdomains links on the page:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.subdomains_extract(link , timeout=10 )
-
+</pre></div>
 # Information gathering:
 
 </pre></div><h4>Get banner:</h4>
@@ -562,7 +562,7 @@ br>bane.mass_scan(threads=100 , protocol="mysql" , word_list= ["root:root","admi
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.subdomains_finder( domain )
 
-
+</pre></div>
 # Encryption & Hashing:
 
 </pre></div><h4>XOR:</h4>
