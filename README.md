@@ -97,15 +97,16 @@ pip install bane
 
 <br>or you can clone the project's link then run setup.py<br>
 
-<br>git clone https://github.com/AlaBouali/bane
+<div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">git clone https://github.com/AlaBouali/bane
 <br>cd bane
 <br>python setup.py install
+</pre></div>
 
 <br>to import it you just do:
 
 
-import bane
 
+<div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">import bane</pre></div>
 
 ---------------------------------------------------------------------------------------------------------------------------
 II-Usage (General usage):
