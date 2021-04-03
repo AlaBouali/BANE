@@ -304,7 +304,7 @@ def set_login_form(url,text,username,password):
  for x in a["inputs"]:
   if x["type"].lower().strip()=="password":
    d.update({x["name"]:password})
-  elif x["type"].lower().strip()=="text" or x["type"].lower().strip()=="email":
+  elif x["type"].lower().strip()=="text" or x["type"].lower().strip()=="email" or x["type"].lower().strip()=="tel":
    d.update({x["name"]:username})
   else:
    d.update({x["name"]:x["value"]})

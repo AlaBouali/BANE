@@ -150,7 +150,6 @@ class web_login_bruteforce:
   if cookies:
    h.update({"Cookie":cookies})
   d=form[0]
-  print(d)
   try:
    r=requests.post(form[1],data=d,headers=h,verify=False,proxies=proxy, timeout=timeout)
   except:
