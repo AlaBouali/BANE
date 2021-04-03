@@ -662,10 +662,17 @@ II-Usage (General usage):
 
 # Bruteforcing:
 
-</pre></div><h4>Admin panel on web page:</h4>
+</pre></div><h4>Admin login form on web page:</h4>
 
-<div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.admin_brute_force(link , word_list=["admin:admin","admin:1234"] , timeout=15 )
-</pre></div><h4>FTP server:</h4>
+<div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.web_login_bruteforce(link , word_list=["admin:admin","admin:1234"] , timeout=15 )
+</pre></div>
+
+<h4>Bruteforce HTTP authentication login:</h4>
+
+<div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.http_auth_bruteforce(link , word_list=["admin:admin","admin:1234"] , timeout=15 )
+</pre></div>
+
+<h4>FTP server:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.hydra(IP , protocol="ftp" , word_list=["admin:admin","admin:1234"] , timeout=5 )
 </pre></div><h4>SSH server: (if you are on windows, please install Putty)</h4>
