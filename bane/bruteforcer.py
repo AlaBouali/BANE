@@ -1,8 +1,8 @@
-import requests,random,smtplib,telnetlib,sys,os,hashlib,base64,subprocess,time,xtelnet,os,threading,loginform
+import requests,random,smtplib,telnetlib,sys,os,hashlib,base64,subprocess,time,xtelnet,os,threading
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from ftplib import FTP
-from bane.payloads import *
+from .payloads import *
 if os.path.isdir('/data/data')==True:
     adr=True
 if os.path.isdir('/data/data/com.termux/')==True:
@@ -11,6 +11,7 @@ import mysqlcp
 from .pager import *
 from .wp import wpadmin
 from .hasher import *
+from .pager import *
 
 class http_auth_bruteforce:
  __slots__=["logs","stop","finish","result"]
@@ -144,19 +145,18 @@ class web_login_bruteforce:
     cookies+=" ; "+cook
    else:
     cookies=cook
-  form=loginform.fill_login_form(url, r.text.encode('utf-8','ignore'), username, password)
+  form=set_login_form(url, r.text.encode('utf-8','ignore'), username, password)
   h={"User-Agent":user_agent}
   if cookies:
    h.update({"Cookie":cookies})
-  d={}
-  for x in form[0]:
-   d.update({x[0]:x[1]})
+  d=form[0]
+  print(d)
   try:
    r=requests.post(form[1],data=d,headers=h,verify=False,proxies=proxy, timeout=timeout)
   except:
    return False
   try:
-   loginform.fill_login_form(url, r.text.encode('utf-8','ignore'), username, password)
+   set_login_form(url, r.text.encode('utf-8','ignore'), username, password)
    return False
   except:
    return True

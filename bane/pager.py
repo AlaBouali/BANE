@@ -231,6 +231,85 @@ def forms_parser(u,user_agent=None,timeout=10,bypass=False,proxy=None,cookie=Non
   pass
  return fom
 
+def forms_parser_text(u,text):
+ '''
+   same as "forms" function but it return detailed information about all forms in a given page
+ '''
+ if urlparse(u).path=='':
+  u+="/"
+ l=[]
+ fom=[]
+ try:
+  c=text
+  soup= BeautifulSoup(c,'html.parser')
+  i=soup.find_all('form')
+  for f in i:
+   ac=f.get('action')
+   if not ac:
+    ac=u
+   """if len(ac)==0:
+    ac=u
+   if ac[0]=="/":
+    url_o="/".join(u.split('/')[:-1])
+    ac=url_o+ac
+   if ac[:4]!="http":
+    url_o="/".join(u.split('/')[:-1])
+    ac=url_o+"/"+ac"""
+   if ("://" not in ac):
+      ur=u[:u.rfind('/')]
+      if ac[0]=="/":
+       ac=ac[1:len(ac)]
+      ac=ur+"/"+ac
+   me=f.get('method')
+   if not me :
+    me="get"
+   if len(me)==0:
+    me="get"
+   me=me.lower()
+   p=f.find_all('textarea')
+   for r in p: 
+    if r.has_attr('name'):
+     s=r.get("name")
+     v=r.get("value",'')
+     typ=r.get("type","text")
+     y={"name":s,"value":v,"type":typ}
+     if y not in l:
+      l.append(y)
+   p=f.find_all('input')
+   for r in p: 
+    if r.has_attr('name'):
+     s=r.get("name")
+     v=r.get("value",'')
+     typ=r.get("type","text")
+     y={"name":s,"value":v,"type":typ}
+     if y not in l:
+      l.append(y)
+   fom.append({'inputs':l,'action':ac,'method':me}) 
+   l=[]
+ except Exception as e:
+  pass
+ return fom
+
+def get_login_form(url,text):
+ a=forms_parser_text(url,text)
+ for x in a:
+  for i in x["inputs"]:
+   if i["type"].lower().strip()=="password":
+    return x
+ raise Exception('No login form')
+
+def set_login_form(url,text,username,password):
+ a=get_login_form(url,text)
+ d={}
+ for x in a["inputs"]:
+  if x["type"].lower().strip()=="password":
+   d.update({x["name"]:password})
+  elif x["type"].lower().strip()=="text" or x["type"].lower().strip()=="email":
+   d.update({x["name"]:username})
+  else:
+   d.update({x["name"]:x["value"]})
+ return [d,a["action"]]
+
 
 def crawl(u,timeout=10,user_agent=None,bypass=False,proxy=None,cookie=None):
  '''
