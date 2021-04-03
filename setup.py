@@ -32,24 +32,24 @@ if termux==False:
 #protobuf==3.6.1
 
 if  sys.version_info < (3,0):
- req=["loginform","furl","future","xtelnet","requests","PySocks","bs4","mysqlcp","scapy","stem","cfscrape","google","colorama","dnspython"]
+ req=["furl","future","xtelnet","requests","PySocks","bs4","mysqlcp","scapy","stem","cfscrape","google","colorama","dnspython"]
  if adr==True:
-    req=["loginform","furl","future","xtelnet","requests","PySocks","bs4","mysqlcp","cfscrape","scapy","google","colorama","dnspython"]
+    req=["furl","future","xtelnet","requests","PySocks","bs4","mysqlcp","cfscrape","scapy","google","colorama","dnspython"]
  if termux==True:
-    req=["loginform","furl","future","xtelnet","requests","PySocks","bs4","mysqlcp","scapy","cfscrape","google","colorama","dnspython"]
+    req=["furl","future","xtelnet","requests","PySocks","bs4","mysqlcp","scapy","cfscrape","google","colorama","dnspython"]
 else:
- req=["loginform","furl","future","xtelnet","requests","PySocks","bs4","mysqlcp","kamene==0.32","stem","cfscrape","google","colorama","dnspython"]
+ req=["furl","future","xtelnet","requests","PySocks","bs4","mysqlcp","kamene==0.32","stem","cfscrape","google","colorama","dnspython"]
  if adr==True:
-    req=["loginform","furl","future","xtelnet","requests","PySocks","bs4","mysqlcp","cfscrape","kamene==0.32","google","colorama","dnspython"]
+    req=["furl","future","xtelnet","requests","PySocks","bs4","mysqlcp","cfscrape","kamene==0.32","google","colorama","dnspython"]
  if termux==True:
-    req=["loginform","furl","future","xtelnet","requests","PySocks","bs4","mysqlcp","kamene==0.32","cfscrape","google","colorama","dnspython"]
+    req=["furl","future","xtelnet","requests","PySocks","bs4","mysqlcp","kamene==0.32","cfscrape","google","colorama","dnspython"]
 if (sys.platform == "win32") or( sys.platform == "win64"):
  req+=["win_inet_pton"]
 
 
 setuptools.setup(
     name="bane",
-    version="4.6.0",
+    version="4.6.3",
     author="AlaBouali",
     author_email="trap.leader.123@gmail.com",
     description="cyber security library",
