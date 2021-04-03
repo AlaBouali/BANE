@@ -869,6 +869,31 @@ def clickjacking(u,proxy=None,timeout=10,user_agent=None,cookie=None,debug=False
  return click
 
 
+def hsts(u,proxy=None,timeout=10,user_agent=None,cookie=None,debug=False):
+ if proxy:
+  proxy={'http':'http://'+proxy}
+ if user_agent:
+   us=user_agent
+ else:
+   us=random.choice(ua)
+ if cookie:
+    heads={'User-Agent': us,'Cookie':cookie}
+ else:
+   heads={'User-Agent': us}
+ if '://' in u:
+  u=u.split('://')[1]
+ try:
+  r=requests.get('https://'+u,headers=heads,proxies=proxy,timeout=timeout,verify=False).headers
+  hs=True
+  for x in r:
+   if x.lower().strip()=='strict-transport-security':
+     hs=False
+   if debug==True:
+    print(x+" : "+r[x])
+ except Exception as e:
+  return False
+ return hs
+
 
 def csrf(u,proxy=None,timeout=10,user_agent=None,cookie=None):
  if not cookie or len(cookie.strip())==0:
