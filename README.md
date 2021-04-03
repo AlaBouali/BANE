@@ -407,7 +407,16 @@ II-Usage (General usage):
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.clickjacking(link, timeout=15 )
 
-</pre></div><h4>CORS Misconfigurations:</h4>
+</pre></div>
+
+</pre></div><h4>HTTP Strict Transport Security (HSTS):</h4>
+
+<div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.hsts(link, timeout=15 )
+
+</pre></div>
+
+
+<h4>CORS Misconfigurations:</h4>
 
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">bane.cors_misconfigurations(link, timeout=15 )
 
