@@ -895,20 +895,27 @@ def hsts(u,proxy=None,timeout=10,user_agent=None,cookie=None,debug=False):
  return hs
 
 
-def csrf(u,proxy=None,timeout=10,user_agent=None,cookie=None):
+def csrf(u,proxy=None,timeout=10,logs=True,user_agent=None,cookie=None):
  if not cookie or len(cookie.strip())==0:
   raise Exception("This attack requires authentication !! You need to set a Cookie")
  res={"Vulnerable":[],"Safe":[]}
  f=forms_parser(u,timeout=timeout,user_agent=user_agent,cookie=cookie,proxy=proxy)
  for x in f:
   vuln=True
+  print(Fore.BLUE+"Form: "+Fore.WHITE+str(f.index(x))+Fore.BLUE+"\nAction: "+Fore.WHITE+x['action']+Fore.BLUE+"\nMethod: "+Fore.WHITE+x['method']+Style.RESET_ALL)
   for y in x["inputs"]:
+   print("Name: {} | Type: {} | Value: {}".format(y["name"],y["type"],y["value"]))
    if y["type"].lower()=="hidden":
     vuln=False
-    break
   if vuln==True:
+   colr=Fore.GREEN
+   if logs==True:
+    print (colr+"[+] Vulnerable"+Style.RESET_ALL)
    res["Vulnerable"].append(x)
   else:
+   colr=Fore.RED
+   if logs==True:
+    print (colr+"[-] Not vulnerable"+Style.RESET_ALL)
    res["Safe"].append(x)
  return res
 
