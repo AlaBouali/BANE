@@ -290,6 +290,47 @@ def forms_parser_text(u,text):
   pass
  return fom
 
+
+
+def set_up_injection(url,form_index,parameter,payload,cookie,user_agent,proxy,timeout,auto_fill):
+  cookies=None
+  if proxy:
+   proxy={'http':'http://'+proxy}
+  h={"User-Agent":user_agent}
+  if cookie:
+   h.update({"Cookie":cookie})
+   cookies=cookie
+  try:
+   r=requests.get(url,proxies=proxy,headers=h, verify=False, timeout=timeout)
+  except:
+   return False
+  cook=None
+  try:
+   cook=r.headers['Set-cookie']
+  except:
+   pass
+  if cook:
+   if cookies:
+    cookies+=" ; "+cook
+   else:
+    cookies=cook
+  form=forms_parser_text(url, r.text)[form_index]
+  h={"User-Agent":user_agent}
+  if cookies:
+   h.update({"Cookie":cookies})
+  return form_filler(form,parameter,payload,auto_fill=auto_fill),h,proxy,timeout
+  
+
+def form_filler(form,param,payload,auto_fill=10):
+ for x in form["inputs"]:
+   if x["name"].strip()==param:
+    x["value"]=payload
+   else:
+    if x["value"]=="":
+     for i in range(auto_fill):
+      x["value"]+=random.choice(lis)
+ return form
+
 def get_login_form(url,text):
  a=forms_parser_text(url,text)
  for x in a:
