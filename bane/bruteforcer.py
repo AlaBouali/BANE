@@ -680,3 +680,22 @@ class decrypt:
   self.finish=True
  def done(self):
   return self.finish
+  
+
+def process_threaded(a,check_interval=0.1):
+ while True:
+  try:
+   if a.done()==True:
+    return a.result
+   time.sleep(check_interval)
+  except KeyboardInterrupt:
+   a.stop=True
+   try:
+    return a.result
+   except:
+    pass
+   try:
+    return a.counter
+   except:
+    pass
+  

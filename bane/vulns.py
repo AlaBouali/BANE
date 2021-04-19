@@ -212,7 +212,7 @@ def xss(u,payload=None,unicode_random_level=0,js_function="alert",context_breake
      extr=[]
      l=[]
      for x in l1['inputs']:
-       if x["type"] in ["text","textarea","email","tel","search","url","password","number"]:#any input type that accept direct input from keyboard
+       if x["type"] in ["text","textarea","email","tel","search","url","password","number","select"]:#any input type that accept direct input from keyboard
         i=x["name"]
         parsed_form=set_up_injection(target_page,form_index,i,xp,cookie,setup_ua(user_agent),setup_proxy(proxy,proxies),timeout,fill_empty)
         xss_res=xss_submit(parsed_form,xp,debug=debug)
@@ -750,13 +750,26 @@ def csrf(u,proxy=None,timeout=10,logs=True,user_agent=None,cookie=None):
   raise Exception("This attack requires authentication !! You need to set a Cookie")
  res={"Vulnerable":[],"Safe":[]}
  f=forms_parser(u,timeout=timeout,user_agent=user_agent,cookie=cookie,proxy=proxy)
+ f1=forms_parser(u,timeout=timeout,user_agent=user_agent,cookie=cookie,proxy=proxy)
+ coun=-1
  for x in f:
+  coun+=1
   vuln=True
+  hd_v=False
   print(Fore.BLUE+"Form: "+Fore.WHITE+str(f.index(x))+Fore.BLUE+"\nAction: "+Fore.WHITE+x['action']+Fore.BLUE+"\nMethod: "+Fore.WHITE+x['method']+Style.RESET_ALL)
   for y in x["inputs"]:
    print("Name: {} | Type: {} | Value: {}".format(y["name"],y["type"],y["value"]))
    if y["type"].lower()=="hidden":
+    hd_v=True
+   if y["type"].lower()=="hidden" and any(ele in y["name"].lower() for ele in csrf_strings):#and y["value"]==f1f["inputs"][con]["value"]:
     vuln=False
+  if vuln==True:
+   if hd_v==True:#if there is no Anit-CSRF Tokens then we check if the Hidden fields can be predicted or not (keep their values or change them by request)
+    print(Fore.YELLOW+"[i] Validating hidden values' prediction..."+Style.RESET_ALL)
+    for i in x["hidden_values"]:
+     if len(x["hidden_values"][i])>0:
+      if x["hidden_values"][i]!=f1[coun]["hidden_values"][i]:
+       vuln=False
   if vuln==True:
    colr=Fore.GREEN
    if logs==True:
@@ -768,6 +781,7 @@ def csrf(u,proxy=None,timeout=10,logs=True,user_agent=None,cookie=None):
     print (colr+"[-] Not vulnerable"+Style.RESET_ALL)
    res["Safe"].append(x)
  return res
+
 
 
 def cors_reflection(u,proxy=None,timeout=10,user_agent=None,cookie=None,origin="www.evil-domain.com",debug=False):

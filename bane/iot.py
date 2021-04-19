@@ -44,7 +44,7 @@ class mass_scan:
   self.ip_range=ip_range
   self.timeout=timeout
   self.port=p
-  self.found=[]
+  self.result=[]
   self.file_name=file_name
   for x in range(threads):
    t=threading.Thread(target=self.scan)
@@ -77,7 +77,7 @@ class mass_scan:
       if q==True:
        res="adb:{}:{}".format(ip,self.port)
        write_file(res,self.file_name)
-       self.found.append(res)
+       self.result.append(res)
        if self.logs==True:
          print(res)
      else:
@@ -99,7 +99,7 @@ class mass_scan:
         if q==True:
          res="{}:{}:{}:{}:{}".format(self.protocol,ip,self.port,username,password)
          write_file(res,self.file_name)
-         self.found.append(res)
+         self.result.append(res)
          if self.logs==True:
           print(res)
          break

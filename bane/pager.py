@@ -8,6 +8,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import bs4
 from bs4 import BeautifulSoup
 from bane.payloads import *
+
 def inputs(u,value=False,timeout=10,user_agent=None,bypass=False,proxy=None,cookie=None):
  '''
    this function is to get the names and values of input fields on a given webpage to scan.
@@ -216,6 +217,7 @@ def forms_parser(u,user_agent=None,timeout=10,bypass=False,proxy=None,cookie=Non
      y={"name":s,"value":v,"type":typ}
      if y not in l:
       l.append(y)
+   h_v={}
    p=f.find_all('input')
    for r in p: 
     if r.has_attr('name'):
@@ -223,9 +225,21 @@ def forms_parser(u,user_agent=None,timeout=10,bypass=False,proxy=None,cookie=Non
      v=r.get("value",'')
      typ=r.get("type","text")
      y={"name":s,"value":v,"type":typ}
+     if typ.lower()=="hidden":
+      h_v.update({s:v})
      if y not in l:
       l.append(y)
-   fom.append({'inputs':l,'action':ac,'method':me}) 
+   p=f.find_all('select')
+   opts=[]
+   for r in p:
+    if r.has_attr('name'):
+     s=r.get("name")
+     for x in r.find_all('option'): 
+      opts.append(x.text)
+     y={"name":s,"value":opts,"type":"select"}
+     if y not in l:
+      l.append(y)
+   fom.append({'inputs':l,'action':ac,'method':me,"hidden_values":h_v}) 
    l=[]
  except Exception as e:
   pass
@@ -275,6 +289,7 @@ def forms_parser_text(u,text):
      y={"name":s,"value":v,"type":typ}
      if y not in l:
       l.append(y)
+   h_v={}
    p=f.find_all('input')
    for r in p: 
     if r.has_attr('name'):
@@ -282,9 +297,21 @@ def forms_parser_text(u,text):
      v=r.get("value",'')
      typ=r.get("type","text")
      y={"name":s,"value":v,"type":typ}
+     if typ.lower()=="hidden":
+      h_v.update({s:v})
      if y not in l:
       l.append(y)
-   fom.append({'inputs':l,'action':ac,'method':me}) 
+   p=f.find_all('select')
+   opts=[]
+   for r in p:
+    if r.has_attr('name'):
+     s=r.get("name")
+     for x in r.find_all('option'): 
+      opts.append(x.text)
+     y={"name":s,"value":opts,"type":"select"}
+     if y not in l:
+      l.append(y)
+   fom.append({'inputs':l,'action':ac,'method':me,"hidden_values":h_v}) 
    l=[]
  except Exception as e:
   pass
@@ -329,6 +356,13 @@ def form_filler(form,param,payload,auto_fill=10):
     if x["value"]=="":
      for i in range(auto_fill):
       x["value"]+=random.choice(lis)
+    if x["type"]=="select":
+     if len(x["value"])==0 or x["value"]=="":
+      x["value"]=""
+      for i in range(auto_fill):
+       x["value"]+=random.choice(lis)
+     else:
+      x["value"]=random.choice(x["value"])
  return form
 
 def get_login_form(url,text):
@@ -398,7 +432,8 @@ def crawl(u,timeout=10,user_agent=None,bypass=False,proxy=None,cookie=None):
    u=ur
    if a.has_attr('href'):
     try:
-     txt=str(a).split('>')[1].split('<')[0].strip()
+     txt=a.text
+     print(str(a))
      a=str(a['href'])
      if ("://" not in a):
       if a[0]=="/":
@@ -458,8 +493,8 @@ def media(u,timeout=10,user_agent=None,bypass=False,proxy=None,cookie=None):
   ur=ul.replace("www.",'') 
   for a in soup.findAll('a'):
    try:
-    if a.has_attr('href') and (u not in str(a)) and (ur not in str(a)) and ("://" in str(a)) :
-     txt=str(a).split('>')[1].split('<')[0].strip()
+    if a.has_attr('href') and (u not in a['href']) and (ur not in a['href']) and (a['href'][:4]=="http") :
+     txt=a.text
      if a["href"] not in h:
       h.update({txt:a["href"]})
    except:
@@ -494,7 +529,7 @@ def subdomains_extract(u,timeout=10,user_agent=None,bypass=False,proxy=None,cook
   us=random.choice(ua)
  if proxy:
   proxy={'http':'http://'+proxy}
- h=[]
+ h={}
  if cookie:
   hea={'User-Agent': us,'Cookie':cookie}
  else:
@@ -503,18 +538,16 @@ def subdomains_extract(u,timeout=10,user_agent=None,bypass=False,proxy=None,cook
   if bypass==True:
    u+='#'
   c=requests.get(u, headers = hea,proxies=proxy,timeout=timeout, verify=False).text
-  ul=u.split('://')[1].split('"')[0]
+  ul=u.split('://')[1].split('/')[0]
   soup = BeautifulSoup(c,"html.parser")
   for a in soup.findAll('a'):
-   if a.has_attr('href') and (ul.replace("www",'') in str(a)) and (u not in str(a)):
-    a=str(a)
+   if a.has_attr('href') and (ul.replace("www",'') in a['href']) and (ul not in a['href']) and (a['href'][:4]=="http"):
+    txt=a.text
     try:
-     a=a.split('://')[1].split('"')[0]
-     a=a.split('/')[0].split('"')[0]
-     if a not in h:
-      h.append(a)
+     hr=a['href'].split("://")[1].split("/")[0]
+     h.update({txt:hr})
     except Exception as e:
      pass
- except:
+ except Exception as e:
   pass
  return h

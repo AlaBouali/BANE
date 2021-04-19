@@ -129,12 +129,12 @@ def youtube_search(q,proxy=None,timeout=10):
   pass
  return l
 
-def web_cams(count=10,by={'country':'us'},timeout=10):
+def webcams(count=10,by={'country':'us'},timeout=10):
  a=0
  f={}
  x=1
  if by:
-  key=by.keys()[0].lower()
+  key=list(by.keys())[0]
   if key not in ['country','tag','city','timezone','type']:
    raise Exception('Your search must be in one of these categories: country, city, timezone, type, tag')
   value=by[key].lower()
@@ -160,4 +160,4 @@ def web_cams(count=10,by={'country':'us'},timeout=10):
   if len(f)>=int(count):
     break
   x+=1
- return {k: f[k] for k in f.keys()[:int(count)]}
+ return {k: f[k] for k in list(f.keys())[:int(count)]}
