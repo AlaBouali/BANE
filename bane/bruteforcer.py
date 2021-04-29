@@ -692,7 +692,7 @@ def process_threaded(a,check_interval=0.1):
     except:
      pass
     try:
-     return return a.counter
+     return a.counter
     except:
      return
    time.sleep(check_interval)
