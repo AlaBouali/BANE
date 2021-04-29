@@ -302,8 +302,7 @@ class force_browsing:
    logs: (set by default to: True) showing the process of the attack, you can turn it off by setting it to: False
    returning: (set by default to: False) return a list of the accessible link(s), to make the function return the list, set to: True
    mapping: (set by default to: True) find all possible links, to make stop if it has found 1 link just set it to: False
-   ext: (set by default to: "php") it helps you to find links with the given extention, cuurentky it supports only 3 extentions: "php", "asp"
-   and "aspx"( any other extention won't be used).  
+   ext: (set by default to: "php") it helps you to find links with the given extention, cuurentky it supports only 3 extentions: "php", "asp" and "aspx"( any other extention won't be used).  
 '''
   self.stop=False
   self.finish=False
