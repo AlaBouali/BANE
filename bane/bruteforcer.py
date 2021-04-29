@@ -472,7 +472,7 @@ def telnet(u,username,password,p=23,timeout=5):
   pass
  return False
 
-#why i used this code for ssh brute force instead of: pexpext/paramiko ? Well pexpect doesn't work on non-linux machines and paramiko gives a huuuuge numer of false positive results ! you will see, with this code there is no false positive brute force ;)
+#why i used this code for ssh brute force instead of: pexpext/paramiko ? Well pexpect doesn't work on non-linux machines and paramiko gives a huuuuge number of false positive results ! you will see, with this code there is no false positive brute force ;)
 
 def ssh(u,username,password,p=22,timeout=5,exchange_key=None):
  if os.name == 'nt':
@@ -526,6 +526,7 @@ def ftp_anon(ip,timeout=5):
   except Exception as e:
     pass
   return False
+
 def ftp(ip,username,password,timeout=5):
    try:
     i=False
@@ -535,6 +536,7 @@ def ftp(ip,username,password,timeout=5):
    except Exception as e:
     pass
    return False
+
 def mysql(u,username,password,timeout=5,p=3306):
  try:
   s=mysqlcp.session(u,username,password,timeout=timeout,port=p)
@@ -543,6 +545,7 @@ def mysql(u,username,password,timeout=5,p=3306):
  except Exception as e:
   pass
  return False
+
 class hydra:
  __slots__=["stop","finish","result","logs"]
  def __init__(self,u,p=22,protocol="ssh",word_list=[],logs=True,exchange_key=None,timeout=5,ehlo=False,helo=True,ttls=False,proxy=None,proxies=None):
@@ -680,12 +683,18 @@ class decrypt:
  def done(self):
   return self.finish
   
-
 def process_threaded(a,check_interval=0.1):
  while True:
   try:
    if a.done()==True:
-    return a.result
+    try:
+     return a.result
+    except:
+     pass
+    try:
+     return return a.counter
+    except:
+     return
    time.sleep(check_interval)
   except KeyboardInterrupt:
    a.stop=True
@@ -697,4 +706,3 @@ def process_threaded(a,check_interval=0.1):
     return a.counter
    except:
     pass
-  
