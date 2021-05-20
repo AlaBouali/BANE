@@ -184,8 +184,6 @@ class vse_flood:
  def kill(self):
   self.stop=True
   a=self.__dict__["counter"]
-  while(self.thread_count>0):
-   time.sleep(0.1)
   self.reset()
   return a
 
@@ -258,8 +256,6 @@ class tcp_flood:
  def kill(self):
   self.stop=True
   a=self.__dict__["counter"]
-  while(self.thread_count>0):
-   time.sleep(0.1)
   self.reset()
   return a
  
@@ -388,7 +384,6 @@ class http_spam:
  def kill(self):
   self.stop=True
   a=self.__dict__["counter"]
-  
   self.reset()
   return a
 
@@ -529,8 +524,6 @@ class prox_http_spam(threading.Thread):
  def kill(self):
   self.stop=True
   a=self.__dict__["counter"]
-  while(self.thread_count>0):
-   time.sleep(0.1)
   self.reset()
   return a
 
@@ -604,8 +597,6 @@ class torshammer:
  def kill(self):
   self.stop=True
   a=self.__dict__["counter"]
-  while(self.thread_count>0):
-   time.sleep(0.1)
   self.reset()
   return a
 
@@ -702,8 +693,6 @@ class prox_hammer:
  def kill(self):
   self.stop=True
   a=self.__dict__["counter"]
-  while(self.thread_count>0):
-   time.sleep(0.1)
   self.reset()
   return a
 
@@ -769,8 +758,6 @@ class xerxes:
  def kill(self):
   self.stop=True
   a=self.__dict__["counter"]
-  while(self.thread_count>0):
-   time.sleep(0.1)
   self.reset()
   return a
 
@@ -860,8 +847,6 @@ class prox_xerxes:
  def kill(self):
   self.stop=True
   a=self.__dict__["counter"]
-  while(self.thread_count>0):
-   time.sleep(0.1)
   self.reset()
   return a
   
@@ -963,8 +948,6 @@ class slow_read:
  def kill(self):
   self.stop=True
   a=self.__dict__["counter"]
-  while(self.thread_count>0):
-   time.sleep(0.1)
   self.reset()
   return a
    

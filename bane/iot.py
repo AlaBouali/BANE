@@ -36,7 +36,7 @@ def getip():
 '''
 
 class mass_scan:
- def __init__(self,file_name="results.txt",protocol="telnet",logs=True,threads=100,word_list=[],ip_range=None,timeout=7,p=23):
+ def __init__(self,file_name="results.csv",protocol="telnet",telnet_bots=True,logs=True,threads=100,word_list=[],ip_range=None,timeout=7,p=23):
   self.word_list=word_list
   self.logs=logs
   self.protocol=protocol.lower()
@@ -45,7 +45,10 @@ class mass_scan:
   self.timeout=timeout
   self.port=p
   self.result=[]
+  self.telnet_bots=telnet_bots
   self.file_name=file_name
+  if os.path.exists(self.file_name)==False:
+   write_file("protocol,ip,port,username,password",self.file_name)
   for x in range(threads):
    t=threading.Thread(target=self.scan)
    t.daemon=True
@@ -95,9 +98,12 @@ class mass_scan:
        try:
         username=x.split(':')[0]
         password=x.split(':')[1]
-        q=func(ip,username,password,timeout=self.timeout,p=self.port)
+        if self.protocol=="telnet" and self.telnet_bots==True:
+         q=func(ip,username,password,timeout=self.timeout,p=self.port,bot_mode=True)
+        else:
+         q=func(ip,username,password,timeout=self.timeout,p=self.port)
         if q==True:
-         res="{}:{}:{}:{}:{}".format(self.protocol,ip,self.port,username,password)
+         res="{},{},{},{},{}".format(self.protocol,ip,self.port,username,password)
          write_file(res,self.file_name)
          self.result.append(res)
          if self.logs==True:

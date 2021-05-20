@@ -394,11 +394,11 @@ def rce(u,payload_index=0,save_to_file="rce_report",injection={"command":"linux"
                     "perl":
                            {
                             "file":
-                                   [' open (fh, ">", "{}.txt") '],
+                                   [' open ( my $fh, ">", "{}.txt") '],
                             "time":
                                    [" sleep({}) "]
                            },
-                    "nodejs":
+                    "js":
                              {
                               "file":
                                      [" require('fs').createWriteStream('{}.txt', {flags: 'w'})  "],
@@ -764,7 +764,7 @@ def csrf(u,proxy=None,timeout=10,logs=True,user_agent=None,cookie=None):
    if y["type"].lower()=="hidden" and any(ele in y["name"].lower() for ele in csrf_strings):#and y["value"]==f1f["inputs"][con]["value"]:
     vuln=False
   if vuln==True:
-   if hd_v==True:#if there is no Anit-CSRF Tokens then we check if the Hidden fields can be predicted or not (keep their values or change them by request)
+   if hd_v==True:#if there is no Anti-CSRF Tokens then we check if the Hidden fields can be predicted or not (keep their values or change them by request)
     print(Fore.YELLOW+"[i] Validating hidden values' prediction..."+Style.RESET_ALL)
     for i in x["hidden_values"]:
      if len(x["hidden_values"][i])>0:

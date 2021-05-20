@@ -212,8 +212,8 @@ def forms_parser(u,user_agent=None,timeout=10,bypass=False,proxy=None,cookie=Non
    for r in p: 
     if r.has_attr('name'):
      s=r.get("name")
-     v=r.get("value",'')
-     typ=r.get("type","text")
+     v=r.renderContents().split('</textarea>')[0]
+     typ=r.get("type","textarea")
      y={"name":s,"value":v,"type":typ}
      if y not in l:
       l.append(y)
@@ -284,8 +284,8 @@ def forms_parser_text(u,text):
    for r in p: 
     if r.has_attr('name'):
      s=r.get("name")
-     v=r.get("value",'')
-     typ=r.get("type","text")
+     v=r.renderContents().split('</textarea>')[0]
+     typ=r.get("type","textarea")
      y={"name":s,"value":v,"type":typ}
      if y not in l:
       l.append(y)
