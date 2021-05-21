@@ -64,7 +64,7 @@ class http_auth_bruteforce:
     return
   except:
    if self.logs==True:
-     print("Server doesn't support this type of authentication")
+     print("bane doesn't support this type of authentication")
    self.finish=True
    return
   for x in word_list:
