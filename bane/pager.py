@@ -121,7 +121,6 @@ def forms(u,value=True,user_agent=None,timeout=10,bypass=False,proxy=None,cookie
       ur=u[:u.rfind('/')]
       if ac[0]=="/":
        ac=ac[1:len(ac)]
-       print(ac)
       ac=ur+"/"+ac
    me=f.get('method')
    if not me :
@@ -433,7 +432,6 @@ def crawl(u,timeout=10,user_agent=None,bypass=False,proxy=None,cookie=None):
    if a.has_attr('href'):
     try:
      txt=a.text
-     print(str(a))
      a=str(a['href'])
      if ("://" not in a):
       if a[0]=="/":
