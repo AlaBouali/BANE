@@ -78,7 +78,7 @@ class mass_scan:
      if self.protocol=="adb":
       q=adb_exploit(ip,timeout=self.timeout,p=self.port)
       if q==True:
-       res="adb:{}:{}".format(ip,self.port)
+       res="adb:{}:{}::".format(ip,self.port)
        write_file(res,self.file_name)
        self.result.append(res)
        if self.logs==True:

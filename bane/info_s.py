@@ -298,6 +298,31 @@ class port_scan:
     self.__dict__[x]=None
 
 
+def subdomains_crt(domain,timeout=120,user_agent=None,proxy=None):
+ if user_agent:
+  us=user_agent
+ else:
+  us=random.choice(ua)
+ if proxy:
+  proxy={'http':'http://'+proxy}
+ if "://" in domain:
+  domain=domain.split("://")[1].split('/')[0]
+ if "www." in domain:
+  domain=domain.replace('www.','')
+ try:
+  r=requests.get('https://crt.sh/?output=json&q=%25.'+domain,headers = {"User-Agent":us},proxies=proxy,timeout=timeout, verify=False).json()
+  a= [ x["name_value"].split('\\')[0] for x in r if ("*." not in x["name_value"])]
+  l= []
+  for x in a:
+   if "\n" in x:
+     l+=x.split("\n")
+   else:
+     l.append(x)
+  return list(dict.fromkeys(l))
+ except:
+  return [] 
+
+
 def subdomains_finder(u,process_check_interval=5,logs=True,requests_timeout=15,https=False):
   https_flag=0
   if (https==True) or('https://' in u):

