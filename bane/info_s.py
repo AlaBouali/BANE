@@ -147,7 +147,7 @@ def myip(proxy=None,proxy_type=None,timeout=15):
   pass
  return ''
 
-def who_is(u):
+def whois(u):
  try:
   r=requests.post('https://check-host.net/ip-info/whois',data={'host':u})
   a=r.text.split('\n\n')[0] 
@@ -174,12 +174,20 @@ def geoip(u,timeout=15,proxy=None):
  return {}
 
 
-def headers(u,timeout=10,logs=True,returning=False,proxy=None):
+def headers(u,timeout=10,user_agent=None,cookie=None,logs=True,returning=False,proxy=None):
+ if user_agent:
+   us=user_agent
+ else:
+   us=random.choice(ua)
+ if cookie:
+    heads={'User-Agent': us,'Cookie':cookie}
+ else:
+   heads={'User-Agent': us}
  try:
    if proxy:
     proxy={'http':'http://'+proxy}
    s=requests.session()
-   a=s.get(u,headers = {'User-Agent': random.choice(ua)} ,proxies=proxy,timeout=timeout).headers
+   a=s.get(u,headers = heads ,proxies=proxy,timeout=timeout).headers
  except Exception as ex:
    return None
  if logs==True:
@@ -213,8 +221,8 @@ def reverse_ip_lookup(u,timeout=10,logs=True,returning=False,proxy=None):
 def resolve(u,server='8.8.8.8',timeout=1,lifetime=1):
  o=[]
  r = dns.resolver.Resolver()
- r.timeout = 1
- r.lifetime = 1
+ r.timeout = timeout
+ r.lifetime = lifetime
  r.nameservers = [server]
  a = r.query(u)
  for x in a:
