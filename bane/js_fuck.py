@@ -1,3 +1,10 @@
+import re,random,sys
+
+def get_dict(d):
+ if  sys.version_info < (3,0):
+  return d.iteritems()
+ else:
+  return tuple(d.items())
 """
 P.S: I didn't write the following class but i find it very useful to encode XSS payloads. I would like to thank the guy who did it, good job bro <3
 """
@@ -306,13 +313,13 @@ class js_fuck(object):
         Calculates 0-9's encoded value and adds it to MAPPING
 
         '''
-        for number in xrange(10):
+        for number in range(10):
             output = '+[]'
 
             if number > 0:
                 output = '+!' + output
 
-            for i in xrange(number - 1):
+            for i in range(number - 1):
                 output = '+!+[]' + output
 
             if number > 1:
@@ -364,7 +371,7 @@ class js_fuck(object):
             if head > 0:
                 output = '+!' + output
 
-            for i in xrange(1, head):
+            for i in range(1, head):
                 output = '+!+[]' + output
 
             if head > 1:
@@ -372,7 +379,7 @@ class js_fuck(object):
 
             return re.sub(r'(\d)', digitReplacer, '+'.join([output] + values))
 
-        for i in xrange(self.MIN, self.MAX + 1):
+        for i in range(self.MIN, self.MAX + 1):
             character = chr(i)
             value = self.MAPPING[character]
 
@@ -384,10 +391,10 @@ class js_fuck(object):
             while value != original:
                 original = value
 
-                for key, val in self.CONSTRUCTORS.iteritems():
+                for key, val in get_dict(self.CONSTRUCTORS):
                     value = replace(r'\b' + key, val + '["constructor"]')
 
-                for key, val in self.SIMPLE.iteritems():
+                for key, val in get_dict(self.SIMPLE):
                     value = replace(key, val)
 
             value = replace(r'(\d\d+)', numberReplacer)
@@ -413,7 +420,7 @@ class js_fuck(object):
             # python 2 workaround for nonlocal
             findMissing.missing = {}
 
-            for key, value in self.MAPPING.iteritems():
+            for key, value in get_dict(self.MAPPING):
                 if re.findall(regex, value):
                     findMissing.missing[key] = value
                     done = True
