@@ -1,5 +1,11 @@
 import re,random,sys
 
+"""
+
+I've edited this script to be compatible with python2.X/3.X 
+
+"""
+
 def get_dict(d):
  if  sys.version_info < (3,0):
   return d.iteritems()
