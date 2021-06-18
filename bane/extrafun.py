@@ -17,13 +17,13 @@ def clear_file(w):
  f.close()
 
 
-def get_current_instances(module_type):
+def get_current_instances(instance_type):
  active=[]
  inactive=[]
  b=list(gc.get_objects())
  for x in b:
   try:
-   if 'bane.'+module_type in x.__repr__():
+   if 'bane.'+instance_type in x.__repr__():
     try:
      if x.done()==True:
       inactive.append(x)
