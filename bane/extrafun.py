@@ -1,4 +1,4 @@
-import cgi,requests,os,random,re,hashlib,urllib,sys,cfscrape,json
+import cgi,requests,os,random,re,hashlib,urllib,sys,cfscrape,json,gc
 from googlesearch import search
 from bane.payloads import ua
 from bane.hasher import *
@@ -15,6 +15,26 @@ def clear_file(w):
  with open(w,'w'):
      pass
  f.close()
+
+
+def get_current_instances(module_type):
+ active=[]
+ inactive=[]
+ b=list(gc.get_objects())
+ for x in b:
+  try:
+   if 'bane.'+module_type in x.__repr__():
+    try:
+     if x.done()==True:
+      inactive.append(x)
+     else:
+      active.append(x)
+    except:
+     pass
+  except:
+   pass 
+ return {"active":active,"inactive":inactive}
+
 
 def delete_file(w):
  if os.path.exists(w):
