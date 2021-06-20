@@ -74,7 +74,9 @@ def HTB_invitation():
 def facebook_id(u):
  try:
   r=requests.post('https://lookup-id.com/#',data={"fburl":u,"check":"Lookup"}).text
-  return r.split('<p id="code-wrap"><span id="code">')[1].split('<')[0]
+  fb_id= r.split('<p id="code-wrap"><span id="code">')[1].split('<')[0]
+  name=r.split('<p id="success"><b>Success!</b> If Facebook name is <em>')[1].split('</em>')[0]
+  return(fb_id,name)
  except:
   return None
 

@@ -317,6 +317,41 @@ def forms_parser_text(u,text):
  return fom
 
 
+def cookies_to_dict(cookies):
+  d={}
+  a=cookies.split(";")
+  for x in a:
+   if "=" in x:
+    d.update({x.split("=")[0].strip():x.split("=")[1].strip()})
+  return d
+
+def update_cookies(cookies,cook):
+ c1={}
+ c2={}
+ if cookies:
+  c1=cookies_to_dict(cookies)
+ if cook:
+  c2=cookies_to_dict(cook)
+ c2.update(c1)
+ cookie=""
+ for x in c2:
+  cookie+=x+"="+c2[x]+";"
+ return cookie
+
+def set_correct_cookies(new_cookies,cookie=None):
+ if not cookie:
+  cookie=""
+ if not new_cookies:
+  new_cookies=""
+ if cookie and len(cookie)>0:
+   if new_cookies and len(new_cookies)>0:
+    cookies=update_cookies(new_cookies,cookie)
+   else:
+    cookies=cookie
+ else:
+    cookies=new_cookies
+ return cookies
+
 
 def set_up_injection(url,form_index,parameter,payload,cookie,user_agent,proxy,timeout,auto_fill):
   cookies=None
@@ -335,14 +370,10 @@ def set_up_injection(url,form_index,parameter,payload,cookie,user_agent,proxy,ti
    cook=r.headers['Set-cookie']
   except:
    pass
-  if cook:
-   if cookies:
-    cookies+=" ; "+cook
-   else:
-    cookies=cook
+  cookies=set_correct_cookies(cook,cookie=cookie)
   form=forms_parser_text(url, r.text)[form_index]
   h={"User-Agent":user_agent}
-  if cookies:
+  if cookies and len(cookies.strip())>0:
    h.update({"Cookie":cookies})
   return form_filler(form,parameter,payload,auto_fill=auto_fill),h,proxy,timeout
   
