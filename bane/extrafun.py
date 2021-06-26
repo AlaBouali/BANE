@@ -71,14 +71,16 @@ def HTB_invitation():
  except:
   return None
 
-def facebook_id(u):
+def facebook_id(u,tries=10):
  try:
   r=requests.post('https://lookup-id.com/#',data={"fburl":u,"check":"Lookup"}).text
   fb_id= r.split('<p id="code-wrap"><span id="code">')[1].split('<')[0]
   name=r.split('<p id="success"><b>Success!</b> If Facebook name is <em>')[1].split('</em>')[0]
-  return(fb_id,name)
+  return(int(fb_id),name)
  except:
-  return None
+  if tries==0:
+   return None
+  return facebook_id(u,tries=tries-1)
 
 
 def google_dorking(q,max_results=100,language='en',start_from=1, stop_on=None,top_level_domain='com',pause=2):

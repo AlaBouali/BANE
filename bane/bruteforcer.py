@@ -144,11 +144,7 @@ class web_login_bruteforce:
    cook=r.headers['Set-cookie']
   except:
    pass
-  if cook:
-   if cookies:
-    cookies+=" ; "+cook
-   else:
-    cookies=cook
+  cookies=set_correct_cookies(cook,cookie=cookie)
   form=set_login_form(url, r.text.encode('utf-8','ignore'), username, password)
   h={"User-Agent":user_agent}
   if cookies:
