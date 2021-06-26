@@ -216,6 +216,7 @@ def xss(u,payload=None,unicode_random_level=0,js_function="alert",context_breake
         i=x["name"]
         parsed_form=set_up_injection(target_page,form_index,i,xp,cookie,setup_ua(user_agent),setup_proxy(proxy,proxies),timeout,fill_empty)
         xss_res=xss_submit(parsed_form,xp,debug=debug)
+        print(xss_res)
         if xss_res[0]==True:
           x="parameter: '"+i+"' => [+]Payload was found"
           vul.append((i,xss_res[1]))

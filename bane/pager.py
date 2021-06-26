@@ -185,6 +185,18 @@ def forms_parser(u,user_agent=None,timeout=10,bypass=False,proxy=None,cookie=Non
   soup= BeautifulSoup(c,'html.parser')
   i=soup.find_all('form')
   for f in i:
+   try:
+    tb_inputs=f.find_all('table')[0].find_all('input')
+   except:
+    tb_inputs=[]
+   try:
+    tb_textareas=f.find_all('table')[0].find_all('textarea')
+   except:
+    tb_textareas=[]
+   try:
+    tb_selects=f.find_all('table')[0].find_all('select')
+   except:
+    tb_selects=[]
    ac=f.get('action')
    if not ac:
     ac=u
@@ -207,17 +219,17 @@ def forms_parser(u,user_agent=None,timeout=10,bypass=False,proxy=None,cookie=Non
    if len(me)==0:
     me="get"
    me=me.lower()
-   p=f.find_all('textarea')
+   p=f.find_all('textarea')+tb_textareas
    for r in p: 
     if r.has_attr('name'):
      s=r.get("name")
-     v=r.renderContents().split('</textarea>')[0]
+     v=r.renderContents().decode().split('</textarea>')[0]
      typ=r.get("type","textarea")
      y={"name":s,"value":v,"type":typ}
      if y not in l:
       l.append(y)
    h_v={}
-   p=f.find_all('input')
+   p=f.find_all('input')+tb_inputs
    for r in p: 
     if r.has_attr('name'):
      s=r.get("name")
@@ -228,7 +240,7 @@ def forms_parser(u,user_agent=None,timeout=10,bypass=False,proxy=None,cookie=Non
       h_v.update({s:v})
      if y not in l:
       l.append(y)
-   p=f.find_all('select')
+   p=f.find_all('select')+tb_selects
    opts=[]
    for r in p:
     if r.has_attr('name'):
@@ -241,7 +253,7 @@ def forms_parser(u,user_agent=None,timeout=10,bypass=False,proxy=None,cookie=Non
    fom.append({'inputs':l,'action':ac,'method':me,"hidden_values":h_v}) 
    l=[]
  except Exception as e:
-  pass
+  print(e)
  return fom
 
 def forms_parser_text(u,text):
@@ -257,6 +269,18 @@ def forms_parser_text(u,text):
   soup= BeautifulSoup(c,'html.parser')
   i=soup.find_all('form')
   for f in i:
+   try:
+    tb_inputs=f.find_all('table')[0].find_all('input')
+   except:
+    tb_inputs=[]
+   try:
+    tb_textareas=f.find_all('table')[0].find_all('textarea')
+   except:
+    tb_textareas=[]
+   try:
+    tb_selects=f.find_all('table')[0].find_all('select')
+   except:
+    tb_selects=[]
    ac=f.get('action')
    if not ac:
     ac=u
@@ -279,17 +303,17 @@ def forms_parser_text(u,text):
    if len(me)==0:
     me="get"
    me=me.lower()
-   p=f.find_all('textarea')
+   p=f.find_all('textarea')+tb_textareas
    for r in p: 
     if r.has_attr('name'):
      s=r.get("name")
-     v=r.renderContents().split('</textarea>')[0]
+     v=r.renderContents().decode().split('</textarea>')[0]
      typ=r.get("type","textarea")
      y={"name":s,"value":v,"type":typ}
      if y not in l:
       l.append(y)
    h_v={}
-   p=f.find_all('input')
+   p=f.find_all('input')+tb_inputs
    for r in p: 
     if r.has_attr('name'):
      s=r.get("name")
@@ -300,7 +324,7 @@ def forms_parser_text(u,text):
       h_v.update({s:v})
      if y not in l:
       l.append(y)
-   p=f.find_all('select')
+   p=f.find_all('select')+tb_selects
    opts=[]
    for r in p:
     if r.has_attr('name'):
