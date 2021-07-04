@@ -155,7 +155,7 @@ def setup_ua(usra):
 
 
 
-def xss(u,payload=None,unicode_random_level=0,js_function="alert",context_breaker='">',save_to_file="xss_report",logs=True,fill_empty=10,proxy=None,proxies=None,timeout=10,user_agent=None,cookie=None,debug=False):
+def xss(u,payload=None,unicode_random_level=0,js_function="alert",context_breaker='">',save_to_file=None,logs=True,fill_empty=10,proxy=None,proxies=None,timeout=10,user_agent=None,cookie=None,debug=False):
   '''
    this function is for xss test with both POST and GET requests. it extracts the input fields names using the "inputs" function then test each input using POST and GET methods.
 
@@ -341,7 +341,7 @@ def exec_post(u,pl,delay=10,file_name="",based_on=("time",10),user_agent=None,ex
   
 
 
-def rce(u,payload_index=0,save_to_file="rce_report",injection={"command":"linux"},quote="",based_on="time",delay=10,show_warnings=True,target_form_action=None,ignore_values=False,fresh=True,logs=True,fill_empty=10,proxy=None,ignored_values=["anonymous user","..."],proxies=None,timeout=40,user_agent=None,cookie=None,debug=False,leave_empty=[]):
+def rce(u,payload_index=0,save_to_file=None,injection={"command":"linux"},quote="",based_on="time",delay=10,show_warnings=True,target_form_action=None,ignore_values=False,fresh=True,logs=True,fill_empty=10,proxy=None,ignored_values=["anonymous user","..."],proxies=None,timeout=40,user_agent=None,cookie=None,debug=False,leave_empty=[]):
   '''
    this function is for RCE test with both POST and GET requests. it extracts the input fields names using the "inputs" function then test each input using POST and GET methods.
 

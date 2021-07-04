@@ -9,7 +9,14 @@ import bs4
 from bs4 import BeautifulSoup
 from bane.payloads import *
 
-def inputs(u,value=False,timeout=10,user_agent=None,bypass=False,proxy=None,cookie=None):
+
+
+def remove_html_comments(text):
+ return re.sub(r"<!--(.|\s|\n)*?-->", "",text,flags=re.DOTALL)
+
+
+
+def inputs(u,html_comments=False,value=False,timeout=10,user_agent=None,bypass=False,proxy=None,cookie=None):
  '''
    this function is to get the names and values of input fields on a given webpage to scan.
 
@@ -46,6 +53,8 @@ def inputs(u,value=False,timeout=10,user_agent=None,bypass=False,proxy=None,cook
  l=[]
  try:
   c=requests.get(u, headers = hea,proxies=proxy,timeout=timeout, verify=False).text
+  if html_comments==False:
+   c=remove_html_comments(c)
   soup= BeautifulSoup(c,'html.parser')
   p=soup.find_all('textarea')
   for r in p: 
@@ -81,7 +90,7 @@ def inputs(u,value=False,timeout=10,user_agent=None,bypass=False,proxy=None,cook
   pass
  return l
 
-def forms(u,value=True,user_agent=None,timeout=10,bypass=False,proxy=None,cookie=None):
+def forms(u,value=True,html_comments=False,user_agent=None,timeout=10,bypass=False,proxy=None,cookie=None):
  '''
    same as "inputs" function but it works on forms input fields only
  '''
@@ -103,6 +112,8 @@ def forms(u,value=True,user_agent=None,timeout=10,bypass=False,proxy=None,cookie
  fom=[]
  try:
   c=requests.get(u, headers = hea,proxies=proxy,timeout=timeout, verify=False).text
+  if html_comments==False:
+   c=remove_html_comments(c)
   soup= BeautifulSoup(c,'html.parser')
   i=soup.find_all('form')
   for f in i:
@@ -160,7 +171,7 @@ def forms(u,value=True,user_agent=None,timeout=10,bypass=False,proxy=None,cookie
   pass
  return fom
 
-def forms_parser(u,user_agent=None,timeout=10,bypass=False,proxy=None,cookie=None):
+def forms_parser(u,html_comments=False,user_agent=None,timeout=10,bypass=False,proxy=None,cookie=None):
  '''
    same as "forms" function but it return detailed information about all forms in a given page
  '''
@@ -182,6 +193,8 @@ def forms_parser(u,user_agent=None,timeout=10,bypass=False,proxy=None,cookie=Non
  fom=[]
  try:
   c=requests.get(u, headers = hea,proxies=proxy,timeout=timeout, verify=False).text
+  if html_comments==False:
+   c=remove_html_comments(c)
   soup= BeautifulSoup(c,'html.parser')
   i=soup.find_all('form')
   for f in i:
@@ -256,7 +269,7 @@ def forms_parser(u,user_agent=None,timeout=10,bypass=False,proxy=None,cookie=Non
   print(e)
  return fom
 
-def forms_parser_text(u,text):
+def forms_parser_text(u,text,html_comments=False):
  '''
    same as "forms" function but it return detailed information about all forms in a given page
  '''
@@ -266,6 +279,8 @@ def forms_parser_text(u,text):
  fom=[]
  try:
   c=text
+  if html_comments==False:
+   c=remove_html_comments(c)
   soup= BeautifulSoup(c,'html.parser')
   i=soup.find_all('form')
   for f in i:
@@ -440,7 +455,7 @@ def set_login_form(url,text,username,password):
  return [d,a["action"]]
 
 
-def crawl(u,timeout=10,user_agent=None,bypass=False,proxy=None,cookie=None):
+def crawl(u,timeout=10,html_comments=False,user_agent=None,bypass=False,proxy=None,cookie=None):
  '''
    this function is used to crawl any given link and returns a list of all available links on that webpage with ability to bypass anti-crawlers
    
@@ -477,6 +492,8 @@ def crawl(u,timeout=10,user_agent=None,bypass=False,proxy=None,cookie=None):
   hea={'User-Agent': us}
  try:
   c=requests.get(u, headers = hea,proxies=proxy,timeout=timeout, verify=False).text
+  if html_comments==False:
+   c=remove_html_comments(c)
   soup = BeautifulSoup(c,"html.parser")
   ur=u.replace(u.split("/")[-1],'')
   """if ur[-1]=='/':
@@ -502,7 +519,7 @@ def crawl(u,timeout=10,user_agent=None,bypass=False,proxy=None,cookie=None):
   pass
  return h
 
-def media(u,timeout=10,user_agent=None,bypass=False,proxy=None,cookie=None):
+def media(u,timeout=10,html_comments=False,user_agent=None,bypass=False,proxy=None,cookie=None):
  '''
    this funtion was made to collect the social media links related to the targeted link (facebook, twitter, instagram...).
 
@@ -541,6 +558,8 @@ def media(u,timeout=10,user_agent=None,bypass=False,proxy=None,cookie=None):
   else:
    hea={'User-Agent': us}
   c=requests.get(u,headers = hea,proxies=proxy,timeout=timeout, verify=False).text
+  if html_comments==False:
+   c=remove_html_comments(c)
   soup = BeautifulSoup(c,"html.parser")
   ul=u.split('://')[1].split('"')[0]
   ur=ul.replace("www.",'') 
@@ -556,7 +575,7 @@ def media(u,timeout=10,user_agent=None,bypass=False,proxy=None,cookie=None):
   pass
  return h
 
-def subdomains_extract(u,timeout=10,user_agent=None,bypass=False,proxy=None,cookie=None):
+def subdomains_extract(u,timeout=10,html_comments=False,user_agent=None,bypass=False,proxy=None,cookie=None):
  '''
    this function collects the subdomains found on the targeted webpage.
 
@@ -591,6 +610,8 @@ def subdomains_extract(u,timeout=10,user_agent=None,bypass=False,proxy=None,cook
   if bypass==True:
    u+='#'
   c=requests.get(u, headers = hea,proxies=proxy,timeout=timeout, verify=False).text
+  if html_comments==False:
+   c=remove_html_comments(c)
   ul=u.split('://')[1].split('/')[0]
   soup = BeautifulSoup(c,"html.parser")
   for a in soup.findAll('a'):
