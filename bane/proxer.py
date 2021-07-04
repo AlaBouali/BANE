@@ -5,6 +5,12 @@ from bane.payloads import *
 from bane.pager import crawl
 
 def proxyscrape(protocol="http",timeout=10,country="all",ssl="all",anonymity="all"):
+ if protocol.lower() not in ("http","socks4","socks5","all"):
+  raise Exception('protocol value must be: "http" or "socks4" or "socks5" or "all"')
+ if ssl.lower() not in ("no","yes","all"):
+  raise Exception('protocol value must be: "no" or "yes" or "all"')
+ if anonymity.lower() not in ("elite","anonymous","transparent","all"):
+  raise Exception('protocol value must be: "elite" or "anonymous" or "transparent" or "all"')
  return requests.get("https://api.proxyscrape.com/v2/?request=getproxies&protocol="+protocol+"&timeout="+str(timeout*1000)+"&country="+country+"&ssl="+ssl+"&anonymity="+anonymity ,headers={"User-Agent":random.choice(ua)}).text.split('\r\n')
 
 def masshttp(count=None,timeout=15):
