@@ -3,6 +3,10 @@ import bs4
 from bs4 import BeautifulSoup
 from bane.payloads import *
 from bane.pager import crawl
+
+def proxyscrape(protocol="http",timeout=10,country="all",ssl="all",anonymity="all"):
+ return requests.get("https://api.proxyscrape.com/v2/?request=getproxies&protocol=all&timeout=10000&country=all&ssl=all&anonymity=all",headers={"User-Agent":random.choice(ua)}).text.split('\r\n')
+
 def masshttp(count=None,timeout=15):
  '''
    this function gather up thousands of HTTP / HTTPS proxies from www.proxyserverlist24.top and proxy-daily.com
